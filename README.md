@@ -53,6 +53,26 @@ Aplikasi ini dibangun menggunakan TALL Stack (Tailwind, Alpine.js, Laravel, Live
 
 ---
 
+## 🏷️ Sistem & Alur Kerja Barcode
+
+Sistem ini terintegrasi penuh dengan kode batang (**Barcode**) untuk meminimalkan human-error. Barcode digunakan di dua sisi utama: **Generasi Barcode (Output)** dan **Pemindaian Barcode (Input/Scanning)**.
+
+### 1. Engine Generator Barcode (`Barcode128`)
+Aplikasi ini memiliki library internal khusus [Barcode128.php](file:///c:/laragon/www/WMSLaf/app/Helpers/Barcode128.php) yang menghasilkan visualisasi barcode berbasis standar industri **Code 128 Type B**:
+*   **Modulo-103 Checksum**: Sistem secara dinamis menghitung bit checksum untuk memastikan keakuratan data ketika dipindai oleh alat scan fisik.
+*   **Format Output SVG**: Barcode dirender secara murni menggunakan format SVG (Scalable Vector Graphics) tanpa memerlukan dependensi eksternal atau API internet, sehingga proses loading instan dan aman.
+*   **Tag Produk Premium**: Selain barcode polos, engine ini dapat menghasilkan label tag gantung siap cetak yang memuat nama produk, varian/ukuran, garis pemisah artistik, serta barcode yang terpusat secara presisi (*centered layout*).
+
+### 2. Cara Kerja Sistem Pemindaian Barcode (Scanning Workflow)
+Sistem dirancang untuk mendukung pemindaian berkelanjutan secara hands-free menggunakan **Hardware Barcode Scanner USB / Bluetooth**:
+*   **Keyboard Emulation Capture**: Alat scanner fisik bertindak sebagai keyboard eksternal yang mengetikkan karakter secara sangat cepat diakhiri tombol `Enter`.
+*   **Alpine.js & Livewire Hook**: Antarmuka input menggunakan direktif Alpine.js (`x-on:keydown.enter.prevent`) untuk mendeteksi penekanan tombol `Enter` secara langsung, mencegah reload halaman, lalu memicu method Livewire `$wire.addBarcodeItem()` atau `processBarcodeScan()`.
+*   **Alur Logika Bisnis Scan**:
+    *   **Inbound & Outbound**: Operator cukup mengarahkan kursor ke kolom scan dan memindai barcode produk secara beruntun. Setiap scan yang sukses otomatis menambah jumlah (*qty*) produk sebanyak +1 di daftar transaksi dan memicu bunyi suara **Beep** (`play-beep`).
+    *   **Stock Opname / Audit**: Auditor memindai barcode lokasi (contoh: `GDG-A01`) terlebih dahulu untuk mengunci lokasi rak, kemudian memindai produk di rak tersebut. Jika salah memindai lokasi yang tidak sesuai dengan sesi aktif, sistem akan menolak dan memicu suara peringatan **Buzzer** (`play-error-buzzer`).
+
+---
+
 ## 📈 Dampak Penerapan Aplikasi (Business Impact)
 
 *   **Akurasi Stok Meningkat Drastis (>99%):** Eliminasi kesalahan input manual melalui digitalisasi penuh dan verifikasi scan barcode pada setiap titik perpindahan barang.
