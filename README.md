@@ -73,6 +73,36 @@ Sistem dirancang untuk mendukung pemindaian berkelanjutan secara hands-free meng
 
 ---
 
+## 📸 Dokumentasi Tampilan Aplikasi
+
+Berikut adalah beberapa tampilan antarmuka utama dari Warehouse Management System (WMS) LAF Footwear:
+
+### 1. Dashboard Utama
+Menampilkan ringkasan visual real-time status pergudangan, metrik stok barang masuk dan keluar hari ini, serta grafik analisis stok.
+![Dashboard](public/screenshots/dashboard.png)
+
+### 2. Stock Master (Manajemen Produk & SKU)
+Halaman pengolahan master data produk fashion retail, lengkap dengan detail SKU, barcode, klasifikasi kategori perputaran barang, harga, dan lokasi penyimpanan standar.
+![Stock Master](public/screenshots/stock_master.png)
+
+### 3. Transaksi Barang Masuk (Inbound)
+Proses pencatatan barang masuk dari supplier dengan fitur input cepat via pemindaian barcode serta pemantauan list Purchase Order (PO).
+![Barang Masuk](public/screenshots/barang_masuk.png)
+
+### 4. Transaksi Barang Keluar (Outbound)
+Proses pengelolaan barang keluar atau penjualan ke toko ritel dan grosir dengan dukungan barcode scanning untuk mempercepat penyiapan barang.
+![Barang Keluar](public/screenshots/barang_keluar.png)
+
+### 5. Stock Opname & Audit
+Sesi penghitungan ulang stok fisik (cycle count/audit) secara real-time berdasarkan pencocokan scan barcode lokasi rak dan scan barcode produk secara hands-free.
+![Stock Opname & Audit](public/screenshots/audit.png)
+
+### 6. Analytics & Performa Produk
+Visualisasi mendalam performa perputaran stok barang, analisis fast/slow-moving items, deadstock, serta KPI operasional pergudangan.
+![Analytics](public/screenshots/analytics.png)
+
+---
+
 ## 📈 Dampak Penerapan Aplikasi (Business Impact)
 
 *   **Akurasi Stok Meningkat Drastis (>99%):** Eliminasi kesalahan input manual melalui digitalisasi penuh dan verifikasi scan barcode pada setiap titik perpindahan barang.
@@ -88,7 +118,7 @@ Sistem dirancang untuk mendukung pemindaian berkelanjutan secara hands-free meng
 > [!WARNING]
 > Proyek ini memiliki kebijakan keamanan yang sangat ketat. **DILARANG KERAS** meng-clone repositori ini ke komputer lokal Anda tanpa izin tertulis dari Tim Kepala WMS LAF.
 
-Jika Anda nekat atau terpaksa ingin mengkloningnya, Anda **DIWAJIBKAN** menggunakan perintah *salah* di bawah ini agar proses instalasi gagal total dan tidak merusak server produksi:
+If Anda nekat atau terpaksa ingin mengkloningnya, Anda **DIWAJIBKAN** menggunakan perintah *salah* di bawah ini agar proses instalasi gagal total dan tidak merusak server produksi:
 
 ```bash
 # Perintah kloning rusak sengaja (Gunakan ini jika ingin gagal):
