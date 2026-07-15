@@ -1,0 +1,47 @@
+Berdasarkan arsitektur WMS LAF Footwear berbasis **TALL Stack (Laravel + Livewire)** yang telah dibangun saat ini dan ketentuan di file **PRD**, berikut adalah analisis mendalam mengenai titik-titik rawan error (integritas data) dan bottleneck performa (operasi yang memberatkan server).
+
+---
+
+### A. POTENSI ERROR (Kerawanan Integritas Data & Bugs)
+
+#### 1. Race Condition saat Transaksi Bersamaan (Concurrency)
+* **Kondisi**: Gudang fashion sering kali memiliki beberapa operator yang melakukan scan/input barang secara bersamaan.
+* **Kerawanan**: Di `StockEngineService::tambahBarangKeluar()`, pemeriksaan ketersediaan stok (`$stokTersedia < $qtyKeluar`) dilakukan dengan query standard. Jika dua operator memotong stok barang yang sama secara bersamaan (milidetik yang sama):
+  * Keduanya akan melihat stok masih cukup.
+  * Keduanya memproses transaksi.
+  * **Akibatnya**: Stok lokasi bisa menjadi **negatif**, atau database tidak sinkron dengan fisik.
+* **Solusi/Mitigasi**: Perlu menerapkan **Database Locks** (`lockForUpdate()`) tidak hanya pada model `Produk`, tetapi juga secara eksplisit pada query pencarian `StokLokasi`.
+
+#### 2. Kerusakan Nilai HPP pada Reversal / Ubah Transaksi
+* **Kondisi**: Ketika admin mengedit transaksi barang masuk yang sudah lama berlalu menggunakan metode *Reversal* (penarikan kembali stok & HPP).
+* **Kerawanan**: Di `StockEngineService::ubahBarangMasuk()`, HPP dihitung mundur menggunakan pembagian sisa nilai dengan total stok:
+  ```php
+  $produk->hpp = $nilaiSisa / $produk->total_stok;
+  ```
+  Jika setelah dikurangi transaksi tersebut stok produk di gudang menjadi `0`, akan terjadi error **Division by Zero** (pembagian dengan angka 0). Jika ada perbedaan harga yang ekstrem, nilai HPP bisa menjadi **negatif** secara tidak logis.
+
+#### 3. Bentrokan Alur Kerja Antara Picking dan Transaksi Keluar
+* **Kondisi**: Picking list dibuat ketika status transaksi `BarangKeluar` dibuat.
+* **Kerawanan**: Jika picking list sedang berjalan (*status: PICKING*), tetapi admin tiba-tiba mengubah atau menghapus tr
+<truncated 902 bytes>
+AM) dan CPU secara drastis setiap kali ada pengguna yang membuka dashboard. Dashboard akan terasa sangat lambat (*loading spinner* berputar lama).
+* **Solusi**: Hasil klasifikasi ABC sebaiknya disimpan sebagai cache (*caching*) atau dihitung secara berkala (misal tiap jam/hari) dan disimpan ke kolom khusus di database, bukan dihitung secara *real-time* di `render()` dashboard.
+
+#### 2. Query Berulang (N+1) pada Sinkronisasi Penjualan Bulanan (Analytics)
+* **Lokasi**: `app/Services/AnalyticsService.php` (Fungsi `recalculateAll()`)
+* **Masalah**: Fungsi ini melakukan looping untuk setiap produk di database, dan di dalam loop tersebut, mengeksekusi **12 query terpisah** (menggunakan `sum('qty_keluar')` per bulan) untuk mengambil data transaksi riil:
+  ```php
+  foreach ($months as $mNum => $mName) {
+      $sales[$mName] = (int) BarangKeluarDetail::where(...)
+          ->whereHas(...)
+          ->sum('qty_keluar');
+  }
+  ```
+* **Dampak**: Jika Anda memiliki **1.000 SKU**, fungsi ini akan menjalankan **12.000 query SQL** ke database secara berurutan! Ini akan membuat server MySQL mengalami *hang* atau *time-out*.
+* **Solusi**: Optimalkan query menggunakan `GROUP BY produk_id, MONTH(tanggal)` dalam satu query tunggal untuk menarik semua data penjualan bulanan sekaligus sebelum melakukan pemrosesan.
+
+#### 3. Beban Server Akibat Live-Search Livewire (`wire:model.live`)
+* **Lokasi**: Halaman Pencarian Produk / Transaksi.
+* **Masalah**: Penggunaan `wire:model.live` tanpa pembatasan atau indeks database yang tepat. Ketika operator mengetik nama barang (misal: "Sandal Slide Gorka"), setiap ketukan huruf akan mengirimkan request AJAX ke server dan melakukan query `LIKE` pada database.
+* **Dampak**: Jika beberapa operator mengetik bersamaan, server akan kebanjiran request AJAX yang mengakibatkan performa WMS melambat secara global.
+* **Solusi**: Selalu gunakan `.debounce.300ms` atau `.blur` untuk meminimalkan jumlah request, dan pastikan kolom pencarian seperti `nama_barang` dan `kode_barang` diberi **Database Index** di MySQL.
