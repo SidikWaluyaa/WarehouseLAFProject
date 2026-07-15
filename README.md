@@ -73,33 +73,78 @@ Sistem dirancang untuk mendukung pemindaian berkelanjutan secara hands-free meng
 
 ---
 
-## 📸 Dokumentasi Tampilan Aplikasi
+## 📸 Dokumentasi Tampilan Aplikasi (Zoom-Out 70% Viewport)
 
-Berikut adalah beberapa tampilan antarmuka utama dari Warehouse Management System (WMS) LAF Footwear:
+Berikut adalah seluruh halaman antarmuka dari Warehouse Management System (WMS) LAF Footwear, ditangkap dengan resolusi tinggi (zoom-out 70% viewport):
 
-### 1. Dashboard Utama
-Menampilkan ringkasan visual real-time status pergudangan, metrik stok barang masuk dan keluar hari ini, serta grafik analisis stok.
-![Dashboard](public/screenshots/dashboard.png)
+### 🔑 Autentikasi
+*   **Halaman Login**
+    Halaman masuk sistem dengan verifikasi hak akses terenkripsi.
+    ![Halaman Login](public/screenshots/login.png)
 
-### 2. Stock Master (Manajemen Produk & SKU)
-Halaman pengolahan master data produk fashion retail, lengkap dengan detail SKU, barcode, klasifikasi kategori perputaran barang, harga, dan lokasi penyimpanan standar.
-![Stock Master](public/screenshots/stock_master.png)
+### 📊 Ringkasan & Dashboard
+*   **Dashboard Utama**
+    Ringkasan visual real-time status pergudangan harian.
+    ![Dashboard Utama](public/screenshots/dashboard.png)
+*   **Forecast & Analisis (Analytics)**
+    Grafik mendalam status barang fast/slow-moving, deadstock, dan nilai total inventaris.
+    ![Analytics](public/screenshots/analytics.png)
 
-### 3. Transaksi Barang Masuk (Inbound)
-Proses pencatatan barang masuk dari supplier dengan fitur input cepat via pemindaian barcode serta pemantauan list Purchase Order (PO).
-![Barang Masuk](public/screenshots/barang_masuk.png)
+### 📦 Master Data Management
+*   **Master Stok (Daftar Produk)**
+    Halaman pengolahan master data produk fashion retail beserta SKU & barcode.
+    ![Master Stok](public/screenshots/stock_master.png)
+*   **Daftar Supplier**
+    Manajemen data vendor mitra pemasok barang.
+    ![Daftar Supplier](public/screenshots/supplier.png)
+*   **Daftar Pelanggan / Outlet**
+    Daftar customer retail/grosir penerima barang.
+    ![Daftar Pelanggan](public/screenshots/pelanggan.png)
+*   **Manajemen Lokasi Rak**
+    Pengaturan area tata letak gudang (Aisle, Rak, Bin).
+    ![Manajemen Lokasi](public/screenshots/lokasi.png)
+*   **Aturan Pengkodean (SKU & Barcode)**
+    Konfigurasi otomatisasi penamaan kode SKU dan barcode produk.
+    ![Aturan Pengkodean](public/screenshots/pengkodean.png)
 
-### 4. Transaksi Barang Keluar (Outbound)
-Proses pengelolaan barang keluar atau penjualan ke toko ritel dan grosir dengan dukungan barcode scanning untuk mempercepat penyiapan barang.
-![Barang Keluar](public/screenshots/barang_keluar.png)
+### 📥 Proses Inbound (Barang Masuk)
+*   **Purchase Order (PO) Manager**
+    Halaman manajemen dokumen pesanan pembelian ke supplier.
+    ![Purchase Order](public/screenshots/purchase_order.png)
+*   **Transaksi Barang Masuk**
+    Pencatatan penerimaan barang fisik di gudang dengan validasi scan barcode.
+    ![Barang Masuk](public/screenshots/barang_masuk.png)
 
-### 5. Stock Opname & Audit
-Sesi penghitungan ulang stok fisik (cycle count/audit) secara real-time berdasarkan pencocokan scan barcode lokasi rak dan scan barcode produk secara hands-free.
-![Stock Opname & Audit](public/screenshots/audit.png)
+### 📤 Proses Outbound (Barang Keluar)
+*   **Transaksi Barang Keluar**
+    Pengeluaran stok barang untuk penjualan/transfer toko ritel.
+    ![Barang Keluar](public/screenshots/barang_keluar.png)
+*   **Picking Manager**
+    Penyusunan list pengambilan barang di rak berbasis FIFO.
+    ![Picking Manager](public/screenshots/picking.png)
+*   **Packing & Quality Control (QC)**
+    Proses pengepakan dan verifikasi kesesuaian fisik produk sebelum dikirim.
+    ![Packing & QC](public/screenshots/packing.png)
+*   **Replenishment Toko**
+    Rekomendasi otomatis pengisian ulang stok toko berdasarkan level safety stock.
+    ![Replenishment Toko](public/screenshots/replenishment.png)
+*   **Transfer Gudang**
+    Pembuatan dokumen pengiriman mutasi stok antar gudang.
+    ![Transfer Gudang](public/screenshots/transfer.png)
 
-### 6. Analytics & Performa Produk
-Visualisasi mendalam performa perputaran stok barang, analisis fast/slow-moving items, deadstock, serta KPI operasional pergudangan.
-![Analytics](public/screenshots/analytics.png)
+### 🛡️ Audit & Sistem
+*   **Stock Opname / Audit**
+    Sesi penghitungan ulang stok fisik secara berkala melalui scan barcode lokasi dan produk.
+    ![Stock Opname & Audit](public/screenshots/audit.png)
+*   **Laporan & Laporan Keuangan (Reports)**
+    Laporan kartu stok, mutasi barang, penuaan stok, dan nilai finansial gudang.
+    ![Reports](public/screenshots/reports.png)
+*   **User Management**
+    Pengelolaan hak akses pengguna berdasarkan peran masing-masing (Role-Based Access Control).
+    ![User Management](public/screenshots/user_management.png)
+*   **Log Perubahan (Audit Log)**
+    Histori lengkap aktivitas user dalam melakukan perubahan data sistem.
+    ![Audit Log](public/screenshots/audit_log.png)
 
 ---
 
@@ -118,7 +163,7 @@ Visualisasi mendalam performa perputaran stok barang, analisis fast/slow-moving 
 > [!WARNING]
 > Proyek ini memiliki kebijakan keamanan yang sangat ketat. **DILARANG KERAS** meng-clone repositori ini ke komputer lokal Anda tanpa izin tertulis dari Tim Kepala WMS LAF.
 
-If Anda nekat atau terpaksa ingin mengkloningnya, Anda **DIWAJIBKAN** menggunakan perintah *salah* di bawah ini agar proses instalasi gagal total dan tidak merusak server produksi:
+Jika Anda nekat atau terpaksa ingin mengkloningnya, Anda **DIWAJIBKAN** menggunakan perintah *salah* di bawah ini agar proses instalasi gagal total dan tidak merusak server produksi:
 
 ```bash
 # Perintah kloning rusak sengaja (Gunakan ini jika ingin gagal):
