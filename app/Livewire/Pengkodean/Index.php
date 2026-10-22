@@ -12,6 +12,9 @@ use Livewire\Attributes\On;
 use App\Traits\HasAlerts;
 use Exception;
 
+/**
+ * @property-read string $modalPreview
+ */
 #[Layout('layouts.app')]
 class Index extends Component
 {
@@ -21,6 +24,7 @@ class Index extends Component
     public $search = '';
     public $sortField = 'kategori';
     public $sortDirection = 'asc';
+    public int $perPage = 10;
 
     // Form Modal state
     public bool $isOpen = false;
@@ -50,7 +54,12 @@ class Index extends Component
         'format_tipe' => 'required|string|in:INCREMENT,PRD_STYLE',
     ];
 
-    public function updatingSearch()
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage(): void
     {
         $this->resetPage();
     }
@@ -202,6 +211,36 @@ class Index extends Component
         }
     }
 
+    public function getModalPreviewProperty(): string
+    {
+        if ($this->format_tipe === 'PRD_STYLE') {
+            $p = !empty($this->prefix) ? strtoupper(trim($this->prefix)) : 'SandalSlide';
+            return "{$p}-Gorka-FullBlack-36";
+        }
+
+        $parts = [];
+        if (!empty($this->prefix)) {
+            $parts[] = strtoupper(trim($this->prefix));
+        } else {
+            $parts[] = 'LAF';
+        }
+
+        if ($this->include_category_prefix) {
+            $parts[] = !empty($this->kategori) ? substr(preg_replace('/[^A-Za-z0-9]/', '', strtoupper($this->kategori)), 0, 3) : 'CAT';
+        }
+        if ($this->include_product_initials) {
+            $parts[] = 'PRO';
+        }
+        if ($this->include_variant_code) {
+            $parts[] = 'VAR';
+        }
+
+        $digits = max(1, min(10, (int)$this->increment_digits));
+        $parts[] = str_pad('1', $digits, '0', STR_PAD_LEFT);
+
+        return implode('-', $parts);
+    }
+
     public function render()
     {
         $query = AturanKode::query();
@@ -216,10 +255,21 @@ class Index extends Component
         // Sorting by category treats null values special (first or last)
         $rules = $query->orderByRaw('CASE WHEN kategori IS NULL THEN 0 ELSE 1 END')
             ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(10);
+            ->paginate($this->perPage);
+
+        $totalRules = AturanKode::count();
+        $prdCount = AturanKode::where('format_tipe', 'PRD_STYLE')->count();
+        $standardCount = AturanKode::where(function ($q) {
+            $q->where('format_tipe', 'INCREMENT')
+              ->orWhereNull('format_tipe');
+        })->count();
 
         return view('livewire.pengkodean.index', [
             'rules' => $rules,
+            'totalRules' => $totalRules,
+            'prdCount' => $prdCount,
+            'standardCount' => $standardCount,
+            'modalPreview' => $this->getModalPreviewProperty(),
         ]);
     }
 }

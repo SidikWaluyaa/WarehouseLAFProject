@@ -53,7 +53,7 @@
                                     chevron_right
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap font-medium text-on-surface">{{ $log->created_at->format('d/m/Y H:i:s') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-on-surface">{{ $log->created_at->format('d/m/Y H:i:s') }} WIB</td>
                             <td class="px-6 py-4 whitespace-nowrap font-semibold text-on-surface">{{ $log->username }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-3 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider
@@ -84,9 +84,42 @@
                                             $newVal = $log->new_values;
                                             $diffs = [];
 
+                                            $formatSafeVal = function($val) {
+                                                if (is_array($val)) {
+                                                    return json_encode($val, JSON_UNESCAPED_UNICODE);
+                                                }
+                                                if (is_bool($val)) {
+                                                    return $val ? 'true' : 'false';
+                                                }
+                                                if ($val === null) {
+                                                    return '-';
+                                                }
+                                                return (string)$val;
+                                            };
+
                                             if (is_array($oldVal) && is_array($newVal)) {
-                                                // Check for header-detail structure
-                                                if (isset($oldVal['header']) || isset($newVal['header'])) {
+                                                // 1. Check for Opname session structure (session + details)
+                                                if (isset($oldVal['session']) || isset($newVal['session'])) {
+                                                    $oldS = $oldVal['session'] ?? [];
+                                                    $newS = $newVal['session'] ?? [];
+                                                    $sessionFields = [
+                                                        'nomor_opname' => 'Nomor Opname',
+                                                        'status' => 'Status',
+                                                        'keterangan' => 'Keterangan',
+                                                        'adjusted_by' => 'Disesuaikan Oleh',
+                                                    ];
+                                                    foreach ($sessionFields as $f => $lbl) {
+                                                        $o = $oldS[$f] ?? '-';
+                                                        $n = $newS[$f] ?? '-';
+                                                        if ($o != $n) {
+                                                            $diffs[] = "<strong>Sesi " . e($lbl) . "</strong>: <span class='line-through text-error'>" . e($formatSafeVal($o)) . "</span> &rarr; <span class='text-green-500 font-bold'>" . e($formatSafeVal($n)) . "</span>";
+                                                        }
+                                                    }
+                                                    $newD = $newVal['details'] ?? [];
+                                                    $diffs[] = "<strong>Rincian Item Opname</strong>: " . count($newD) . " item disinkronkan ke stok master.";
+                                                }
+                                                // 2. Check for Header-Detail structure (e.g. Pembelian / Nota)
+                                                elseif (isset($oldVal['header']) || isset($newVal['header'])) {
                                                     $oldH = $oldVal['header'] ?? [];
                                                     $newH = $newVal['header'] ?? [];
                                                     
@@ -104,7 +137,7 @@
                                                                 $o = date('d/m/Y', strtotime($o));
                                                                 $n = date('d/m/Y', strtotime($n));
                                                             }
-                                                            $diffs[] = "<strong>Header $lbl</strong>: <span class='line-through text-error'>$o</span> &rarr; <span class='text-green-500 font-bold'>$n</span>";
+                                                            $diffs[] = "<strong>Header " . e($lbl) . "</strong>: <span class='line-through text-error'>" . e($formatSafeVal($o)) . "</span> &rarr; <span class='text-green-500 font-bold'>" . e($formatSafeVal($n)) . "</span>";
                                                         }
                                                     }
 
@@ -126,7 +159,7 @@
                                                         }
                                                     }
                                                 } else {
-                                                    // Flat model diff
+                                                    // 3. Flat model diff
                                                     $keys = array_unique(array_merge(array_keys($oldVal), array_keys($newVal)));
                                                     $ignored = ['created_at', 'updated_at', 'id', 'password', 'remember_token'];
                                                     foreach ($keys as $k) {
@@ -135,7 +168,7 @@
                                                         $n = $newVal[$k] ?? '-';
                                                         if ($o != $n) {
                                                             $label = ucwords(str_replace('_', ' ', $k));
-                                                            $diffs[] = "<strong>$label</strong>: <span class='line-through text-error'>$o</span> &rarr; <span class='text-green-500 font-bold'>$n</span>";
+                                                            $diffs[] = "<strong>" . e($label) . "</strong>: <span class='line-through text-error'>" . e($formatSafeVal($o)) . "</span> &rarr; <span class='text-green-500 font-bold'>" . e($formatSafeVal($n)) . "</span>";
                                                         }
                                                     }
                                                 }
@@ -148,15 +181,19 @@
                                                     $n = $newVal[$k] ?? '-';
                                                     if (!empty($n) && $n !== '-') {
                                                         $label = ucwords(str_replace('_', ' ', $k));
-                                                        $diffs[] = "<strong>$label</strong>: <span class='text-green-500 font-bold'>$n</span>";
+                                                        $diffs[] = "<strong>" . e($label) . "</strong>: <span class='text-green-500 font-bold'>" . e($formatSafeVal($n)) . "</span>";
                                                     }
                                                 }
                                             } elseif ($log->action === 'DELETE' && is_array($oldVal)) {
                                                 // Delete details
                                                 if (isset($oldVal['header']) || isset($oldVal['details'])) {
                                                     $oldH = $oldVal['header'] ?? [];
-                                                    $diffs[] = "<strong>Nomor Nota Dihapus</strong>: <span class='text-error font-bold'>" . ($oldH['nomor_nota'] ?? '-') . "</span>";
-                                                    $diffs[] = "<strong>Tipe Transaksi</strong>: " . ($oldH['tipe_nota'] ?? '-');
+                                                    $diffs[] = "<strong>Nomor Nota Dihapus</strong>: <span class='text-error font-bold'>" . e($formatSafeVal($oldH['nomor_nota'] ?? '-')) . "</span>";
+                                                    $diffs[] = "<strong>Tipe Transaksi</strong>: " . e($formatSafeVal($oldH['tipe_nota'] ?? '-'));
+                                                    $diffs[] = "<strong>Jumlah Item</strong>: " . count($oldVal['details'] ?? []) . " item";
+                                                } elseif (isset($oldVal['session'])) {
+                                                    $oldS = $oldVal['session'] ?? [];
+                                                    $diffs[] = "<strong>Sesi Opname Dihapus</strong>: <span class='text-error font-bold'>" . e($formatSafeVal($oldS['nomor_opname'] ?? '-')) . "</span>";
                                                     $diffs[] = "<strong>Jumlah Item</strong>: " . count($oldVal['details'] ?? []) . " item";
                                                 } else {
                                                     $keys = array_keys($oldVal);
@@ -166,7 +203,7 @@
                                                         $o = $oldVal[$k] ?? '-';
                                                         if (!empty($o) && $o !== '-') {
                                                             $label = ucwords(str_replace('_', ' ', $k));
-                                                            $diffs[] = "<strong>$label</strong>: <span class='text-error font-bold'>$o</span>";
+                                                            $diffs[] = "<strong>" . e($label) . "</strong>: <span class='text-error font-bold'>" . e($formatSafeVal($o)) . "</span>";
                                                         }
                                                     }
                                                 }

@@ -1,4 +1,4 @@
-<div x-init="$dispatch('update-header-title', 'Buat Transfer Order')" class="flex-1 overflow-y-auto p-6 lg:p-margin-desktop space-y-stack-lg custom-scrollbar">
+﻿<div x-init="$dispatch('update-header-title', 'Buat Transfer Order')" class="flex-1 overflow-y-auto p-6 lg:p-margin-desktop space-y-stack-lg custom-scrollbar">
 
 
     <form wire:submit="store" class="space-y-6">
@@ -95,7 +95,7 @@
 
         {{-- Actions --}}
         <div class="flex items-center justify-between">
-            <a href="{{ route('transfer') }}" wire:navigate class="px-6 py-3 rounded-2xl text-sm font-bold text-on-surface-variant hover:text-on-surface transition-colors">
+            <a href="{{ route('transfer') }}" class="px-6 py-3 rounded-2xl text-sm font-bold text-on-surface-variant hover:text-on-surface transition-colors">
                 &larr; Kembali
             </a>
             <button type="submit" class="flex items-center gap-2 px-8 py-3 rounded-2xl text-sm font-bold bg-primary text-on-primary hover:bg-primary/90 transition-colors shadow-lg">

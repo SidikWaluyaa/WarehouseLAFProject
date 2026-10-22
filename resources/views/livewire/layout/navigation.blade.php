@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use App\Livewire\Actions\Logout;
 use Livewire\Volt\Component;
@@ -12,7 +12,7 @@ new class extends Component
     {
         $logout();
 
-        $this->redirect('/', navigate: true);
+        $this->redirect('/');
     }
 }; ?>
 
@@ -47,42 +47,42 @@ new class extends Component
             <!-- Side Navigation Menu Links (Indonesian) -->
             <nav class="flex-1 space-y-2 overflow-y-auto custom-scrollbar px-2">
                 <!-- Dashboard -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('dashboard') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('dashboard') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('dashboard') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('dashboard') }}">
                     <span class="material-symbols-outlined">dashboard</span>
                     <span>Dashboard</span>
                 </a>
                 <!-- Stock Master -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('stock-master*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('stock-master') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('stock-master*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('stock-master') }}">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
                     <span>Master Stok</span>
                 </a>
                 <!-- Supplier -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('supplier*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('supplier') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('supplier*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('supplier') }}">
                     <span class="material-symbols-outlined">conveyor_belt</span>
                     <span>Supplier</span>
                 </a>
                 <!-- Customers (Pelanggan) -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('pelanggan*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('pelanggan') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('pelanggan*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('pelanggan') }}">
                     <span class="material-symbols-outlined">group</span>
                     <span>Pelanggan</span>
                 </a>
                 <!-- Incoming Goods (Barang Masuk) -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('barang-masuk*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('barang-masuk') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('barang-masuk*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('barang-masuk') }}">
                     <span class="material-symbols-outlined">input</span>
                     <span>Barang Masuk</span>
                 </a>
                 <!-- Outgoing Goods (Barang Keluar) -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('barang-keluar*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('barang-keluar') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('barang-keluar*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('barang-keluar') }}">
                     <span class="material-symbols-outlined">output</span>
                     <span>Barang Keluar</span>
                 </a>
                 <!-- Purchase Orders -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('purchase-order*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('purchase-order') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('purchase-order*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('purchase-order') }}">
                     <span class="material-symbols-outlined">shopping_cart</span>
                     <span>Purchase Order</span>
                 </a>
                 <!-- Analytics (Forecast & Analisis) -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('analytics*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('analytics') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('analytics*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('analytics') }}">
                     <span class="material-symbols-outlined">analytics</span>
                     <span>Forecast & Analisis</span>
                 </a>
@@ -93,32 +93,32 @@ new class extends Component
                 </div>
 
                 <!-- Transfer Gudang -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('transfer*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('transfer') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('transfer*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('transfer') }}">
                     <span class="material-symbols-outlined">swap_horiz</span>
                     <span>Transfer Gudang</span>
                 </a>
                 <!-- Replenishment Toko -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('replenishment*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('replenishment') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('replenishment*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('replenishment') }}">
                     <span class="material-symbols-outlined">local_shipping</span>
                     <span>Replenishment</span>
                 </a>
                 <!-- Picking -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('picking*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('picking') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('picking*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('picking') }}">
                     <span class="material-symbols-outlined">barcode_scanner</span>
                     <span>Picking Barang</span>
                 </a>
                 <!-- Packing -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('packing*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('packing') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('packing*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('packing') }}">
                     <span class="material-symbols-outlined">inventory_2</span>
                     <span>Packing & QC</span>
                 </a>
                 <!-- Lokasi -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('lokasi*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('lokasi') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('lokasi*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('lokasi') }}">
                     <span class="material-symbols-outlined">location_on</span>
                     <span>Manajemen Lokasi</span>
                 </a>
                 <!-- Audit Stok -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('audit*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('audit') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('audit*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('audit') }}">
                     <span class="material-symbols-outlined">fact_check</span>
                     <span>Audit Stok</span>
                 </a>
@@ -129,19 +129,19 @@ new class extends Component
                 </div>
 
                 <!-- Reports -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('reports*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('reports') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('reports*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('reports') }}">
                     <span class="material-symbols-outlined">summarize</span>
                     <span>Laporan & Analitik</span>
                 </a>
                 @can('manage master')
                 <!-- Log Perubahan -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('audit-log*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('audit-log') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('audit-log*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('audit-log') }}">
                     <span class="material-symbols-outlined">history</span>
                     <span>Log Perubahan</span>
                 </a>
                 @endcan
                 <!-- Pengkodean -->
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('pengkodean*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('pengkodean') }}" wire:navigate>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('pengkodean*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('pengkodean') }}">
                     <span class="material-symbols-outlined">qr_code</span>
                     <span>Aturan Pengkodean</span>
                 </a>
@@ -187,42 +187,42 @@ new class extends Component
         
         <nav class="flex-1 space-y-2 overflow-y-auto custom-scrollbar px-2">
             <!-- Dashboard -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('dashboard') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('dashboard') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('dashboard') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('dashboard') }}">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span>Dashboard</span>
             </a>
             <!-- Stock Master -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('stock-master*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('stock-master') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('stock-master*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('stock-master') }}">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
                 <span>Master Stok</span>
             </a>
             <!-- Supplier -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('supplier*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('supplier') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('supplier*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('supplier') }}">
                 <span class="material-symbols-outlined">conveyor_belt</span>
                 <span>Supplier</span>
             </a>
             <!-- Customers (Pelanggan) -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('pelanggan*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('pelanggan') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('pelanggan*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('pelanggan') }}">
                 <span class="material-symbols-outlined">group</span>
                 <span>Pelanggan</span>
             </a>
             <!-- Incoming Goods (Barang Masuk) -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('barang-masuk*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('barang-masuk') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('barang-masuk*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('barang-masuk') }}">
                 <span class="material-symbols-outlined">input</span>
                 <span>Barang Masuk</span>
             </a>
             <!-- Outgoing Goods (Barang Keluar) -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('barang-keluar*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('barang-keluar') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('barang-keluar*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('barang-keluar') }}">
                 <span class="material-symbols-outlined">output</span>
                 <span>Barang Keluar</span>
             </a>
             <!-- Purchase Orders -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('purchase-order*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('purchase-order') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('purchase-order*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('purchase-order') }}">
                 <span class="material-symbols-outlined">shopping_cart</span>
                 <span>Purchase Order</span>
             </a>
             <!-- Analytics (Forecast & Analisis) -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('analytics*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('analytics') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('analytics*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('analytics') }}">
                 <span class="material-symbols-outlined">analytics</span>
                 <span>Forecast & Analisis</span>
             </a>
@@ -233,32 +233,32 @@ new class extends Component
             </div>
 
             <!-- Transfer Gudang -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('transfer*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('transfer') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('transfer*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('transfer') }}">
                 <span class="material-symbols-outlined">swap_horiz</span>
                 <span>Transfer Gudang</span>
             </a>
             <!-- Replenishment Toko -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('replenishment*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('replenishment') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('replenishment*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('replenishment') }}">
                 <span class="material-symbols-outlined">local_shipping</span>
                 <span>Replenishment</span>
             </a>
             <!-- Picking -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('picking*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('picking') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('picking*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('picking') }}">
                 <span class="material-symbols-outlined">barcode_scanner</span>
                 <span>Picking Barang</span>
             </a>
             <!-- Packing -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('packing*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('packing') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('packing*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('packing') }}">
                 <span class="material-symbols-outlined">inventory_2</span>
                 <span>Packing & QC</span>
             </a>
             <!-- Lokasi -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('lokasi*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('lokasi') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('lokasi*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('lokasi') }}">
                 <span class="material-symbols-outlined">location_on</span>
                 <span>Manajemen Lokasi</span>
             </a>
             <!-- Audit Stok -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('audit*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('audit') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('audit*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('audit') }}">
                 <span class="material-symbols-outlined">fact_check</span>
                 <span>Audit Stok</span>
             </a>
@@ -269,19 +269,19 @@ new class extends Component
             </div>
 
             <!-- Reports -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('reports*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('reports') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('reports*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('reports') }}">
                 <span class="material-symbols-outlined">summarize</span>
                 <span>Laporan & Analitik</span>
             </a>
             @can('manage master')
             <!-- Log Perubahan -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('audit-log*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('audit-log') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('audit-log*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('audit-log') }}">
                 <span class="material-symbols-outlined">history</span>
                 <span>Log Perubahan</span>
             </a>
             @endcan
             <!-- Pengkodean -->
-            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('pengkodean*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('pengkodean') }}" wire:navigate>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl active:scale-[0.98] transition-all duration-200 {{ request()->routeIs('pengkodean*') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium' }}" href="{{ route('pengkodean') }}">
                 <span class="material-symbols-outlined">qr_code</span>
                 <span>Aturan Pengkodean</span>
             </a>

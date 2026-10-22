@@ -113,4 +113,51 @@ class AuditLogTest extends TestCase
         $this->assertEquals('-', AuditLog::parseUserAgent(null));
         $this->assertEquals('-', AuditLog::parseUserAgent(''));
     }
+
+    public function test_audit_log_handles_nested_array_values_safely(): void
+    {
+        $this->actingAs($this->admin);
+
+        // Opname style audit log with nested session and details arrays
+        AuditLog::create([
+            'user_id' => $this->admin->id,
+            'username' => 'Super Admin',
+            'action' => 'UPDATE',
+            'auditable_type' => 'App\Models\OpnameHeader',
+            'auditable_id' => 1,
+            'old_values' => [
+                'session' => ['nomor_opname' => 'OPN-001', 'status' => 'COMPLETED'],
+                'details' => [['produk_id' => 1, 'qty_fisik' => 10]],
+            ],
+            'new_values' => [
+                'session' => ['nomor_opname' => 'OPN-001', 'status' => 'ADJUSTED', 'adjusted_by' => 'Super Admin'],
+                'details' => [['produk_id' => 1, 'qty_fisik' => 10]],
+            ],
+            'ip_address' => '127.0.0.1',
+            'user_agent' => 'PHPUnit'
+        ]);
+
+        // General model with raw nested array attribute
+        AuditLog::create([
+            'user_id' => $this->admin->id,
+            'username' => 'Super Admin',
+            'action' => 'UPDATE',
+            'auditable_type' => 'App\Models\Setting',
+            'auditable_id' => 2,
+            'old_values' => [
+                'config' => ['theme' => 'dark'],
+            ],
+            'new_values' => [
+                'config' => ['theme' => 'light'],
+            ],
+            'ip_address' => '127.0.0.1',
+            'user_agent' => 'PHPUnit'
+        ]);
+
+        Livewire::test(\App\Livewire\AuditLog\Index::class)
+            ->assertOk()
+            ->assertSee('Sesi Status')
+            ->assertSee('ADJUSTED')
+            ->assertSee('Rincian Item Opname');
+    }
 }

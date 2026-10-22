@@ -212,7 +212,7 @@
                 @elseif($reportType === 'warehouse-performance') Laporan Kinerja Gudang
                 @endif
             </h2>
-            <p>Dicetak pada: {{ now()->format('d/m/Y H:i') }}</p>
+            <p>Dicetak pada: {{ now()->format('d/m/Y H:i') }} WIB</p>
         </div>
     </div>
 
@@ -325,7 +325,7 @@
             <tbody>
                 @forelse($data['rows'] as $row)
                     <tr>
-                        <td>{{ $row->created_at->format('d/m/Y H:i') }}</td>
+                        <td>{{ $row->created_at->format('d/m/Y H:i') }} WIB</td>
                         <td style="font-family: monospace;">{{ $row->produk->kode_barang ?? '-' }}</td>
                         <td class="text-bold">{{ $row->produk->nama_barang ?? '-' }}</td>
                         <td><span class="badge">{{ $row->tipe_mutasi }}</span></td>

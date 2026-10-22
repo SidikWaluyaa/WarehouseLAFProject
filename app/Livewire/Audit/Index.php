@@ -4,12 +4,16 @@ namespace App\Livewire\Audit;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 use App\Models\Lokasi;
 use App\Models\Produk;
 use App\Models\StokLokasi;
 use App\Models\MutasiLokasi;
 use App\Models\OpnameHeader;
 use App\Models\OpnameDetail;
+use App\Exports\OpnameCountSheetExport;
+use App\Imports\OpnameCountSheetImport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -22,12 +26,25 @@ use Exception;
 class Index extends Component
 {
     use WithPagination;
+    use WithFileUploads;
     use HasAlerts;
 
     // View state
     public $search = '';
     public ?int $activeSessionId = null;
     public bool $isCreatingSession = false;
+
+    // Excel Import state
+    public bool $isImportOpen = false;
+    public ?\Livewire\Features\SupportFileUploads\TemporaryUploadedFile $importFile = null;
+    public array $importErrors = [];
+    public bool $isImportPreviewOpen = false;
+    public array $importPreviewList = [];
+    public array $importPreviewSummary = [];
+
+    // Discrepancy Summary Modal state
+    public bool $isDiscrepancyModalOpen = false;
+    public string $discrepancyFilter = 'diff'; // 'all' or 'diff'
 
     // New Session Form
     public $new_tanggal = '';
@@ -158,7 +175,7 @@ class Index extends Component
                 ->join('mst_produk', function ($join) {
                     $join->on('trx_opname_detail.produk_id', '=', 'mst_produk.id');
                 })
-                ->select('trx_opname_detail.*', 'mst_produk.nama_barang', 'mst_produk.kode_barang', 'mst_produk.satuan')
+                ->select('trx_opname_detail.*', 'mst_produk.nama_barang', 'mst_produk.kode_barang', 'mst_produk.satuan', 'mst_produk.hpp', 'mst_produk.variasi_barang')
                 ->orderByRaw('mst_produk.nama_barang')
                 ->get()
                 ->toArray();
@@ -361,7 +378,174 @@ class Index extends Component
         $this->selectedSession->save();
 
         $this->loadSession($this->selectedSession->id);
-        $this->toastSuccess("Pencatatan sesi audit selesai. Menunggu proses adjustment.");
+        $this->isDiscrepancyModalOpen = true;
+        $this->toastSuccess("Pencatatan sesi audit selesai. Tinjau rangkuman selisih untuk persetujuan.");
+    }
+
+    public function reopenSession(): void
+    {
+        Gate::authorize('input masuk');
+        if (!$this->selectedSession) {
+            $this->alertError("Sesi audit tidak aktif.");
+            return;
+        }
+
+        if ($this->selectedSession->status !== 'COMPLETED') {
+            $this->alertError("Hanya sesi berstatus SELESAI (COMPLETED) yang dapat dikembalikan ke DRAFT.");
+            return;
+        }
+
+        $this->selectedSession->status = 'DRAFT';
+        $this->selectedSession->save();
+
+        $this->loadSession($this->selectedSession->id);
+        $this->isDiscrepancyModalOpen = false;
+        $this->toastSuccess("Sesi audit dikembalikan ke status DRAFT. Anda dapat merevisi atau mengimpor ulang data.");
+    }
+
+    public function openDiscrepancyModal(): void
+    {
+        $this->isDiscrepancyModalOpen = true;
+    }
+
+    public function closeDiscrepancyModal(): void
+    {
+        $this->isDiscrepancyModalOpen = false;
+    }
+
+    public function exportExcel()
+    {
+        Gate::authorize('input masuk');
+        if (!$this->selectedSession) {
+            $this->alertError("Sesi audit tidak aktif.");
+            return;
+        }
+
+        $cleanNomor = str_replace(['/', '\\', ' '], '_', $this->selectedSession->nomor_opname);
+        $filename = "lembar_audit_{$cleanNomor}.xlsx";
+
+        return Excel::download(new OpnameCountSheetExport($this->selectedSession->id), $filename);
+    }
+
+    public function openImportModal(): void
+    {
+        Gate::authorize('input masuk');
+        $this->importFile = null;
+        $this->importErrors = [];
+        $this->isImportOpen = true;
+    }
+
+    public function closeImportModal(): void
+    {
+        $this->isImportOpen = false;
+        $this->importFile = null;
+        $this->importErrors = [];
+    }
+
+    public function importExcel()
+    {
+        Gate::authorize('input masuk');
+        if (!$this->selectedSession || $this->selectedSession->status !== 'DRAFT') {
+            $this->alertError("Hanya sesi opname berstatus DRAFT yang dapat diimpor datanya.");
+            return;
+        }
+
+        $this->validate([
+            'importFile' => 'required|file|mimes:xlsx,xls,csv|max:10240',
+        ], [
+            'importFile.required' => 'Silakan pilih file Excel lembar audit terlebih dahulu.',
+            'importFile.mimes' => 'File harus berupa Excel (.xlsx, .xls, .csv).',
+            'importFile.max' => 'Ukuran file maksimal adalah 10MB.',
+        ]);
+
+        $importer = new OpnameCountSheetImport($this->selectedSession->id, isStagingOnly: true);
+
+        try {
+            Excel::import($importer, $this->importFile->getRealPath());
+
+            $this->importPreviewList = $importer->previewList;
+            $this->importPreviewSummary = $importer->previewSummary;
+            $this->isImportOpen = false;
+            $this->isImportPreviewOpen = true;
+            $this->toastSuccess("File Excel berhasil dibaca. Silakan periksa pratinjau sebelum menerapkan.");
+        } catch (Exception $e) {
+            if (!empty($importer->errorsList)) {
+                $this->importErrors = $importer->errorsList;
+            } else {
+                $this->importErrors = ["Terjadi kesalahan saat memproses file Excel: " . $e->getMessage()];
+            }
+            $this->alertError("Gagal membaca lembar audit. Silakan periksa file Anda.");
+        }
+    }
+
+    public function applyImportPreview(): void
+    {
+        Gate::authorize('input masuk');
+        if (!$this->selectedSession || $this->selectedSession->status !== 'DRAFT') {
+            $this->alertError("Hanya sesi opname berstatus DRAFT yang dapat diperbarui.");
+            return;
+        }
+
+        if (empty($this->importPreviewList)) {
+            $this->alertError("Tidak ada data pratinjau untuk diterapkan.");
+            return;
+        }
+
+        try {
+            $updated = OpnameCountSheetImport::applyPreviewItems($this->selectedSession->id, $this->importPreviewList);
+
+            $this->loadSession($this->selectedSession->id);
+            $this->closeImportPreview();
+            $this->toastSuccess("Berhasil menerapkan {$updated} data fisik dari Excel ke sesi audit.");
+        } catch (Exception $e) {
+            $this->alertError("Gagal menerapkan hasil import: " . $e->getMessage());
+        }
+    }
+
+    public function closeImportPreview(): void
+    {
+        $this->isImportPreviewOpen = false;
+        $this->importPreviewList = [];
+        $this->importPreviewSummary = [];
+        $this->importFile = null;
+    }
+
+    public function getDiscrepancyStatsProperty(): array
+    {
+        $totalItems = count($this->detailsList);
+        $matched = 0;
+        $surplus = 0;
+        $deficit = 0;
+        $totalQtySistem = 0;
+        $totalQtyFisik = 0;
+        $netNominal = 0;
+
+        foreach ($this->detailsList as $item) {
+            $totalQtySistem += (int)$item['qty_sistem'];
+            $totalQtyFisik += (int)$item['qty_fisik'];
+            $diff = (int)$item['selisih'];
+            $hpp = isset($item['hpp']) ? (float)$item['hpp'] : 0;
+            $netNominal += ($diff * $hpp);
+
+            if ($diff == 0) {
+                $matched++;
+            } elseif ($diff > 0) {
+                $surplus++;
+            } else {
+                $deficit++;
+            }
+        }
+
+        return [
+            'totalItems' => $totalItems,
+            'matched' => $matched,
+            'surplus' => $surplus,
+            'deficit' => $deficit,
+            'totalQtySistem' => $totalQtySistem,
+            'totalQtyFisik' => $totalQtyFisik,
+            'netSelisihQty' => $totalQtyFisik - $totalQtySistem,
+            'netNominal' => $netNominal,
+        ];
     }
 
     public function cancelSession()
@@ -371,14 +555,15 @@ class Index extends Component
             $this->alertError("Sesi audit tidak aktif.");
             return;
         }
-        if ($this->selectedSession->status !== 'DRAFT') {
-            $this->alertError("Hanya sesi audit berstatus DRAFT yang dapat dibatalkan.");
+        if (!in_array($this->selectedSession->status, ['DRAFT', 'COMPLETED'])) {
+            $this->alertError("Hanya sesi audit berstatus DRAFT atau COMPLETED yang dapat dibatalkan.");
             return;
         }
 
         $this->selectedSession->status = 'CANCELLED';
         $this->selectedSession->save();
 
+        $this->isDiscrepancyModalOpen = false;
         $this->backToList();
         $this->toastSuccess("Sesi audit dibatalkan.");
     }
@@ -476,6 +661,7 @@ class Index extends Component
         });
 
         $this->loadSession($this->selectedSession->id);
+        $this->isDiscrepancyModalOpen = false;
         $this->toastSuccess("Sinkronisasi stok berhasil diterapkan.");
     }
 

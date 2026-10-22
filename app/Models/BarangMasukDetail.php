@@ -19,6 +19,9 @@ class BarangMasukDetail extends Model
         'lokasi_simpan',
         'hpp',
         'po_detail_id',
+        'sisa_po_sebelum',
+        'selisih_po',
+        'alasan_selisih',
     ];
 
     public function barangMasukHeader(): BelongsTo

@@ -63,6 +63,8 @@ class TopbarTest extends TestCase
             'stok_keluar' => 0,
             'total_stok' => 2,
             'lokasi' => 'GUDANG',
+            'is_threshold_active' => true,
+            'min_stok' => 10,
         ]);
 
         AnalyticsProduk::create([

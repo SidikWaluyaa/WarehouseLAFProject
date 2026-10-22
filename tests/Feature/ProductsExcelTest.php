@@ -6,6 +6,9 @@ use App\Models\User;
 use App\Models\Produk;
 use App\Models\Supplier;
 use App\Models\BarangMasuk;
+use App\Models\BarangMasukDetail;
+use App\Models\PoDetail;
+use App\Models\PoHeader;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Livewire\Livewire;
@@ -45,7 +48,8 @@ class ProductsExcelTest extends TestCase
         $component->call('downloadTemplate');
 
         Excel::assertDownloaded('template_produk_wms.xlsx', function (ProductsTemplateExport $export) {
-            return true;
+            $array = $export->array();
+            return isset($array[0][7]) && $array[0][7] === 'GDG-A01';
         });
     }
 
@@ -60,7 +64,7 @@ class ProductsExcelTest extends TestCase
         $component = Livewire::actingAs($this->user)->test(\App\Livewire\StockMaster\Index::class);
         $component->call('exportExcel');
 
-        Excel::assertDownloaded('stock_master_' . date('Ymd_His') . '.xlsx', function (ProductsExport $export) {
+        Excel::assertDownloaded('stock_master_' . now()->format('Ymd_His') . '.xlsx', function (ProductsExport $export) {
             return true;
         });
 
@@ -216,10 +220,10 @@ class ProductsExcelTest extends TestCase
         $this->actingAs($this->user);
 
         // Delete all suppliers to simulate the scenario (clear dependencies first)
-        \App\Models\BarangMasukDetail::query()->delete();
-        \App\Models\BarangMasuk::query()->delete();
-        \App\Models\PoDetail::query()->delete();
-        \App\Models\PoHeader::query()->delete();
+        BarangMasukDetail::query()->delete();
+        BarangMasuk::query()->delete();
+        PoDetail::query()->delete();
+        PoHeader::query()->delete();
         Supplier::query()->delete();
 
         $import = new \App\Imports\ProductsImport();

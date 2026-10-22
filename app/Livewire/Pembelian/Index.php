@@ -75,7 +75,7 @@ class Index extends Component
             $this->toastSuccess(session('success_message'));
         }
 
-        $query = BarangMasuk::with(['details.produk', 'supplier']);
+        $query = BarangMasuk::with(['details.produk', 'supplier', 'poHeader']);
 
         // Apply search
         if (!empty($this->search)) {
@@ -88,6 +88,10 @@ class Index extends Component
                   ->orWhereHas('details.produk', function ($pQuery) {
                       $pQuery->where('nama_barang', 'like', '%' . $this->search . '%')
                              ->orWhere('kode_barang', 'like', '%' . $this->search . '%');
+                  })
+                  ->orWhereHas('poHeader', function ($poQ) {
+                      $poQ->where('nomor_po', 'like', '%' . $this->search . '%')
+                          ->orWhere('artikel', 'like', '%' . $this->search . '%');
                   });
             });
         }

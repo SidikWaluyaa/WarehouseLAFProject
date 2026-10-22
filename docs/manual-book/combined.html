@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Manual Book WMS LAF Project</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm 15mm 20mm 15mm;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #1e293b;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            font-size: 22pt;
+            color: #0f172a;
+            border-bottom: 2px solid #0284c7;
+            padding-bottom: 8px;
+            margin-top: 24px;
+            page-break-after: avoid;
+        }
+        h2 {
+            font-size: 16pt;
+            color: #0369a1;
+            margin-top: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 6px;
+            page-break-after: avoid;
+        }
+        h3 {
+            font-size: 13pt;
+            color: #334155;
+            margin-top: 16px;
+            page-break-after: avoid;
+        }
+        p, ul, ol {
+            margin-bottom: 12px;
+        }
+        li {
+            margin-bottom: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 9.5pt;
+            page-break-inside: avoid;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f1f5f9;
+            font-weight: bold;
+            color: #0f172a;
+        }
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        code {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+            font-size: 9pt;
+        }
+        .img-container {
+            text-align: center;
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+        img {
+            max-width: 95%;
+            height: auto;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .caption {
+            font-size: 9pt;
+            color: #64748b;
+            font-style: italic;
+            margin-top: 6px;
+        }
+        hr {
+            border: 0;
+            height: 1px;
+            background: #e2e8f0;
+            margin: 24px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>MANUAL BOOK DOKUMENTASI PENGGUNAAN WMS LAF PROJECT</h1>
+<h2>Sistem Manajemen Gudang & Inventori Terintegrasi</h2>
+
+<hr>
+
+<h3><strong>Daftar Isi (Table of Contents)</strong></h3>
+<p>1. [Bab 1: Pengenalan & Dashboard Utama](01-dashboard.md)</p>
+<ul><li>Overview Sistem WMS LAF Project</li>
+<li>Ringkasan KPI Gudang & Indikator Inventori</li>
+<li>Peringatan Stok Minimum (<em>Reorder Alert</em>) & <em>Dead Stock</em></li>
+<li>Grafik Tren Penjualan & Analisis Musiman (<em>Peak Months</em>)</li>
+<li>Aktivitas Operasional Real-Time Gudang & Riwayat Transaksi</li>
+
+</ul>2. [Bab 2: Manajemen Master Data](02-master-data.md)
+<ul><li>Master Stok (Katalog Produk & Inventori)</li>
+<li>Manajemen Lokasi Gudang & Toko</li>
+<li>Aturan Pengkodean Barang (Generator SKU Otomatis)</li>
+<li>Master Data Supplier</li>
+<li>Master Data Pelanggan</li>
+
+</ul>3. [Bab 3: Audit Stok & Opname](03-audit-stok.md)
+<ul><li>Konsep & Metode Stok Opname</li>
+<li>Pembuatan Sesi Audit (Full vs Partial Per Lokasi/Kategori)</li>
+<li>Input Hasil Perhitungan Fisik (<em>Physical Count</em>)</li>
+<li>Penyesuaian Varian Stok (<em>Stock Adjustment</em>) & Jurnal Log</li>
+
+</ul>4. [Bab 4: Transaksi Gudang](04-transaksi-gudang.md)
+<ul><li>Barang Masuk (<em>Inbound / Receiving</em>)</li>
+<li>Barang Keluar (<em>Outbound / Dispatch</em>)</li>
+<li>Purchase Order (PO Supplier & Tracking Sisa PO)</li>
+
+</ul>5. [Bab 5: Forecast & Analisis Inventori](05-forecast-analisis.md)
+<ul><li>Analisis Klasifikasi ABC (Pareto Inventory)</li>
+<li>Perhitungan <em>Reorder Point</em> (ROP), <em>Safety Stock</em>, & <em>Maximum Stock</em></li>
+<li>Deteksi <em>Dead Stock</em> & Nilai Aset Tertahan</li>
+<li>Peramalan Permintaan (<em>Demand Forecasting</em>) & <em>Days of Inventory</em> (DOI)</li>
+
+</ul>6. [Bab 6: Operasi Gudang](06-operasi-gudang.md)
+<ul><li>Transfer Gudang (Internal Location Transfer)</li>
+<li>Replenishment Toko (Pengisian Kembali Stok Toko Ritel)</li>
+<li>Picking Barang (Daftar Pengambilan Barang & QR/Barcode Scanner)</li>
+<li>Packing & Quality Control (QC & Verifikasi Pengiriman)</li>
+
+</ul>7. [Bab 7: Laporan & Audit Log](07-laporan-dan-audit-log.md)
+<ul><li>Laporan Mutasi Stok, Keuangan, & Transaksi</li>
+<li>Fitur Ekspor PDF, Excel, & Mode Cetak Struk/Faktur</li>
+<li>Audit Log System (Penelusuran Jejak Perubahan Data & Pengguna)</li>
+
+</ul>8. [Bab 8: Manajemen Akses & Keamanan System](08-manajemen-akses.md)
+<ul><li>Pengelolaan Pengguna (<em>User Management</em>)</li>
+<li>Pengaturan Peran & Hak Akses (<em>Roles & Permissions</em>)</li>
+<li>Profil Pengguna & Keamanan Log Out</li>
+
+</ul><hr>
+
+<h3><strong>Matriks Role & Hak Akses Sistem</strong></h3>
+<p>Sistem WMS LAF Project menerapkan kontrol akses berbasis peran (<em>Role-Based Access Control / RBAC</em>). Berikut adalah pemetaan hak akses untuk setiap peran pengguna di dalam sistem:</p>
+
+<table><tr><td>Fitur / Modul Menu</td><td>Super Admin</td><td>Admin Manajer</td><td>Operator Gudang</td><td>Tim Sales</td><td>Tim Finance</td></tr>
+<tr><td>---</td><td>:---:</td><td>:---:</td><td>:---:</td><td>:---:</td><td>:---:</td></tr>
+<tr><td><strong>Dashboard Utama</strong></td></tr>
+<tr><td><strong>Master Stok</strong> (Lihat)</td></tr>
+<tr><td><strong>Master Stok</strong> (Tambah/Edit/Hapus/Import)</td><td>❌</td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Manajemen Lokasi</strong> (Lihat)</td></tr>
+<tr><td><strong>Manajemen Lokasi</strong> (Tambah/Edit/Hapus)</td><td>❌</td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Aturan Pengkodean</strong></td><td>❌</td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Supplier & Pelanggan</strong> (Lihat & Riwayat)</td></tr>
+<tr><td><strong>Supplier & Pelanggan</strong> (Kelola Data)</td><td>❌</td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Audit Stok (Opname)</strong></td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Barang Masuk (Inbound)</strong></td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Barang Keluar (Outbound)</strong></td><td>❌</td></tr>
+<tr><td><strong>Purchase Order (Lihat)</strong></td></tr>
+<tr><td><strong>Purchase Order (Buat/Edit)</strong></td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Forecast & Analisis</strong></td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Transfer Gudang & Replenishment</strong></td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Picking & Packing/QC</strong></td><td>❌</td></tr>
+<tr><td><strong>Laporan & Analitik (Keuangan)</strong></td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Log Perubahan (Audit Log)</strong></td><td>❌</td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Manajemen Akses User</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+
+</table><hr>
+
+<h3><strong>Persyaratan Perangkat & Lingkungan Sistem</strong></h3>
+<ul><li><strong>Browser yang Didukung</strong>: Google Chrome (versi 100+), Mozilla Firefox (versi 100+), Microsoft Edge, atau Safari.</li>
+<li><strong>Koneksi Jaringan</strong>: Terhubung ke jaringan LAN gudang atau internet server WMS.</li>
+<li><strong>Perangkat Opsional</strong>: Barcode Scanner Handheld (USB/Bluetooth), Printer Thermal / Laser untuk pencetakan label & dokumen faktur.</li>
+
+
+</ul><div style="page-break-after: always;"></div>
+
+<h1>BAB 1: DASHBOARD UTAMA WMS</h1>
+
+<div class="img-container"><img alt="Tampilan keseluruhan halaman Dashboard Utama WMS LAF Project" src="images/dashboard-overview.png" /><p class="caption">Tampilan keseluruhan halaman Dashboard Utama WMS LAF Project</p></div>
+
+<h2>Dashboard Utama & KPI Gudang</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Dashboard Utama merupakan pusat kendali visual dan analisis real-time dari seluruh aktivitas inventori, kesehatan stok gudang, transaksi masuk-keluar, serta rekomendasi pengadaan barang (reorder) di WMS LAF Project. Halaman ini menyajikan indikator kinerja utama (KPI) secara konsolidasi untuk membantu pembuat keputusan dan operator gudang memantau arus barang dengan cepat.
+
+<hr>
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Super Admin</strong>: Akses penuh ke seluruh widget dan data KPI.</li>
+<li><strong>Admin Manajer</strong>: Akses penuh ke seluruh widget dan data KPI.</li>
+<li><strong>Operator Gudang</strong>: Akses ke widget stok, status operasional (receiving, picking, shipment), dan riwayat transaksi.</li>
+<li><strong>Tim Sales</strong>: Akses ke ringkasan stok, produk menipis, dan riwayat barang keluar.</li>
+<li><strong>Tim Finance</strong>: Akses ke nilai investasi inventori (inventory value), nilai dead stock, dan grafik penjualan.</li>
+
+</ul><hr>
+
+<h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar Utama -> Dashboard</li>
+<li><strong>URL</strong>: <code>/dashboard</code> (atau halaman utama <code>/</code>)</li>
+
+</ul><hr>
+
+<h3>4. Alur Penggunaan (Step by Step)</h3>
+1. <strong>Pengaksesan</strong>: Setelah login berhasil, sistem secara otomatis mengarahkan pengguna ke halaman Dashboard (<code>/dashboard</code>).
+2. <strong>Pemantauan Kartu KPI Utama</strong>: Periksa 4 Kartu KPI di bagian atas:
+<ul><li><em>Total SKUs/Produk</em> & <em>Total Kuantitas Unit Stok</em>.</li>
+<li><em>Total Nilai Inventori (Asset Value)</em> berbasis HPP.</li>
+<li><em>Stok Menipis (Low Stock Alert)</em>.</li>
+<li><em>Nilai & Kuantitas Dead Stock</em>.</li>
+</ul>3. <strong>Analisis Operasional Gudang</strong>: Gulir ke panel <em>Operasi Gudang Hari Ini</em> untuk melihat jumlah <em>Receiving Today</em>, <em>Picking Today</em>, <em>Shipment Today</em>, <em>Pending Transfer</em>, dan <em>Rekomendasi Replenishment</em>.
+4. <strong>Tinjauan Rekomendasi Reorder</strong>: Periksa tabel <em>Rekomendasi Pembelian Ulang (Reorder Point Alert)</em> untuk melihat barang yang sudah menyentuh batas minimum stok beserta perkiraan <em>Days of Inventory (DOI)</em>.
+5. <strong>Evaluasi Tren & Klasifikasi ABC</strong>: Tinjau grafik distribusi produk kelas A, B, C dan grafik tren penjualan bulanan (<em>Peak Months</em>).
+6. <strong>Pemantauan Riwayat Transaksi Terakhir</strong>: Lihat 5 transaksi barang masuk dan 5 transaksi barang keluar terbaru di bagian bawah halaman.
+
+<hr>
+
+<h3>5. Penjelasan Field / Kolom / Indikator</h3>
+
+<table><tr><td>Nama Indikator / Widget</td><td>Tipe / Format</td><td>Keterangan & Rumus Kalkulasi</td><td>Sumber Data (Model / Tabel)</td></tr>
+
+<tr><td><strong>Total Produk</strong></td><td>Angka Bulat</td><td>Jumlah total varian produk/SKU aktif di sistem</td><td><code>mst_produk.id</code> (Count)</td></tr>
+<tr><td><strong>Total Unit Stok</strong></td><td>Angka Bulat</td><td>Akumulasi kuantitas fisik stok seluruh produk</td><td><code>mst_produk.total_stok</code> (Sum)</td></tr>
+<tr><td><strong>Nilai Inventori</strong></td><td>Currency (Rp)</td><td>Total nilai aset persediaan = $\sum (\text{total\_stok} \times \text{hpp})$</td><td><code>mst_produk</code> (Sum HPP * Stok)</td></tr>
+<tr><td><strong>Low Stock Count</strong></td><td>Angka Bulat</td><td>Jumlah SKU dengan <code>total_stok < minimal_stock</code></td><td><code>mst_produk</code> join <code>analytics_produk</code></td></tr>
+<tr><td><strong>Dead Stock Count & Value</strong></td><td>Angka & Currency (Rp)</td><td>SKU dengan <code>total_stok > 0</code> dan penjualan harian $= 0$. Nilai dead stock = $\sum (\text{total\_stok} \times \text{hpp})$</td><td><code>mst_produk</code> join <code>analytics_produk</code></td></tr>
+<tr><td><strong>Days of Inventory (DOI)</strong></td><td>Angka (Hari)</td><td>Ketahanan stok fisik dalam hari = $\lfloor \frac{\text{total\_stok}}{\text{rata\_rata\_harian}} \rfloor$</td><td>Kalkulasi dinamis <code>Dashboard.php</code></td></tr>
+<tr><td><strong>Reorder Point (ROP)</strong></td><td>Angka (Unit)</td><td>Titik pemesanan ulang = $(\text{rata\_rata\_harian} \times \text{leadtime}) + \text{safety\_stock}$</td><td>Kalkulasi dinamis <code>Dashboard.php</code></td></tr>
+<tr><td><strong>Reorder Qty Recommendation</strong></td><td>Angka (Unit)</td><td>Jumlah rekomendasi beli = $\max(0, \text{maximum\_stock} - \text{total\_stok})$</td><td>Kalkulasi dinamis <code>Dashboard.php</code></td></tr>
+<tr><td><strong>Pending PO (Sisa PO)</strong></td><td>Angka (Unit)</td><td>Sisa unit barang yang belum diterima dari supplier</td><td><code>po_detail.sisa</code> (Sum)</td></tr>
+
+</table><hr>
+
+<h3>6. Tombol & Aksi</h3>
+
+<table><tr><td>Nama Tombol / Link</td><td>Lokasi / Widget</td><td>Aksi & Efek ke Sistem</td></tr>
+
+<tr><td><strong>Buat PO Baru</strong></td><td>Card Reorder Alert</td><td>Mengarahkan pengguna ke halaman pembuatan Purchase Order (<code>/purchase-order</code>) dengan menyertakan rekomendasi SKU.</td></tr>
+<tr><td><strong>Lihat Semua Barang Masuk</strong></td><td>Panel Transaksi Terakhir</td><td>Mengarahkan pengguna ke halaman Transaksi Barang Masuk (<code>/barang-masuk</code>).</td></tr>
+<tr><td><strong>Lihat Semua Barang Keluar</strong></td><td>Panel Transaksi Terakhir</td><td>Mengarahkan pengguna ke halaman Transaksi Barang Keluar (<code>/barang-keluar</code>).</td></tr>
+
+</table><hr>
+
+<h3>7. Validasi & Aturan Bisnis (dari Controller <code>Dashboard.php</code>)</h3>
+<ul><li><strong>Cache Optimization</strong>: Data KPI berat (Total Produk, Nilai Inventori, Dead Stock, Klasifikasi ABC, Penjualan Bulanan) di-cache secara otomatis selama <strong>5 menit (300 detik)</strong> menggunakan <code>cache()->remember('dashboard_kpi_stats', 300, ...)</code> untuk menjamin performa dashboard tetap di bawah 100ms.</li>
+<li><strong>Dynamic Reorder Calculation</strong>: Tabel rekomendasi reorder diproses secara real-time (tanpa cache) agar perubahan stok dari transaksi terbaru langsung terefleksi.</li>
+<li><strong>Fall Back DOI</strong>: Jika penjualan harian produk bernilai <code>0</code>, DOI diberi nilai default <code>999</code> hari untuk mencegah pembagian dengan nol (<em>division by zero</em>).</li>
+
+</ul><hr>
+
+<h3>8. Keterkaitan dengan Fitur Lain</h3>
+<ul><li><strong>Modul Master Data</strong>: Mengambil data HPP, total stok, dan info produk dari <code>mst_produk</code>.</li>
+<li><strong>Modul Analytics</strong>: Mengambil batas <code>minimal_stock</code>, <code>safety_stock</code>, <code>maximum_stock</code>, <code>leadtime_produksi</code>, dan <code>rata_rata_harian</code> dari <code>analytics_produk</code>.</li>
+<li><strong>Modul Transaksi Gudang</strong>: Mengambil data riwayat barang masuk/keluar real-time dan sisa pesanan supplier (<code>po_detail</code>).</li>
+<li><strong>Modul Operasi Gudang</strong>: Membaca antrean <em>Pending Transfer</em> dan rekomendasi <em>Replenishment Toko</em>.</li>
+
+</ul><hr>
+
+<h3>9. Studi Kasus / Contoh Skenario</h3>
+<strong>Skenario</strong>: Manajer Gudang ingin memeriksa barang sepatu yang kehabisan stok di tengah bulan.
+1. Manajer membuka Dashboard WMS.
+2. Pada tabel <em>Rekomendasi Pembelian Ulang</em>, terlihat produk <code>LAF-SHOE-BLK-42</code> memiliki sisa stok <code>5 pasang</code>, sedangkan <code>minimal_stock</code> adalah <code>20 pasang</code>.
+3. Sistem menghitung DOI = <code>2 hari</code> (karena rata-rata penjualan 2.5 pasang/hari).
+4. Manajer mengklik tombol <em>Buat PO Baru</em> pada rekomendasi tersebut untuk memesan <code>50 pasang</code> (sesuai rekomendasi <code>maximum_stock</code>).
+
+<hr>
+
+<h3>10. Kemungkinan Error & Solusi</h3>
+
+<table><tr><td>Gejala / Pesan Error</td><td>Penyebab</td><td>Solusi Pengguna / Admin</td></tr>
+
+<tr><td>Angka KPI Stok pada Dashboard tidak berubah setelah transaksi barang masuk baru.</td><td>Data KPI KPI di-cache selama 5 menit oleh sistem untuk efisiensi server.</td><td>Tunggu hingga 5 menit atau lakukan reload halaman setelah cache terkelola otomatis.</td></tr>
+<tr><td>Nilai Reorder Point / DOI bernilai 0 atau 999.</td><td>Data analitik produk (<code>analytics_produk</code>) belum pernah dihitung atau di-generate.</td><td>Buka menu <strong>Forecast & Analisis</strong> (<code>/analytics</code>) lalu jalankan regenerasi data analitik.</td></tr>
+
+
+</table><div style="page-break-after: always;"></div>
+
+<h1>BAB 2: MANAJEMEN MASTER DATA</h1>
+
+<div class="img-container"><img alt="Halaman Master Stok tempat mengelola katalog produk, pencarian variasi, import excel, dan cetak barcode" src="images/master-data-stock.png" /><p class="caption">Halaman Master Stok tempat mengelola katalog produk, pencarian variasi, import excel, dan cetak barcode</p></div>
+
+<h2>2.1 Master Stok (Katalog Produk & Inventori)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Master Stok adalah pusat pengelolaan katalog produk, SKU, variasi barang (warna/ukuran), lokasi penyimpanan awal, HPP (Harga Pokok Penjualan), harga jual, serta pelacakan total stok fisik per SKU di seluruh gudang.
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Melihat Data (<code>view master</code>)</strong>: Super Admin, Admin Manajer, Operator Gudang, Tim Sales, Tim Finance.</li>
+<li><strong>Kelola Data (Tambah / Edit / Hapus / Import Excel) (<code>manage master</code>)</strong>: Super Admin, Admin Manajer.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Master Data -> Master Stok</li>
+<li><strong>URL</strong>: <code>/stock-master</code></li>
+
+</ul><h3>4. Alur Penggunaan (Step by Step)</h3>
+1. <strong>Melihat & Memfilter Stok</strong>:
+<ul><li>Manfaatkan bilah pencarian <code>search</code> untuk mencari berdasarkan nama barang, kode SKU, kategori, warna, atau ukuran.</li>
+<li>Filter stok berdasarkan Kategori, Lokasi, Filter Ketersediaan Stok (<em>Low Stock</em>, <em>Out of Stock</em>, <em>In Stock</em>), serta Status Aktif.</li>
+</ul>2. <strong>Menambah Produk Baru secara Manual</strong>:
+<ul><li>Klik tombol <strong>+ Tambah Barang Baru</strong>.</li>
+<li>Isi form data produk (Nama Produk, Kategori, Variasi, Warna, Ukuran, Satuan, Lokasi, HPP, Harga Jual).</li>
+<li>Centang <em>Generate SKU Otomatis</em> jika ingin sistem membuat Kode SKU berdasarkan Aturan Pengkodean, atau uncheck untuk menginput SKU kustom.</li>
+<li>Klik <strong>Simpan Data</strong>.</li>
+</ul>3. <strong>Mengedit / Menghapus Produk</strong>:
+<ul><li>Klik ikon <strong>Edit (Pensil)</strong> pada baris tabel untuk mengubah data produk.</li>
+<li>Klik ikon <strong>Hapus (Tong Sampah)</strong> untuk menghapus SKU (hanya jika produk belum memiliki histori transaksi fisik).</li>
+</ul>4. <strong>Export & Import Excel</strong>:
+<ul><li>Klik <strong>Export Excel</strong> untuk mengunduh seluruh data katalog stok dalam format XLSX.</li>
+<li>Klik <strong>Import Excel</strong> -> Upload file template Excel -> Sistem akan memvalidasi data dan mengimpor SKU secara masal.</li>
+</ul>5. <strong>Cetak Barcode / QR Code</strong>:
+<ul><li>Klik tombol <strong>Barcode (Ikon Kode Bar)</strong> pada baris produk untuk membuka modal pratinjau barcode SKU dan mengunduh / mencetaknya.</li>
+
+</ul><h3>5. Penjelasan Field / Kolom</h3>
+
+<table><tr><td>Nama Field</td><td>Tipe Input</td><td>Wajib / Opsional</td><td>Keterangan & Batasan Validasi</td><td>Sumber Data / Tabel</td></tr>
+
+<tr><td><code>nama_produk</code></td><td>Text</td><td>Wajib</td><td>Nama induk kelompok produk (maks 200 karakter)</td><td><code>mst_produk.nama_produk</code></td></tr>
+<tr><td><code>kategori</code></td><td>Select / Text</td><td>Wajib</td><td>Kategori utama produk (misal: <em>Sepatu</em>, <em>Sandal</em>)</td><td><code>mst_produk.kategori</code></td></tr>
+<tr><td><code>kategori_2</code></td><td>Text</td><td>Opsional</td><td>Sub-kategori atau tag sekunder</td><td><code>mst_produk.kategori_2</code></td></tr>
+<tr><td><code>kode_barang</code></td><td>Text</td><td>Wajib (Auto)</td><td>Kode SKU unik (maks 100 karakter, Unique)</td><td><code>mst_produk.kode_barang</code></td></tr>
+<tr><td><code>nama_barang</code></td><td>Text</td><td>Wajib</td><td>Nama spesifik barang lengkap dengan variasi</td><td><code>mst_produk.nama_barang</code></td></tr>
+<tr><td><code>variasi_barang</code></td><td>Text</td><td>Wajib</td><td>Keterangan variasi (misal: <em>Hitam Size 42</em>)</td><td><code>mst_produk.variasi_barang</code></td></tr>
+<tr><td><code>warna</code></td><td>Text</td><td>Opsional</td><td>Warna spesifik barang</td><td><code>mst_produk.warna</code></td></tr>
+<tr><td><code>size</code></td><td>Text</td><td>Opsional</td><td>Ukuran/size barang (misal: <em>42</em>, <em>XL</em>)</td><td><code>mst_produk.size</code></td></tr>
+<tr><td><code>satuan</code></td><td>Select</td><td>Wajib</td><td>Satuan kuantitas (Default: <em>pasang</em>, <em>pcs</em>, <em>box</em>)</td><td><code>mst_produk.satuan</code></td></tr>
+<tr><td><code>lokasi</code></td><td>Select</td><td>Wajib</td><td>Kode lokasi gudang default (FK to <code>mst_lokasi</code>)</td><td><code>mst_lokasi.kode_lokasi</code></td></tr>
+<tr><td><code>hpp</code></td><td>Number</td><td>Wajib</td><td>Harga Pokok Pembelian per unit (min: 0)</td><td><code>mst_produk.hpp</code></td></tr>
+<tr><td><code>harga_jual</code></td><td>Number</td><td>Wajib</td><td>Harga Jual standar ke pelanggan (min: 0)</td><td><code>mst_produk.harga_jual</code></td></tr>
+<tr><td><code>total_stok</code></td><td>System Auto</td><td>Auto</td><td>Akumulasi kuantitas stok aktual di gudang</td><td><code>mst_produk.total_stok</code></td></tr>
+<tr><td><code>is_active</code></td><td>Toggle / Checkbox</td><td>Wajib</td><td>Status keaktifan produk dalam transaksi</td><td><code>mst_produk.is_active</code></td></tr>
+
+</table><h3>6. Tombol & Aksi</h3>
+
+<table><tr><td>Nama Tombol</td><td>Aksi & Efek ke Sistem</td></tr>
+
+<tr><td><strong>+ Tambah Barang Baru</strong></td><td>Membuka modal form pembuatan produk baru.</td></tr>
+<tr><td><strong>Import Excel</strong></td><td>Membuka modal upload file spreadsheet <code>.xlsx</code> / <code>.xls</code> untuk membuat SKU masal.</td></tr>
+<tr><td><strong>Export Excel</strong></td><td>Mengunduh file Excel <code>products_export.xlsx</code> berisikan seluruh daftar stok.</td></tr>
+<tr><td><strong>Download Template Import</strong></td><td>Mengunduh format file Excel standar untuk pengisian data import.</td></tr>
+<tr><td><strong>Barcode Icon</strong></td><td>Membuka modal pratinjau Barcode SVG/PNG yang siap dicetak ke label printer.</td></tr>
+<tr><td><strong>Simpan Data</strong></td><td>Memvalidasi input dan menyimpan/memperbarui data di database <code>mst_produk</code>.</td></tr>
+
+</table><h3>7. Validasi & Aturan Bisnis (Controller <code>StockMaster\Index.php</code>)</h3>
+<ul><li><strong>Auto-Generate SKU</strong>: Jika <code>autoGenerateSku = true</code>, sistem akan merangkai Kode Barang secara otomatis berdasarkan formula di <code>AturanKode</code> (contoh: <code>SEPATU-LAF-BLK-42-001</code>).</li>
+<li><strong>Keunikan SKU</strong>: Field <code>kode_barang</code> harus unik di dalam tabel <code>mst_produk</code>.</li>
+<li><strong>Integritas Stok Transaksi</strong>: Total stok produk disinkronkan secara otomatis saat terjadi transaksi Barang Masuk, Barang Keluar, Transfer, atau Opname.</li>
+
+</ul><h3>8. Keterkaitan dengan Fitur Lain</h3>
+<ul><li>Terhubung dengan <strong>Manajemen Lokasi</strong> (<code>mst_lokasi</code>) untuk lokasi penyimpanan default.</li>
+<li>Terhubung dengan <strong>Aturan Pengkodean</strong> (<code>mst_aturan_kode</code>) untuk format otomatis SKU.</li>
+<li>Menjadi referensi utama dalam seluruh transaksi gudang (Pembelian, Penjualan, Transfer, Opname, Picking, Packing).</li>
+
+</ul><h3>9. Studi Kasus / Contoh Skenario</h3>
+<strong>Skenario</strong>: Menambahkan produk baru "Sepatu Sneakers Running LAF Hitam Size 41" sejumlah 0 stok awal.
+1. Buka Master Stok -> Klik <strong>+ Tambah Barang Baru</strong>.
+2. Isi Nama Produk: "Sneakers Running LAF", Kategori: "Sepatu", Variasi: "Hitam 41", Warna: "Hitam", Size: "41", Satuan: "pasang", HPP: "150000", Harga Jual: "250000".
+3. Biarkan centang <em>Generate SKU Otomatis</em> aktif -> Sistem merilis SKU <code>SPT-SNK-HTM-41-001</code>.
+4. Klik <strong>Simpan Data</strong>. Produk kini terdaftar di sistem.
+
+<h3>10. Kemungkinan Error & Solusi</h3>
+
+<table><tr><td>Pesan Error / Masalah</td><td>Penyebab</td><td>Solusi</td></tr>
+
+<tr><td><code>The kode barang has already been taken.</code></td><td>Kode SKU yang dimasukkan manual sudah terdaftar di sistem.</td><td>Gunakan fitur Auto-Generate SKU atau masukkan Kode SKU lain yang unik.</td></tr>
+<tr><td>Data pada File Import Excel gagal diproses.</td><td>Format kolom tidak sesuai dengan template atau kode lokasi tidak terdaftar di <code>mst_lokasi</code>.</td><td>Unduh ulang <em>Template Import</em>, pastikan Kode Lokasi persis sama dengan yang ada di menu Manajemen Lokasi.</td></tr>
+
+</table><hr>
+
+<div class="img-container"><img alt="Halaman Manajemen Lokasi Gudang dan Toko" src="images/master-data-lokasi.png" /><p class="caption">Halaman Manajemen Lokasi Gudang dan Toko</p></div>
+
+<h2>2.2 Manajemen Lokasi (Gudang & Toko)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Manajemen Lokasi digunakan untuk memetakan rak, bin, zona gudang (<em>Warehouse Sub-locations</em>), serta lokasi fisik toko (<em>Retail Outlets</em>). Setiap posisi penyimpanan barang teridentifikasi secara unik oleh Kode Lokasi.
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Melihat Data (<code>view master</code>)</strong>: Semua User terautentikasi.</li>
+<li><strong>Kelola Data (<code>manage master</code>)</strong>: Super Admin, Admin Manajer.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Master Data -> Manajemen Lokasi</li>
+<li><strong>URL</strong>: <code>/lokasi</code> (Detail: <code>/lokasi/{lokasi}/detail</code>)</li>
+
+</ul><h3>4. Alur Penggunaan (Step by Step)</h3>
+1. Buka halaman <strong>Manajemen Lokasi</strong>.
+2. Klik <strong>+ Tambah Lokasi</strong>.
+3. Isi <code>kode_lokasi</code> (misal: <code>GDG-A02</code>), <code>nama_lokasi</code> (misal: <em>Gudang Utama Rak A02</em>), dan pilih <code>tipe_lokasi</code> (<em>GUDANG</em> atau <em>TOKO</em>).
+4. Klik <strong>Simpan</strong>.
+5. Untuk melihat daftar stok spesifik pada lokasi tersebut, klik tombol <strong>Detail Lokasi</strong>.
+
+<h3>5. Penjelasan Field / Kolom</h3>
+
+<table><tr><td>Nama Field</td><td>Tipe Input</td><td>Wajib / Opsional</td><td>Keterangan & Validasi</td></tr>
+
+<tr><td><code>kode_lokasi</code></td><td>Text</td><td>Wajib</td><td>Kode unik lokasi (Upper Case, Unique, misal: <code>GDG-A01</code>, <code>TKO-R01</code>)</td></tr>
+<tr><td><code>nama_lokasi</code></td><td>Text</td><td>Wajib</td><td>Nama deskriptif area penyimpanan (maks 200 karakter)</td></tr>
+<tr><td><code>tipe_lokasi</code></td><td>Select</td><td>Wajib</td><td>Kategori tipe lokasi: <code>GUDANG</code> (Internal Warehouse) atau <code>TOKO</code> (Retail Shop)</td></tr>
+<tr><td><code>is_active</code></td><td>Toggle</td><td>Wajib</td><td>Status aktif lokasi</td></tr>
+
+</table><h3>6. Validasi & Aturan Bisnis (Controller <code>Lokasi\Index.php</code>)</h3>
+<ul><li><strong>Proteksi Default System</strong>: Kode lokasi default <code>GDG-A01</code> dan <code>TKO-R01</code> <strong>TIDAK BOLEH DIDELETE atau DIUBAH KODENYA</strong> karena digunakan sebagai fallback sistem untuk transaksi dasar dan pengisian stok otomatis.</li>
+
+</ul><hr>
+
+<div class="img-container"><img alt="Halaman Aturan Pengkodean SKU Otomatis" src="images/master-data-pengkodean.png" /><p class="caption">Halaman Aturan Pengkodean SKU Otomatis</p></div>
+
+<h2>2.3 Aturan Pengkodean (Auto SKU Generator)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Fitur Aturan Pengkodean memungkinkan Admin mengonfigurasi pola pembentukan kode SKU otomatis berdasarkan kombinasi Kategori, Inisial Nama Barang, Kode Variasi/Warna/Size, serta Angka Urut (<em>Auto-Increment Digits</em>).
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Kelola Data (<code>manage master</code>)</strong>: Super Admin, Admin Manajer.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Master Data -> Aturan Pengkodean</li>
+<li><strong>URL</strong>: <code>/pengkodean</code></li>
+
+</ul><h3>4. Penjelasan Field & Format Pengkodean</h3>
+
+<table><tr><td>Nama Field</td><td>Tipe Input</td><td>Keterangan & Contoh Efek</td></tr>
+
+<tr><td><code>kategori</code></td><td>Select / Text</td><td>Kategori spesifik aturan (kosongkan untuk aturan <em>Default Global</em>)</td></tr>
+<tr><td><code>prefix</code></td><td>Text</td><td>Prefix kustom depan SKU (misal: <code>LAF</code>, <code>PRD</code>)</td></tr>
+<tr><td><code>include_category_prefix</code></td><td>Toggle</td><td>Memasukkan 3 huruf depan kategori (contoh: <code>SEPATU</code> -> <code>SPT</code>)</td></tr>
+<tr><td><code>include_product_initials</code></td><td>Toggle</td><td>Memasukkan inisial dari nama produk (contoh: <code>Running Shoes</code> -> <code>RS</code>)</td></tr>
+<tr><td><code>include_variant_code</code></td><td>Toggle</td><td>Memasukkan kode warna/size di SKU</td></tr>
+<tr><td><code>increment_digits</code></td><td>Number</td><td>Jumlah digit nomor urut belakang (contoh: <code>3</code> -> <code>001</code>, <code>4</code> -> <code>0001</code>)</td></tr>
+<tr><td><code>format_tipe</code></td><td>Select</td><td>Pola penomoran: <code>INCREMENT</code> (Numerik Urut) atau <code>PRD_STYLE</code> (Format Gaya Produk LAF)</td></tr>
+
+</table><hr>
+
+<h2>2.4 Master Data Supplier & Pelanggan</h2>
+
+<div class="img-container"><img alt="Halaman Pengelolaan Supplier dan Pelanggan" src="images/master-data-supplier.png" /><p class="caption">Halaman Pengelolaan Supplier dan Pelanggan</p></div>
+
+<h3>1. Deskripsi Singkat</h3>
+Mengelola database entitas eksternal perusahaan: <strong>Supplier</strong> (Pemasok barang/vendor untuk transaksi Purchase Order & Barang Masuk) dan <strong>Pelanggan</strong> (Customer/Mitra pembeli untuk transaksi Barang Keluar).
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Melihat & Riwayat (<code>view master</code>)</strong>: Semua User terautentikasi.</li>
+<li><strong>Kelola Data (<code>manage master</code>)</strong>: Super Admin, Admin Manajer.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Supplier</strong>: <code>/supplier</code> (Riwayat Transaksi: <code>/supplier/riwayat</code>)</li>
+<li><strong>Pelanggan</strong>: <code>/pelanggan</code> (Riwayat Transaksi: <code>/pelanggan/riwayat</code>)</li>
+
+</ul><h3>4. Penjelasan Field Data (Supplier & Pelanggan)</h3>
+
+<table><tr><td>Nama Field</td><td>Tipe Input</td><td>Wajib / Opsional</td><td>Keterangan</td></tr>
+
+<tr><td><code>kode_supplier</code> / <code>kode_pelanggan</code></td><td>Text</td><td>Wajib</td><td>Kode Unik identitas mitra (misal: <code>SUP-001</code>, <code>CUST-001</code>)</td></tr>
+<tr><td><code>nama_supplier</code> / <code>nama_pelanggan</code></td><td>Text</td><td>Wajib</td><td>Nama resmi perusahaan atau perorangan</td></tr>
+<tr><td><code>kontak</code> / <code>telepon</code></td><td>Text</td><td>Opsional</td><td>Nomor HP / WhatsApp aktif</td></tr>
+<tr><td><code>email</code></td><td>Email</td><td>Opsional</td><td>Alamat email korespondensi</td></tr>
+<tr><td><code>alamat</code></td><td>Textarea</td><td>Opsional</td><td>Alamat lengkap domisili / pengiriman</td></tr>
+
+
+</table><div style="page-break-after: always;"></div>
+
+<h1>BAB 3: AUDIT STOK & OPNAME</h1>
+
+<div class="img-container"><img alt="Halaman Lembar Kerja Audit Stok Opname dan Input Hasil Fisik" src="images/audit-stok-session.png" /><p class="caption">Halaman Lembar Kerja Audit Stok Opname dan Input Hasil Fisik</p></div>
+
+<h2>Audit Stok (Opname Inventori & Stock Adjustment)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Audit Stok (Stock Opname) adalah fitur verifikasi fisik persediaan barang di gudang/toko untuk mencocokkan jumlah stok fisik nyata (<em>Physical Count</em>) dengan catatan stok sistem (<em>System Count</em>). Fitur ini secara otomatis menghitung selisih (varian) dan memperbarui stok lokasi secara akurat saat sesi audit disahkan (<em>POSTED</em>).
+
+<hr>
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Membuat & Mengisi Audit (<code>input masuk</code>)</strong>: Super Admin, Admin Manajer, Operator Gudang.</li>
+<li><strong>Mengesahkan Penyesuaian Stok (Approve / Post Opname)</strong>: Super Admin, Admin Manajer, Operator Gudang.</li>
+<li><strong>Membatalkan Sesi Audit</strong>: Super Admin, Admin Manajer.</li>
+
+</ul><hr>
+
+<h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Audit Stok (Opname)</li>
+<li><strong>URL</strong>: <code>/audit</code></li>
+
+</ul><hr>
+
+<h3>4. Alur Penggunaan (Step by Step)</h3>
+<p>#### <strong>A. Membuka Sesi Audit Baru (DRAFT)</strong></p>
+1. Masuk ke menu <strong>Audit Stok (Opname)</strong>.
+2. Klik tombol <strong>+ Sesi Audit Baru</strong> (atau gunakan Barcode Scanner untuk memindai Barcode Lokasi gudang seperti <code>GDG-A01</code>).
+3. Pilih <strong>Tanggal Audit</strong>, pilih <strong>Lokasi Gudang / Toko</strong> yang akan diaudit, dan beri catatan pada kolom <strong>Keterangan</strong>.
+4. Klik <strong>Mulai Audit</strong>. Sistem secara otomatis merilis Nomor Opname unik (misal: <code>OPN/20260818/A1F9</code>) dan memuat seluruh produk yang terdaftar di lokasi tersebut dengan <code>qty_sistem</code> awal.
+<p>#### <strong>B. Penginputan Hasil Hitung Fisik (Physical Count)</strong></p>
+Ada 2 cara penginputan fisik:
+<ul><li><strong>Cara 1: Pemindaian Barcode (Metode Cepat Scanner Handheld)</strong></li>
+  </ul>1. Arahkan kursor ke input <strong>Scan QR / Barcode Produk</strong>.
+  2. Pindai label SKU produk dengan scanner. Setiap kali dipindai, jumlah <code>qty_fisik</code> produk tersebut bertambah <code>+1</code> secara otomatis dan suara <em>beep</em> berbunyi.
+<ul><li><strong>Cara 2: Pengisian Manual pada Lembar Kerja</strong></li>
+  </ul>1. Pada tabel lembar kerja audit, cari nama barang/SKU yang dimaksud.
+  2. Ketik jumlah stok fisik yang dihitung di kolom <strong>Stok Fisik</strong>.
+  3. Sistem secara otomatis menghitung <code>Selisih = Stok Fisik - Stok Sistem</code>.
+<p>#### <strong>C. Pengesahan Audit & Penyesuaian Stok (POSTED)</strong></p>
+1. Setelah seluruh barang dihitung, periksa ringkasan varian (Selisih Positif / Selisih Negatif).
+2. Klik tombol <strong>Sahkan & Post Opname (Sesuaikan Stok)</strong>.
+3. Konfirmasikan dialog persetujuan.
+4. <strong>Efek Sistem</strong>:
+<ul><li>Status sesi audit berubah menjadi <code>POSTED</code>.</li>
+<li>Stok fisik pada tabel <code>trx_stok_lokasi</code> dan <code>mst_produk.total_stok</code> langsung disesuaikan secara otomatis.</li>
+<li>Sistem mencatat jurnal mutasi lokasi (<code>trx_mutasi_lokasi</code>) dengan tipe <code>ADJUSTMENT</code> untuk kebutuhan audit trail.</li>
+
+</ul><hr>
+
+<h3>5. Penjelasan Field / Kolom</h3>
+
+<table><tr><td>Nama Field</td><td>Tipe Input</td><td>Wajib / Opsional</td><td>Keterangan & Batasan</td><td>Tabel Database</td></tr>
+
+<tr><td><code>nomor_opname</code></td><td>System Auto</td><td>Auto</td><td>Nomor referensi unik sesi audit (contoh: <code>OPN/20260818/B3C2</code>)</td><td><code>trx_opname_header.nomor_opname</code></td></tr>
+<tr><td><code>tanggal</code></td><td>Date</td><td>Wajib</td><td>Tanggal pelaksanaan opname fisik</td><td><code>trx_opname_header.tanggal</code></td></tr>
+<tr><td><code>lokasi_id</code></td><td>Select</td><td>Wajib</td><td>Lokasi spesifik yang diaudit (FK to <code>mst_lokasi</code>)</td><td><code>trx_opname_header.lokasi_id</code></td></tr>
+<tr><td><code>status</code></td><td>System</td><td>Auto</td><td>Status Sesi: <code>DRAFT</code> (Sedang berjalan) atau <code>POSTED</code> (Disahkan)</td><td><code>trx_opname_header.status</code></td></tr>
+<tr><td><code>barcodeScan</code></td><td>Text / Scan</td><td>Opsional</td><td>Input cepat pemindaian barcode lokasi atau barcode SKU</td><td>Temporary State</td></tr>
+<tr><td><code>qty_sistem</code></td><td>Read-only</td><td>Auto</td><td>Kuantitas stok di sistem saat sesi audit dibuka</td><td><code>trx_opname_detail.qty_sistem</code></td></tr>
+<tr><td><code>qty_fisik</code></td><td>Number</td><td>Wajib</td><td>Kuantitas aktual hasil perhitungan fisik petugas</td><td><code>trx_opname_detail.qty_fisik</code></td></tr>
+<tr><td><code>selisih</code></td><td>Read-only</td><td>Auto</td><td>Selisih varian = <code>qty_fisik</code> - <code>qty_sistem</code></td><td><code>trx_opname_detail.selisih</code></td></tr>
+
+</table><hr>
+
+<h3>6. Tombol & Aksi</h3>
+
+<table><tr><td>Nama Tombol</td><td>Aksi & Efek ke Sistem</td></tr>
+
+<tr><td><strong>+ Sesi Audit Baru</strong></td><td>Membuka form modal inisiasi sesi opname lokasi baru.</td></tr>
+<tr><td><strong>Sahkan & Post Opname</strong></td><td>Mengunci sesi opname (status <code>POSTED</code>) dan memperbarui stok aktual di database.</td></tr>
+<tr><td><strong>Batal / Hapus Sesi DRAFT</strong></td><td>Membatalkan sesi DRAFT tanpa mengubah stok di database.</td></tr>
+<tr><td><strong>Reset ke Stok Sistem</strong></td><td>Mengembalikan seluruh <code>qty_fisik</code> sama dengan <code>qty_sistem</code> pada lembar kerja.</td></tr>
+
+</table><hr>
+
+<h3>7. Validasi & Aturan Bisnis (Controller <code>Audit\Index.php</code>)</h3>
+<ul><li><strong>Pencegahan Sesi Ganda</strong>: Tidak diperbolehkan membuat sesi audit <code>DRAFT</code> baru pada lokasi yang sama jika lokasi tersebut masih memiliki sesi audit <code>DRAFT</code> yang belum disahkan. Sistem akan secara otomatis mengarahkan ke sesi <code>DRAFT</code> yang ada.</li>
+<li><strong>Proteksi Pengesahan</strong>: Sesi audit yang sudah berstatus <code>POSTED</code> terkunci secara permanen dan tidak dapat diubah atau dihapus.</li>
+<li><strong>Pencatatan Mutasi</strong>: Setiap penyesuaian stok dari opname menghasilkan record <code>MutasiLokasi</code> dengan reference ID opname untuk transparansi pemeriksaan akuntan/auditor.</li>
+
+</ul><hr>
+
+<h3>8. Keterkaitan dengan Fitur Lain</h3>
+<ul><li><strong>Manajemen Lokasi</strong>: Menentukan area fisik rak/gudang yang diaudit.</li>
+<li><strong>Master Stok</strong>: Memperbarui kolom <code>total_stok</code> pada <code>mst_produk</code>.</li>
+<li><strong>Log Perubahan (Audit Log)</strong>: Mencatat identitas operator dan waktu pengesahan penyesuaian stok opname.</li>
+
+</ul><hr>
+
+<h3>9. Studi Kasus / Contoh Skenario</h3>
+<strong>Skenario</strong>: Opname bulanan Rak Gudang <code>GDG-A01</code>.
+1. Petugas memilih lokasi <code>GDG-A01</code> -> Klik <strong>Mulai Audit</strong>.
+2. Pada barang <code>LAF-SHOE-BLK-40</code>, stok sistem mencatat <code>10 pasang</code>.
+3. Setelah dihitung fisik, ternyata hanya ada <code>8 pasang</code> (hilang 2 pasang). Petugas mengisi <code>Stok Fisik = 8</code>.
+4. Kolom selisih menampilkan <code>-2</code> (berwarna merah).
+5. Petugas mengklik <strong>Sahkan & Post Opname</strong>. Stok di gudang <code>GDG-A01</code> langsung berkurang dari <code>10</code> menjadi <code>8 pasang</code>, dan jurnal penyesuaian <code>-2 pasang</code> tercatat di log audit.
+
+<hr>
+
+<h3>10. Kemungkinan Error & Solusi</h3>
+
+<table><tr><td>Pesan Error / Masalah</td><td>Penyebab</td><td>Solusi</td></tr>
+
+<tr><td><code>Barcode lokasi tidak cocok dengan lokasi sesi audit saat ini.</code></td><td>Petugas memindai kode lokasi lain di tengah-tengah sesi audit aktif.</td><td>Pastikan memindai produk yang ada pada lokasi yang sedang dibuka, atau kembali ke menu utama untuk membuka sesi lokasi lain.</td></tr>
+<tr><td>Tombol <em>Sahkan & Post Opname</em> tidak dapat diklik / diabaikan.</td><td>Terdapat nilai stok fisik negatif atau format input bukan angka.</td><td>Periksa lembar kerja, pastikan semua kolom stok fisik terisi dengan angka desimal/bulat non-negatif ($\ge 0$).</td></tr>
+
+
+</table><div style="page-break-after: always;"></div>
+
+<h1>BAB 4: TRANSAKSI GUDANG</h1>
+
+<div class="img-container"><img alt="Form Input Penerimaan Barang Masuk (Inbound Transaction)" src="images/barang-masuk-create.png" /><p class="caption">Form Input Penerimaan Barang Masuk (Inbound Transaction)</p></div>
+
+<h2>4.1 Barang Masuk (Inbound / Receiving)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Barang Masuk digunakan untuk mencatat penerimaan persediaan barang baru ke gudang, baik yang berasal dari transaksi <strong>Pembelian Supplier</strong>, penerimaan dari <strong>Purchase Order (PO)</strong>, <strong>Stock Awal</strong>, <strong>Retur Masuk</strong>, maupun <strong>Penyesuaian Transaksi</strong>.
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Akses Transaksi Masuk (<code>input masuk</code>)</strong>: Super Admin, Admin Manajer, Operator Gudang.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Transaksi Gudang -> Barang Masuk</li>
+<li><strong>URL</strong>: <code>/barang-masuk</code> (Buat Baru: <code>/barang-masuk/create</code>, Edit: <code>/barang-masuk/{id}/edit</code>, Riwayat: <code>/barang-masuk/riwayat</code>)</li>
+
+</ul><h3>4. Alur Penggunaan (Step by Step)</h3>
+1. Buka menu <strong>Barang Masuk</strong> -> Klik <strong>+ Tambah Barang Masuk</strong>.
+2. Sistem membuat <strong>Nomor Nota</strong> otomatis (contoh: <code>BM/20260818/001</code>).
+3. Pilih <strong>Tipe Nota</strong>: <code>Pembelian</code>, <code>Stock Awal</code>, <code>Retur Masuk</code>, atau <code>Penyesuaian</code>.
+4. Pilih <strong>Supplier</strong> pengirim barang (Wajib untuk Pembelian/Retur).
+5. <strong>Tambahkan Item Barang</strong>:
+<ul><li><em>Pilihan A (Manual)</em>: Ketik nama barang/SKU -> Pilih Produk -> Tentukan <code>Kuantitas Masuk</code>, <code>Lokasi Simpan</code>, dan <code>HPP / Harga Beli</code>.</li>
+<li><em>Pilihan B (Scanner Barcode)</em>: Pindai barcode produk pada input scan -> Item langsung ditambahkan ke tabel dengan kuantitas +1.</li>
+<li><em>Pilihan C (Dari Purchase Order)</em>: Jika transaksi berasal dari PO, sistem akan memuat otomatis item yang dipesan beserta sisa kuantitas PO-nya (<code>po_detail_id</code>).</li>
+</ul>6. Klik <strong>Simpan Transaksi</strong>.
+7. <strong>Efek Sistem</strong>:
+<ul><li>Kuantitas stok produk di <code>mst_produk.total_stok</code> bertambah.</li>
+<li>Kuantitas stok spesifik lokasi di <code>trx_stok_lokasi</code> bertambah.</li>
+<li>Jika terhubung PO, <code>po_detail.sisa</code> dan <code>po_detail.diterima</code> diperbarui (sisa PO berkurang).</li>
+<li>Jurnal mutasi lokasi terbit secara otomatis.</li>
+
+</ul><h3>5. Penjelasan Field Header & Detail (Tabel Data)</h3>
+
+<table><tr><td>Nama Field</td><td>Tipe Input</td><td>Wajib / Opsional</td><td>Keterangan & Validasi</td></tr>
+
+<tr><td><code>tanggal</code></td><td>Date</td><td>Wajib</td><td>Tanggal penerimaan barang</td></tr>
+<tr><td><code>tipe_nota</code></td><td>Select</td><td>Wajib</td><td>Pilihan: <code>Stock Awal</code>, <code>Pembelian</code>, <code>Retur Masuk</code>, <code>Penyesuaian</code></td></tr>
+<tr><td><code>supplier_id</code></td><td>Select</td><td>Wajib<em></td><td>Supplier pengirim (</em>Opsional hanya jika Tipe Nota = Stock Awal)</td></tr>
+<tr><td><code>nomor_nota</code></td><td>Text</td><td>Wajib</td><td>Kode Nota unik (Auto-generated: <code>BM/YYYYMMDD/XXX</code>)</td></tr>
+<tr><td><code>keterangan_tambahan</code></td><td>Textarea</td><td>Opsional</td><td>Catatan tambahan seperti nomor surat jalan supplier</td></tr>
+<tr><td><code>items.*.produk_id</code></td><td>Select / Scan</td><td>Wajib</td><td>SKU/Produk yang diterima</td></tr>
+<tr><td><code>items.*.qty_masuk</code></td><td>Number</td><td>Wajib</td><td>Jumlah unit masuk (Integer $\ge 1$)</td></tr>
+<tr><td><code>items.*.lokasi_simpan</code></td><td>Select</td><td>Wajib</td><td>Kode lokasi rak tujuan barang disimpan (misal: <code>GDG-A01</code>)</td></tr>
+<tr><td><code>items.*.hpp</code></td><td>Number</td><td>Wajib</td><td>Harga beli / modal per unit ($\ge 0$)</td></tr>
+
+</table><hr>
+
+<div class="img-container"><img alt="Form Input Pengeluaran Barang Keluar (Outbound Transaction)" src="images/barang-keluar-create.png" /><p class="caption">Form Input Pengeluaran Barang Keluar (Outbound Transaction)</p></div>
+
+<h2>4.2 Barang Keluar (Outbound / Dispatch)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Barang Keluar digunakan untuk mengoperasikan pengeluaran stok fisik dari gudang, meliputi pengiriman penjualan ke <strong>Pelanggan</strong>, <strong>Penjualan Langsung</strong>, <strong>Retur Keluar</strong>, maupun <strong>Penyesuaian Outbound</strong>.
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Akses Transaksi Keluar (<code>input keluar</code>)</strong>: Super Admin, Admin Manajer, Operator Gudang, Tim Sales.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Transaksi Gudang -> Barang Keluar</li>
+<li><strong>URL</strong>: <code>/barang-keluar</code> (Buat Baru: <code>/barang-keluar/create</code>, Riwayat: <code>/barang-keluar/riwayat</code>)</li>
+
+</ul><h3>4. Alur Penggunaan (Step by Step)</h3>
+1. Buka menu <strong>Barang Keluar</strong> -> Klik <strong>+ Tambah Barang Keluar</strong>.
+2. Sistem menerbitkan <strong>Nomor Nota Outbound</strong> otomatis (contoh: <code>BK/20260818/001</code>).
+3. Pilih <strong>Pelanggan</strong> (Customer/Mitra).
+4. Tambahkan item barang yang dikeluarkan, tentukan <strong>Lokasi Asal Ambil</strong> dan <strong>Kuantitas Keluar</strong>.
+5. <strong>Validasi Stok</strong>: Sistem secara otomatis mengecek ketersediaan stok aktual di lokasi tersebut. Jika <code>qty_keluar > stok_tersedia</code>, transaksi ditolak dengan pesan peringatan.
+6. Klik <strong>Simpan Transaksi</strong>.
+7. <strong>Efek Sistem</strong>:
+<ul><li>Total stok produk di <code>mst_produk.total_stok</code> dan <code>trx_stok_lokasi</code> berkurang.</li>
+<li>Terbit dokumen transaksi pengeluaran dan struk/faktur pengiriman yang siap dicetak.</li>
+
+</ul><hr>
+
+<div class="img-container"><img alt="Halaman Pengelolaan Purchase Order ke Supplier" src="images/purchase-order-manager.png" /><p class="caption">Halaman Pengelolaan Purchase Order ke Supplier</p></div>
+
+<h2>4.3 Purchase Order (PO Supplier)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Purchase Order (PO) adalah sistem manajemen pemesanan pembelian barang resmi kepada supplier sebelum barang dikirim/diterima di gudang. Modul ini melacak status penerimaan barang parsial hingga PO dinyatakan selesai (<em>CLOSED</em>).
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Melihat PO (<code>view po</code>)</strong>: Semua User terautentikasi.</li>
+<li><strong>Membuat & Mengelola PO (<code>manage po</code>)</strong>: Super Admin, Admin Manajer, Tim Sales.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Transaksi Gudang -> Purchase Order</li>
+<li><strong>URL</strong>: <code>/purchase-order</code></li>
+
+</ul><h3>4. Penjelasan Status & Workflow PO</h3>
+<p>``<code></p>
+[ DRAFT ] ➔ [ APPROVED / ORDERED ] ➔ [ PARTIAL ] ➔ [ RECEIVED / CLOSED ]
+</code>`<code>
+<p>1. <strong>DRAFT / ORDERED</strong>: PO baru dibuat dan dikirim ke Supplier.</p>
+2. <strong>PARTIAL</strong>: Barang dari supplier diterima sebagian di gudang melalui menu <em>Barang Masuk</em>.
+3. <strong>RECEIVED / CLOSED</strong>: Seluruh kuantitas barang dalam PO telah diterima 100% di gudang (</code>sisa = 0<code>).
+
+<h3>5. Penjelasan Field Utama PO</h3>
+
+<table><tr><td>Nama Field</td><td>Tipe Input</td><td>Keterangan</td></tr>
+
+<tr><td></code>nomor_po<code></td><td>System Auto</td><td>Nomor PO unik (contoh: </code>PO/20260818/001<code>)</td></tr>
+<tr><td></code>supplier_id<code></td><td>Select</td><td>Supplier tujuan pemesanan</td></tr>
+<tr><td></code>tanggal_po<code></td><td>Date</td><td>Tanggal penerbitan pesanan</td></tr>
+<tr><td></code>target_tanggal<code></td><td>Date</td><td>Target estimasi barang tiba di gudang</td></tr>
+<tr><td></code>qty_pesan<code></td><td>Number</td><td>Kuantitas total dipesan ke supplier</td></tr>
+<tr><td></code>qty_diterima<code></td><td>Auto</td><td>Kuantitas yang sudah sampai di gudang</td></tr>
+<tr><td></code>sisa<code></td><td>Auto</td><td>Sisa kuantitas PO yang belum dikirim (</code>qty_pesan - qty_diterima<code>)</td></tr>
+
+
+</table><div style="page-break-after: always;"></div>
+
+<h1>BAB 5: FORECAST & ANALISIS INVENTORI</h1>
+
+<div class="img-container"><img alt="Halaman Dashboard Forecast, Analisis ABC, ROP, dan Perhitungan Safety Stock" src="images/forecast-analytics-dashboard.png" /><p class="caption">Halaman Dashboard Forecast, Analisis ABC, ROP, dan Perhitungan Safety Stock</p></div>
+
+<h2>Forecast & Analisis Inventori (ABC Analysis, ROP, & Demand Forecasting)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Forecast & Analisis adalah kecerdasan buatan dan engine analitik internal WMS LAF Project yang menghitung Klasifikasi ABC (Prinsip Pareto 80/20), Peramalan Permintaan (<em>Demand Forecasting</em>), <em>Safety Stock</em>, <em>Minimal Stock</em>, <em>Maximum Stock</em>, serta <em>Reorder Point (ROP)</em> secara otomatis berdasarkan data historis penjualan atau input manual pengguna.
+
+<hr>
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Melihat & Edit Analisis (</code>view analytics<code>)</strong>: Super Admin, Admin Manajer, Tim Finance.</li>
+
+</ul><hr>
+
+<h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Forecast & Analisis</li>
+<li><strong>URL</strong>: </code>/analytics<code></li>
+
+</ul><hr>
+
+<h3>4. Alur Penggunaan (Step by Step)</h3>
+1. Buka menu <strong>Forecast & Analisis</strong>.
+2. <strong>Lihat Hasil Klasifikasi ABC & Matriks Stok</strong>:
+<ul><li><strong>Kelas A (High-Value / Fast-Moving)</strong>: 20% SKU teratas yang menyumbang ~80% dari total nilai penjualan.</li>
+<li><strong>Kelas B (Moderate-Value)</strong>: 30% SKU berikutnya yang menyumbang ~15% penjualan.</li>
+<li><strong>Kelas C (Low-Value / Slow-Moving)</strong>: 50% SKU terbawah yang hanya menyumbang ~5% penjualan.</li>
+</ul>3. <strong>Regenerasi Perhitungan Otomatis</strong>:
+<ul><li>Klik tombol <strong>Hitung Ulang Analisis (Recalculate All)</strong> untuk menjalankan kalkulasi statistik ulang terhadap seluruh produk berdasarkan transaksi penjualan terbaru dari database.</li>
+</ul>4. <strong>Mengubah Parameter per Produk</strong>:
+<ul><li>Klik ikon <strong>Edit (Pensil)</strong> pada baris SKU yang diinginkan.</li>
+<li>Sesuaikan <strong>Leadtime Produksi / Pengiriman (hari)</strong> (default: 14 hari).</li>
+<li>Tentukan apakah akan menggunakan <em>Hitung Otomatis</em> dari tren bulanan atau mengaktifkan <em>Override Stok Manual</em> (</code>is_manual_stock<code>).</li>
+<li>Klik <strong>Tarik Data Aktual</strong> jika ingin mengambil angka riwayat transaksi dari database secara instan.</li>
+<li>Klik <strong>Simpan Analisis</strong>.</li>
+
+</ul><hr>
+
+<h3>5. Formulasi Matematika & Aturan Kalkulasi</h3>
+
+<table><tr><td>Variabel Analisis</td><td>Formulasi Matematika</td><td>Keterangan Bisnis</td></tr>
+
+<tr><td><strong>Rata-Rata Penjualan Harian</strong></td><td>$D_{daily} = \frac{\sum_{m=1}^{12} \text{penjualan}_m}{365}$</td><td>Rerata unit terjual per hari dalam 1 tahun</td></tr>
+<tr><td><strong>Standar Deviasi Harian</strong></td><td>$\sigma_{daily} = \sqrt{\frac{\sum (\text{penjualan}_m - \text{mean})^2}{12}} \div \sqrt{30}$</td><td>Variabilitas / fluktuasi permintaan</td></tr>
+<tr><td><strong>Safety Stock (Stok Pengaman)</strong></td><td>$SS = Z \times \sigma_{daily} \times \sqrt{L}$</td><td>Stok cadangan mengantisipasi lonjakan ($Z=1.65$ untuk Service Level 95%, $L = \text{Leadtime}$)</td></tr>
+<tr><td><strong>Reorder Point (ROP)</strong></td><td>$ROP = (D_{daily} \times L) + SS$</td><td>Batas kuantitas saat PO harus diterbitkan</td></tr>
+<tr><td><strong>Minimal Stock</strong></td><td>$Min = ROP$</td><td>Batas ambang bawah persediaan aman</td></tr>
+<tr><td><strong>Maximum Stock</strong></td><td>$Max = ROP + (D_{daily} \times 30)$</td><td>Batas ambang atas pencegahan <em>overstock</em></td></tr>
+
+</table><hr>
+
+<h3>6. Penjelasan Field Modal Edit Analisis</h3>
+
+<table><tr><td>Nama Field</td><td>Tipe Input</td><td>Wajib / Opsional</td><td>Keterangan & Validasi</td></tr>
+
+<tr><td></code>leadtime_produksi<code></td><td>Number</td><td>Wajib</td><td>Waktu tunggu dari PO diterbitkan hingga barang masuk gudang (1 - 365 hari)</td></tr>
+<tr><td></code>is_manual_stock<code></td><td>Toggle</td><td>Wajib</td><td>Aktifkan jika ingin menentukan batas Min/Safety/Max stock secara manual</td></tr>
+<tr><td></code>minimal_stock<code></td><td>Number</td><td>Wajib (jika manual)</td><td>Batas stok minimum manual ($\ge 0$)</td></tr>
+<tr><td></code>safety_stock<code></td><td>Number</td><td>Wajib (jika manual)</td><td>Stok pengaman manual ($\ge 0$)</td></tr>
+<tr><td></code>maximum_stock<code></td><td>Number</td><td>Wajib (jika manual)</td><td>Batas stok maksimal manual ($\ge 0$)</td></tr>
+<tr><td></code>sales.jan<code> s/d </code>des<code></td><td>Number</td><td>Wajib</td><td>Histori volume penjualan dari Januari hingga Desember ($\ge 0$)</td></tr>
+
+</table><hr>
+
+<h3>7. Tombol & Aksi</h3>
+
+<table><tr><td>Nama Tombol</td><td>Aksi & Efek ke Sistem</td></tr>
+
+<tr><td><strong>Hitung Ulang Analisis (Recalculate All)</strong></td><td>Menjalankan </code>AnalyticsService::recalculateAllProductAnalytics()<code> untuk memperbarui seluruh parameter ABC, ROP, Min, Max, dan Safety Stock seluruh SKU.</td></tr>
+<tr><td><strong>Tarik Data Aktual (Sync from Database)</strong></td><td>Menghitung dan mengisi angka penjualan bulanan dari tabel </code>trx_barang_keluar_detail<code> aktual.</td></tr>
+<tr><td><strong>Simpan Analisis</strong></td><td>Memperbarui parameter analitik SKU di tabel </code>analytics_produk<code>.</td></tr>
+
+</table><hr>
+
+<h3>8. Keterkaitan dengan Fitur Lain</h3>
+<ul><li><strong>Dashboard Utama</strong>: Menyuplai data indikator <em>Low Stock Alert</em>, <em>Dead Stock</em>, <em>Peak Months</em>, dan rekomendasi kuantitas <em>Reorder</em>.</li>
+<li><strong>Purchase Order (PO)</strong>: Rekomendasi kuantitas pesan otomatis merujuk pada </code>maximum_stock - total_stok<code>.</li>
+<li><strong>Replenishment Toko</strong>: Menggunakan </code>minimal_stock<code> sebagai dasar pemicu pengisian kembali barang dari Gudang ke Toko.</li>
+
+
+</ul><div style="page-break-after: always;"></div>
+
+<h1>BAB 6: OPERASI GUDANG</h1>
+
+<div class="img-container"><img alt="Halaman Transfer Gudang Internal dan Mutasi antar Rak/Lokasi" src="images/transfer-gudang-index.png" /><p class="caption">Halaman Transfer Gudang Internal dan Mutasi antar Rak/Lokasi</p></div>
+
+<h2>6.1 Transfer Gudang (Internal Warehouse Transfer)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Transfer Gudang mengelola perpindahan fisik stok barang antar-lokasi internal (misalnya dari <em>Gudang Utama GDG-A01</em> ke <em>Gudang Transit GDG-B01</em> atau ke <em>Toko TKO-R01</em>). Modul ini menjamin transparansi posisi stok selama proses perpindahan barang berlangsung (<em>In-Transit Tracking</em>).
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Akses Transfer Gudang (</code>input masuk<code>)</strong>: Super Admin, Admin Manajer, Operator Gudang.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Operasi Gudang -> Transfer Gudang</li>
+<li><strong>URL</strong>: </code>/transfer<code> (Buat Baru: </code>/transfer/create<code>, Detail: </code>/transfer/{transfer}/detail<code>)</li>
+
+</ul><h3>4. Alur & Siklus Status Transfer Gudang</h3>
+
+</code>`<code>
+[ DRAFT ] ➔ [ PICKING ] ➔ [ IN_TRANSIT ] ➔ [ COMPLETED ]
+</code>`<code>
+<p>1. <strong>DRAFT</strong>: Dokumen perintah transfer dibuat oleh Admin/Operator.</p>
+2. <strong>PICKING</strong>: Petugas gudang mengambil barang dari lokasi asal (terhubung ke modul Picking List).
+3. <strong>IN_TRANSIT</strong>: Barang telah keluar dari lokasi asal dan dalam perjalanan menuju lokasi tujuan (stok dikurangi dari lokasi asal).
+4. <strong>COMPLETED</strong>: Barang telah sampai dan diterima secara fisik di lokasi tujuan (stok ditambahkan ke lokasi tujuan).
+
+<hr>
+
+<div class="img-container"><img alt="Halaman Rekomendasi Replenishment Pengisian Stok Toko Ritel" src="images/replenishment-toko.png" /><p class="caption">Halaman Rekomendasi Replenishment Pengisian Stok Toko Ritel</p></div>
+
+<h2>6.2 Replenishment Toko (Store Stock Replenishment)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Replenishment Toko adalah sistem pengisian kembali persediaan toko ritel otomatis. Engine rekomendasi mendeteksi produk di toko yang jumlah stoknya telah berada di bawah <em>Minimal Stock</em> dan memicu pengiriman stok dari gudang utama ke lokasi toko.
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Akses Replenishment (</code>input masuk<code>)</strong>: Super Admin, Admin Manajer, Operator Gudang.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Operasi Gudang -> Replenishment Toko</li>
+<li><strong>URL</strong>: </code>/replenishment<code></li>
+
+</ul><h3>4. Alur Penggunaan</h3>
+1. Buka menu <strong>Replenishment Toko</strong>.
+2. Sistem secara otomatis menampilkan daftar SKU di Toko yang membutuhkan pengisian persediaan beserta <strong>Rekomendasi Qty Kirim</strong>.
+3. Centang item produk yang ingin diisi kembali -> Klik <strong>Buat Dokumen Transfer Replenishment</strong>.
+4. Dokumen Transfer Gudang diterbitkan secara otomatis dari </code>GDG-A01<code> menuju </code>TKO-R01<code>.
+
+<hr>
+
+<div class="img-container"><img alt="Halaman Pengambilan Barang (Picking) dengan Barcode Scanner" src="images/picking-barang-manager.png" /><p class="caption">Halaman Pengambilan Barang (Picking) dengan Barcode Scanner</p></div>
+
+<h2>6.3 Picking Barang (Order Picking & Barcode Verification)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Picking Barang memandu petugas gudang dalam proses pengambilan barang dari lokasi rak (<em>Bin/Shelf Location</em>) untuk memenuhi pesanan Barang Keluar atau Transfer Gudang. Modul ini dilengkapi verifikasi barcode scanner untuk mencegah salah ambil barang (<em>Zero Picking Error</em>).
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Akses Picking (</code>input keluar<code> / </code>input masuk<code>)</strong>: Super Admin, Admin Manajer, Operator Gudang, Tim Sales.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Operasi Gudang -> Picking Barang</li>
+<li><strong>URL</strong>: </code>/picking<code></li>
+
+</ul><h3>4. Alur Penggunaan (Step by Step)</h3>
+1. Buka halaman <strong>Picking Barang</strong>.
+2. Pilih antrean pesanan pada tab <strong>Pending Outbound</strong> -> Klik <strong>Mulai Picking</strong>.
+3. Petugas gudang menuju lokasi rak yang tertera pada lembar instruksi picking.
+4. <strong>Verifikasi Barcode</strong>:
+<ul><li>Pindai barcode rak lokasi (misal: </code>GDG-A01<code>).</li>
+<li>Pindai barcode SKU barang (misal: </code>LAF-SHOE-BLK-42<code>).</li>
+<li>Masukkan kuantitas yang diambil -> Klik <strong>Verifikasi Item</strong>.</li>
+</ul>5. Setelah seluruh item dalam daftar terambil 100%, klik <strong>Selesaikan Picking</strong>. Status pesanan berubah menjadi </code>PICKED<code> dan siap untuk diproses ke modul Packing & QC.
+
+<hr>
+
+<div class="img-container"><img alt="Halaman Packing, Verifikasi Quality Control, dan Cetak Shipping Label" src="images/packing-qc-manager.png" /><p class="caption">Halaman Packing, Verifikasi Quality Control, dan Cetak Shipping Label</p></div>
+
+<h2>6.4 Packing & QC (Packaging & Quality Control)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Packing & QC adalah tahap verifikasi akhir sebelum barang dikemas dalam koli/kardus dan diserahkan ke jasa kurir/pengirim. Petugas melakukan inspeksi fisik barang, pengemasan, dan pencetakan Label Pengiriman / Resi (<em>Shipping Label</em>).
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Akses Packing & QC (</code>input keluar<code>)</strong>: Super Admin, Admin Manajer, Operator Gudang, Tim Sales.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Operasi Gudang -> Packing & QC</li>
+<li><strong>URL</strong>: </code>/packing<code></li>
+
+</ul><h3>4. Alur Penggunaan</h3>
+1. Buka menu <strong>Packing & QC</strong>.
+2. Pilih pesanan berstatus </code>PICKED<code> -> Klik <strong>Mulai Packing & QC</strong>.
+3. Pindai ulang barcode produk untuk memastikan barang tidak cacat dan sesuai dengan pesanan.
+4. Masukkan dimensi berat/koli kardus -> Klik <strong>Selesai Packing & Cetak Label Pengiriman</strong>.
+5. Tempelkan label pengiriman pada kardus kemasan.
+
+
+<div style="page-break-after: always;"></div>
+
+<h1>BAB 7: LAPORAN & AUDIT LOG</h1>
+
+<div class="img-container"><img alt="Halaman Laporan Eksekutif, Mutasi Stok, dan Cetak PDF/Excel" src="images/laporan-analitik-index.png" /><p class="caption">Halaman Laporan Eksekutif, Mutasi Stok, dan Cetak PDF/Excel</p></div>
+
+<h2>7.1 Laporan & Analitik (Reports & Financial Statements)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Laporan & Analitik menyajikan rangkuman data eksekutif mencakup Laporan Nilai Aset Inventori, Laporan Mutasi Stok Masuk & Keluar, Analisis Profitabilitas/Margin HPP vs Harga Jual, serta Laporan Transaksi Per Periode Tanggal.
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Akses Laporan (</code>view financial<code>)</strong>: Super Admin, Admin Manajer, Tim Finance.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Laporan -> Laporan & Analitik</li>
+<li><strong>URL</strong>: </code>/reports<code> (Format Cetak PDF: </code>/reports/print<code>)</li>
+
+</ul><h3>4. Jenis-Jenis Laporan yang Tersedia</h3>
+1. <strong>Laporan Nilai Persediaan (Inventory Valuation Report)</strong>: Rincian total nilai aset produk berbasis HPP per lokasi gudang.
+2. <strong>Laporan Mutasi Stok (Stock Movement Summary)</strong>: Rekapitulasi volume stok awal, stok masuk, stok keluar, dan stok akhir.
+3. <strong>Laporan Penjualan & Margin Keuntungan</strong>: Analisis omzet penjualan, modal HPP, dan gross profit per varian barang.
+4. <strong>Laporan Transaksi Barang Masuk & Keluar Per Periode</strong>: Rekap harian/bulanan dengan filter rentang tanggal.
+
+<h3>5. Fitur Ekspor & Cetak</h3>
+<ul><li><strong>Ekspor Excel (.xlsx)</strong>: Mengunduh dataset laporan dalam bentuk spreadsheet untuk diolah lebih lanjut.</li>
+<li><strong>Cetak Dokumen PDF</strong>: Membuka tampilan mode cetak ramah printer (<em>Print Friendly</em>) lengkap dengan Kop Surat Perusahaan LAF Project dan kolom tanda tangan pengesahan.</li>
+
+</ul><hr>
+<p>[SCREENSHOT: audit-log-index - Halaman Audit Log Sistem Penelusuran Jejak Aktivitas User]</p>
+
+<h2>7.2 Log Perubahan (System Audit Log)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Log Perubahan adalah sistem pencatat jejak audit (<em>Audit Trail</em>) independen yang merekam seluruh perubahan data sensitif, aktivitas pembuat data, penyuntingan, penghapusan, IP Address, dan perubahan nilai kolom (<em>Old Values</em> vs <em>New Values</em>) di dalam database WMS.
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Akses Log Perubahan (</code>manage system<code> / </code>manage master<code>)</strong>: Super Admin, Admin Manajer.</li>
+
+</ul><h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Laporan -> Log Perubahan</li>
+<li><strong>URL</strong>: </code>/audit-log<code></li>
+
+</ul><h3>4. Penjelasan Kolom Audit Log</h3>
+
+<table><tr><td>Nama Kolom</td><td>Keterangan Data</td></tr>
+
+<tr><td><strong>Tanggal & Waktu</strong></td><td>Timestamp kejadian presisi hingga detik (</code>created_at<code>)</td></tr>
+<tr><td><strong>Pengguna (Username)</strong></td><td>Nama user / operator yang melakukan aksi</td></tr>
+<tr><td><strong>Aksi (Action)</strong></td><td>Jenis tindakan: </code>CREATE<code> (Tambah), </code>UPDATE<code> (Ubah), </code>DELETE<code> (Hapus), </code>POST<code> (Pengesahan)</td></tr>
+<tr><td><strong>Model / Objek</strong></td><td>Nama entitas tabel yang dimodifikasi (misal: </code>App\Models\Produk<code>, </code>OpnameHeader<code>)</td></tr>
+<tr><td><strong>ID Objek</strong></td><td>Primary key record yang diubah</td></tr>
+<tr><td><strong>Perubahan Data</strong></td><td>Perbandingan JSON data sebelum diubah (<em>Before</em>) vs sesudah diubah (<em>After</em>)</td></tr>
+<tr><td><strong>IP Address</strong></td><td>Alamat IP jaringan perangkat pengguna</td></tr>
+
+</table><h3>5. Keamanan & Imutabilitas Log</h3>
+<ul><li>Log Audit bersifat <strong>Read-Only</strong> dan <strong>Imutabel</strong> (tidak dapat diedit atau dihapus oleh siapapun, termasuk Super Admin) untuk menjamin standar kepatuhan audit keamanan informasi IT.</li>
+
+
+</ul><div style="page-break-after: always;"></div>
+
+<h1>BAB 8: MANAJEMEN AKSES & KEAMANAN SISTEM</h1>
+
+<div class="img-container"><img alt="Halaman Pengelolaan Pengguna, Peran, dan Hak Akses Role RBAC" src="images/user-management-index.png" /><p class="caption">Halaman Pengelolaan Pengguna, Peran, dan Hak Akses Role RBAC</p></div>
+
+<h2>Manajemen Akses & Keamanan Pengguna (User & Role Access Control)</h2>
+
+<h3>1. Deskripsi Singkat</h3>
+Modul Manajemen Akses mengatur otentikasi akun pengguna (<em>User Management</em>), kredensial login, status aktif/non-aktif akun, serta alokasi peran (<em>Roles & Permissions</em>) menggunakan standar Spatie Permission RBAC (Role-Based Access Control) di WMS LAF Project.
+
+<hr>
+
+<h3>2. Role / Hak Akses</h3>
+<ul><li><strong>Akses Sistem Administrator (</code>manage system<code>)</strong>: Super Admin saja.</li>
+
+</ul><hr>
+
+<h3>3. Lokasi Menu (Path / URL)</h3>
+<ul><li><strong>Path Navigasi</strong>: Sidebar -> Manajemen Akses</li>
+<li><strong>URL</strong>: </code>/user-management<code></li>
+
+</ul><hr>
+
+<h3>4. Alur Penggunaan (Step by Step)</h3>
+<p>#### <strong>A. Menambah Pengguna Baru</strong></p>
+1. Buka menu <strong>Manajemen Akses</strong> -> Klik tombol <strong>+ Tambah Pengguna Baru</strong>.
+2. Isi <strong>Nama Lengkap</strong>, <strong>Alamat Email</strong> (Unik), dan <strong>Password</strong> (min 8 karakter + konfirmasi).
+3. Pilih <strong>Peran / Role</strong>:
+<ul><li></code>super_admin<code>: Memiliki seluruh akses termasuk manajemen sistem pengguna.</li>
+<li></code>admin<code>: Memiliki seluruh akses operasional gudang, master, dan laporan keuangan (kecuali user management).</li>
+<li></code>operator_gudang<code>: Akses khusus transaksi barang masuk, barang keluar, transfer, opname, picking, dan packing.</li>
+<li></code>sales<code>: Akses khusus pencatatan barang keluar, buat PO, dan pratinjau katalog stok.</li>
+<li></code>finance<code>: Akses khusus laporan analitik, nilai inventori, dan transaksi PO/Stok.</li>
+</ul>4. Tentukan <strong>Status Akun</strong> (Aktif / Non-Aktif).
+5. Klik <strong>Simpan Pengguna</strong>.
+<p>#### <strong>B. Mengedit Data / Reset Password Pengguna</strong></p>
+1. Klik tombol <strong>Edit</strong> pada baris pengguna yang ingin diubah.
+2. Ubah data nama, email, role, atau centang ubah password jika pengguna lupa kata sandi.
+3. Klik <strong>Perbarui Pengguna</strong>.
+<p>#### <strong>C. Menonaktifkan Akun Pengguna</strong></p>
+1. Klik tombol <strong>Nonaktifkan Akun</strong> (atau ubah status </code>is_active<code> menjadi false).
+2. Pengguna yang dinonaktifkan tidak akan bisa login ke dalam sistem WMS LAF Project meskipun password benar.
+
+<hr>
+
+<h3>5. Penjelasan Field User Management</h3>
+
+<table><tr><td>Nama Field</td><td>Tipe Input</td><td>Wajib / Opsional</td><td>Keterangan & Validasi</td></tr>
+
+<tr><td></code>name<code></td><td>Text</td><td>Wajib</td><td>Nama pengguna lengkap (maks 255 karakter)</td></tr>
+<tr><td></code>email<code></td><td>Email</td><td>Wajib</td><td>Alamat email unik login pengguna (Unique in </code>users<code>)</td></tr>
+<tr><td></code>password<code></td><td>Password</td><td>Wajib<em></td><td>Kata sandi minimal 8 karakter (</em>Wajib saat buat baru, opsional saat edit)</td></tr>
+<tr><td></code>password_confirmation<code></td><td>Password</td><td>Wajib*</td><td>Konfirmasi ulang kata sandi (Harus identik dengan </code>password<code>)</td></tr>
+<tr><td></code>roleName<code></td><td>Select</td><td>Wajib</td><td>Pilihan Role Spatie (</code>super_admin<code>, </code>admin<code>, </code>operator_gudang<code>, </code>sales<code>, </code>finance<code>)</td></tr>
+<tr><td></code>is_active<code></td><td>Toggle / Select</td><td>Wajib</td><td>Status akun pengguna (</code>Aktif<code> / </code>Non-Aktif<code>)</td></tr>
+
+</table><hr>
+
+<h3>6. Tombol & Aksi</h3>
+
+<table><tr><td>Nama Tombol</td><td>Aksi & Efek ke Sistem</td></tr>
+
+<tr><td><strong>+ Tambah Pengguna Baru</strong></td><td>Membuka modal form pendaftaran akun user WMS baru.</td></tr>
+<tr><td><strong>Edit Pengguna</strong></td><td>Membuka modal penyuntingan nama, role, email, dan reset password.</td></tr>
+<tr><td><strong>Nonaktifkan / Aktifkan</strong></td><td>Mengubah status keaktifan </code>is_active<code> pengguna secara instan.</td></tr>
+<tr><td><strong>Hapus User</strong></td><td>Memindahkan/menghapus akun user (Super Admin terlindungi dari penghapusan mandiri).</td></tr>
+
+</table><hr>
+
+<h3>7. Validasi & Aturan Bisnis (Controller </code>UserManagement\Index.php<code>)</h3>
+<ul><li><strong>Proteksi Super Admin Mandiri</strong>: Pengguna </code>super_admin<code> <strong>TIDAK BISA MENGHAPUS ATAU MENONAKTIFKAN AKUNNYA SENDIRI</strong> saat sedang dalam posisi login untuk mencegah terkuncinya sistem (<em>System Lockout Protection</em>).</li>
+<li><strong>Enkripsi Kredensial</strong>: Password disimpan di database menggunakan enkripsi hashing aman </code>Bcrypt<code> (</code>Hash::make()`).</li>
+
+</ul><hr>
+
+<h3>8. Keamanan & Log Out Session</h3>
+<ul><li><strong>Pemberhentian Sesi</strong>: Pengguna dapat keluar dari sistem dengan mengklik tombol <strong>Keluar (Logout)</strong> di bagian paling bawah sidebar utama. Sesi cookie dan token CSRF otomatis dihanguskan.</li>
+</ul>
+</body>
+</html>

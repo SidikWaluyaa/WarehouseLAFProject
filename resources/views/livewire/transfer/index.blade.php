@@ -1,4 +1,4 @@
-<div x-init="$dispatch('update-header-title', 'Transfer Gudang')" class="flex-1 overflow-y-auto p-6 lg:p-margin-desktop space-y-stack-lg custom-scrollbar">
+﻿<div x-init="$dispatch('update-header-title', 'Transfer Gudang')" class="flex-1 overflow-y-auto p-6 lg:p-margin-desktop space-y-stack-lg custom-scrollbar">
 
 
     {{-- KPI Cards --}}
@@ -38,7 +38,7 @@
                 <option value="CANCELLED">Cancelled</option>
             </select>
         </div>
-        <a href="{{ route('transfer.create') }}" wire:navigate class="btn-primary flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold whitespace-nowrap bg-primary text-on-primary hover:bg-primary/90 transition-colors">
+        <a href="{{ route('transfer.create') }}" class="btn-primary flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold whitespace-nowrap bg-primary text-on-primary hover:bg-primary/90 transition-colors">
             <span class="material-symbols-outlined text-lg">add</span>
             Buat Transfer Order
         </a>
@@ -75,7 +75,7 @@
                             </td>
                             <td class="py-4 px-5 text-sm">{{ $t->created_by }}</td>
                             <td class="py-4 px-5 text-center">
-                                <a href="{{ route('transfer.detail', $t->id) }}" wire:navigate class="text-primary hover:underline text-xs font-bold">Detail &rarr;</a>
+                                <a href="{{ route('transfer.detail', $t->id) }}" class="text-primary hover:underline text-xs font-bold">Detail &rarr;</a>
                             </td>
                         </tr>
                     @empty

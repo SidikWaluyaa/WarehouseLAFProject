@@ -21,10 +21,6 @@ class Index extends Component
         if (!$user || (!$user->can('manage master') && !$user->can('input keluar') && !$user->can('view master'))) {
             abort(403, 'Unauthorized action.');
         }
-
-        if (session()->has('success_message')) {
-            $this->toastSuccess(session('success_message'));
-        }
     }
 
     // Search and Filter states
@@ -92,10 +88,6 @@ class Index extends Component
 
     public function render()
     {
-        if (session()->has('success_message')) {
-            $this->toastSuccess(session('success_message'));
-        }
-
         $query = BarangKeluar::with(['details.produk', 'pelanggan']);
 
         // Apply search

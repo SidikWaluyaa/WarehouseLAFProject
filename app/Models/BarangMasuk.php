@@ -17,6 +17,7 @@ class BarangMasuk extends Model
         'tipe_nota',
         'supplier_id',
         'nomor_nota',
+        'po_header_id',
         'keterangan_tambahan',
         'data_dimasukan_oleh',
     ];
@@ -28,6 +29,21 @@ class BarangMasuk extends Model
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class, 'supplier_id');
+    }
+
+    public function poHeader(): BelongsTo
+    {
+        return $this->belongsTo(PoHeader::class, 'po_header_id');
+    }
+
+    public function scopeFromPo($query)
+    {
+        return $query->whereNotNull('po_header_id')->orWhere('tipe_nota', 'Purchase Order');
+    }
+
+    public function scopeNonPo($query)
+    {
+        return $query->whereNull('po_header_id')->where('tipe_nota', '!=', 'Purchase Order');
     }
 
     public function auditLogs(): \Illuminate\Database\Eloquent\Relations\MorphMany

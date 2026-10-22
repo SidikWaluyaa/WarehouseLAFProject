@@ -21,6 +21,7 @@ class Create extends Component
     public $tanggal = '';
     public $tipe_nota = 'Pembelian';
     public $supplier_id = '';
+    public ?int $po_header_id = null;
     public $nomor_nota = '';
     public $keterangan_tambahan = '';
 
@@ -38,10 +39,11 @@ class Create extends Component
 
     protected function rules()
     {
-        return [
+        $rules = [
             'tanggal' => 'required|date',
-            'tipe_nota' => 'required|in:Stock Awal,Pembelian,Retur Masuk,Penyesuaian',
+            'tipe_nota' => 'required|in:Stock Awal,Pembelian,Purchase Order,Retur Masuk,Penyesuaian',
             'supplier_id' => $this->tipe_nota === 'Stock Awal' ? 'nullable|exists:mst_supplier,id' : 'required|exists:mst_supplier,id',
+            'po_header_id' => 'nullable|exists:po_header,id',
             'nomor_nota' => 'required|string|max:100|unique:trx_barang_masuk_header,nomor_nota',
             'keterangan_tambahan' => 'nullable|string',
             'items' => 'required|array|min:1',
@@ -51,7 +53,22 @@ class Create extends Component
             'items.*.lokasi_simpan' => 'required|exists:mst_lokasi,kode_lokasi',
             'items.*.hpp' => 'required|numeric|min:0',
             'items.*.po_detail_id' => 'nullable|exists:po_detail,id',
+            'items.*.alasan_selisih' => 'nullable|string|max:255',
         ];
+
+        // Alasan wajib diisi jika qty terima berbeda dari sisa PO (dicek terhadap data DB, bukan state klien)
+        $poDetailIds = collect($this->items)->pluck('po_detail_id')->filter()->unique()->all();
+        if (!empty($poDetailIds)) {
+            $sisaMap = PoDetail::whereIn('id', $poDetailIds)->pluck('sisa', 'id');
+            foreach ($this->items as $i => $item) {
+                $pid = $item['po_detail_id'] ?? null;
+                if (!empty($pid) && isset($sisaMap[$pid]) && (int) ($item['qty_masuk'] ?? 0) !== (int) $sisaMap[$pid]) {
+                    $rules["items.{$i}.alasan_selisih"] = 'required|string|max:255';
+                }
+            }
+        }
+
+        return $rules;
     }
 
     public function messages(): array
@@ -77,6 +94,7 @@ class Create extends Component
             'items.*.hpp.required' => 'Harga beli/HPP wajib diisi.',
             'items.*.hpp.numeric' => 'Harga beli harus berupa angka.',
             'items.*.hpp.min' => 'Harga beli minimal adalah 0.',
+            'items.*.alasan_selisih.required' => 'Qty berbeda dari sisa PO — isi alasan selisih.',
         ];
     }
 
@@ -98,7 +116,52 @@ class Create extends Component
         $this->nomor_nota = StockEngineService::generateNomorNotaBarangMasuk($this->tanggal);
         $this->suppliersList = Supplier::orderByRaw('nama_supplier')->get();
         $this->locationsList = \App\Models\Lokasi::where(['is_active' => true])->orderByRaw('kode_lokasi')->get();
-        $this->addItem();
+
+        $poId = request()->query('po_id');
+        if (!empty($poId)) {
+            $poHeader = \App\Models\PoHeader::with(['poDetails.produk'])->find($poId);
+            if ($poHeader) {
+                $this->po_header_id = $poHeader->id;
+                $this->tipe_nota = 'Purchase Order';
+                $this->supplier_id = $poHeader->supplier_id;
+                $poIdent = $poHeader->nomor_po ?: ($poHeader->artikel ?: 'PO #' . $poHeader->id);
+                if (empty($this->keterangan_tambahan)) {
+                    $this->keterangan_tambahan = "Penerimaan PO: " . $poIdent;
+                }
+                
+                // Opsional: hanya item terpilih dari halaman Detail PO, format ?terima[po_detail_id]=qty
+                $terima = request()->query('terima');
+                $terima = is_array($terima) ? array_filter($terima, fn($q) => is_numeric($q) && (int) $q > 0) : [];
+
+                $poDetailsQuery = $poHeader->poDetails()->where('sisa', '>', 0);
+                if (!empty($terima)) {
+                    $poDetailsQuery->whereIn('id', array_map('intval', array_keys($terima)));
+                }
+                $poDetails = $poDetailsQuery->get();
+                if ($poDetails->count() > 0) {
+                    $this->items = [];
+                    foreach ($poDetails as $poD) {
+                        $this->items[] = [
+                            'produk_id' => $poD->produk_id,
+                            'search_query' => $poD->produk?->nama_barang ?? '',
+                            'qty_masuk' => isset($terima[$poD->id]) ? (int) $terima[$poD->id] : $poD->sisa,
+                            'hpp' => $poD->hpp,
+                            'lokasi_simpan' => $poD->produk?->lokasi ?: 'GDG-A01',
+                            'po_detail_id' => $poD->id,
+                            'sisa_po' => (int) $poD->sisa,
+                            'alasan_selisih' => '',
+                        ];
+                    }
+                } else {
+                    $this->addItem();
+                    session()->flash('error_message', "Seluruh item pada Purchase Order ini sudah diterima.");
+                }
+            } else {
+                $this->addItem();
+            }
+        } else {
+            $this->addItem();
+        }
     }
 
     public function updatedTanggal(mixed $value)
@@ -118,6 +181,12 @@ class Create extends Component
 
     public function updated(string $propertyName): void
     {
+        // Sinkronkan sisa PO saat item dihubungkan/dilepas dari PO lewat dropdown
+        if (str_starts_with($propertyName, 'items.') && str_ends_with($propertyName, '.po_detail_id')) {
+            $index = (int) explode('.', $propertyName)[1];
+            $pid = $this->items[$index]['po_detail_id'] ?? null;
+            $this->items[$index]['sisa_po'] = !empty($pid) ? (int) (PoDetail::find($pid)?->sisa ?? 0) : null;
+        }
         if (str_starts_with($propertyName, 'items.') && str_ends_with($propertyName, '.produk_id')) {
             $parts = explode('.', $propertyName);
             $index = (int)$parts[1];
@@ -267,7 +336,10 @@ class Create extends Component
             });
 
             session()->flash('success_message', "Transaksi barang masuk berhasil disimpan dan stok terupdate.");
-            return $this->redirect('/barang-masuk', navigate: true);
+            if (!empty($this->po_header_id)) {
+                return $this->redirect(route('purchase-order.show', $this->po_header_id), navigate: false);
+            }
+            return $this->redirect('/barang-masuk', navigate: false);
         } catch (\Illuminate\Database\QueryException $e) {
             \Illuminate\Support\Facades\Log::error("Database Error in Pembelian/Create: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             $this->alertError("Terjadi kesalahan pada server. Silakan coba lagi atau hubungi administrator.");

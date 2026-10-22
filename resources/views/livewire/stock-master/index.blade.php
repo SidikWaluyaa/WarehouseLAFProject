@@ -13,17 +13,17 @@
         <!-- KPI Card 1 -->
         <div class="glass-card rounded-3xl p-6 relative overflow-hidden group hover:border-primary/20 transition-all duration-500 amber-glow">
             <div class="absolute -top-4 -right-4 material-symbols-outlined text-primary/10 text-8xl group-hover:scale-110 transition-transform duration-700">inventory</div>
-            <p class="text-on-surface-variant text-sm font-medium mb-1">Total SKUs</p>
+            <p class="text-on-surface-variant text-sm font-medium mb-1">{{ $selectedLokasi ? 'SKU di ' . $selectedLokasi->kode_lokasi : 'Total SKUs' }}</p>
             <h3 class="text-headline-lg font-bold text-on-surface">{{ number_format($totalSkus, 0, ',', '.') }}</h3>
             <div class="mt-4 flex items-center text-[10px] uppercase tracking-wider text-primary">
                 <span class="material-symbols-outlined text-sm mr-1">trending_up</span>
-                <span>Produk Aktif</span>
+                <span>{{ $selectedLokasi ? 'Tersedia di Lokasi' : 'Produk Aktif' }}</span>
             </div>
         </div>
         <!-- KPI Card 2 -->
         <div class="glass-card rounded-3xl p-6 relative overflow-hidden group hover:border-error/20 transition-all duration-500 {{ $stokMenipis > 0 ? 'border-error/30 bg-error/5' : '' }}">
             <div class="absolute -top-4 -right-4 material-symbols-outlined text-error/10 text-8xl group-hover:scale-110 transition-transform duration-700">warning</div>
-            <p class="text-on-surface-variant text-sm font-medium mb-1">Stok Menipis</p>
+            <p class="text-on-surface-variant text-sm font-medium mb-1">{{ $selectedLokasi ? 'Stok Menipis (' . $selectedLokasi->kode_lokasi . ')' : 'Stok Menipis' }}</p>
             <h3 class="text-headline-lg font-bold text-on-surface">{{ number_format($stokMenipis, 0, ',', '.') }}</h3>
             <div class="mt-4 flex items-center text-[10px] uppercase tracking-wider text-error">
                 <span class="material-symbols-outlined text-sm mr-1">priority_high</span>
@@ -33,7 +33,7 @@
         <!-- KPI Card 3 -->
         <div class="glass-card rounded-3xl p-6 relative overflow-hidden group hover:border-primary/20 transition-all duration-500 amber-glow">
             <div class="absolute -top-4 -right-4 material-symbols-outlined text-primary/10 text-8xl group-hover:scale-110 transition-transform duration-700">payments</div>
-            <p class="text-on-surface-variant text-sm font-medium mb-1">Total Nilai Stok</p>
+            <p class="text-on-surface-variant text-sm font-medium mb-1">{{ $selectedLokasi ? 'Nilai Stok (' . $selectedLokasi->kode_lokasi . ')' : 'Total Nilai Stok' }}</p>
             <h3 class="text-headline-lg font-bold text-on-surface">{{ $totalNilaiStok }}</h3>
             <div class="mt-4 w-full h-1 bg-white/5 rounded-full overflow-hidden">
                 <div class="h-full bg-primary amber-glow-strong" style="width: 75%"></div>
@@ -42,13 +42,13 @@
         <!-- KPI Card 4 -->
         <div class="glass-card rounded-3xl p-6 relative overflow-hidden group hover:border-primary/20 transition-all duration-500 amber-glow">
             <div class="absolute -top-4 -right-4 material-symbols-outlined text-primary/10 text-8xl group-hover:scale-110 transition-transform duration-700">rocket_launch</div>
-            <p class="text-on-surface-variant text-sm font-medium mb-1">Fast Moving</p>
+            <p class="text-on-surface-variant text-sm font-medium mb-1">{{ $selectedLokasi ? 'Fast Moving (' . $selectedLokasi->kode_lokasi . ')' : 'Fast Moving' }}</p>
             <h3 class="text-xl font-bold text-on-surface truncate">
                 {{ $fastMovingProduct ? $fastMovingProduct->nama_barang : 'N/A' }}
             </h3>
             <div class="mt-4 flex items-center text-[10px] uppercase tracking-wider text-on-tertiary-container">
                 <span class="material-symbols-outlined text-sm mr-1">check_circle</span>
-                <span>Permintaan Tinggi ({{ $fastMovingProduct ? $fastMovingProduct->stok_keluar : 0 }} Keluar)</span>
+                <span>{{ $selectedLokasi ? ($fastMovingProduct && isset($fastMovingProduct->lokasi_keluar) ? $fastMovingProduct->lokasi_keluar . ' Keluar dari ' . $selectedLokasi->kode_lokasi : 'Stok Aktif di Lokasi') : 'Permintaan Tinggi (' . ($fastMovingProduct ? $fastMovingProduct->stok_keluar : 0) . ' Keluar)' }}</span>
             </div>
         </div>
     </section>
@@ -98,6 +98,13 @@
                     <span class="material-symbols-outlined text-primary">upload</span>
                     Impor Excel
                 </button>
+                <button wire:click="openWaModal" class="flex items-center gap-2 px-4 py-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-2xl text-sm font-semibold hover:bg-emerald-500/20 transition-all active:scale-95">
+                    <span class="material-symbols-outlined text-emerald-400">chat</span>
+                    Peringatan Stok WA
+                    @if($lowStockCount > 0)
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-500 text-black text-[10px] font-black">{{ $lowStockCount }}</span>
+                    @endif
+                </button>
                 @endcan
             </div>
             @can('manage master')
@@ -121,7 +128,7 @@
             
             <!-- Location Filter -->
             <div class="space-y-1.5">
-                <label class="text-[10px] uppercase tracking-wider text-on-surface-variant/80 font-bold">Lokasi Default</label>
+                <label class="text-[10px] uppercase tracking-wider text-on-surface-variant/80 font-bold">Filter Lokasi Stok</label>
                 <div class="relative">
                     <select wire:model.live="locationFilter" class="w-full bg-surface-container-low border border-white/10 rounded-xl py-2 pl-3 pr-8 text-xs text-on-surface appearance-none focus:ring-1 focus:ring-primary focus:border-primary transition-all">
                         <option value="">Semua Lokasi</option>
@@ -138,7 +145,8 @@
                 <div class="relative">
                     <select wire:model.live="stockFilter" class="w-full bg-surface-container-low border border-white/10 rounded-xl py-2 pl-3 pr-8 text-xs text-on-surface appearance-none focus:ring-1 focus:ring-primary focus:border-primary transition-all">
                         <option value="">Semua Stok</option>
-                        <option value="menipis">Stok Menipis (≤ 5)</option>
+                        <option value="menipis">Stok Menipis (Di Bawah Ambang Batas)</option>
+                        <option value="threshold_only">Hanya Ber-Ambang Batas</option>
                         <option value="habis">Stok Habis (= 0)</option>
                         <option value="melimpah">Stok Melimpah (> 5)</option>
                     </select>
@@ -217,7 +225,7 @@
                         <th class="px-6 py-5 text-[11px] font-bold tracking-[0.2em] text-on-surface-variant/60 uppercase text-center">Mutasi</th>
                         <th wire:click="sortBy('total_stok')" class="px-6 py-5 text-[11px] font-bold tracking-[0.2em] text-on-surface-variant/60 uppercase text-right cursor-pointer hover:text-on-surface select-none">
                             <div class="flex items-center justify-end gap-1">
-                                Total Stok
+                                {{ $selectedLokasi ? 'Stok (' . $selectedLokasi->kode_lokasi . ')' : 'Total Stok' }}
                                 @if ($sortField === 'total_stok')
                                     <span class="text-primary text-xs">{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
                                 @endif
@@ -275,11 +283,14 @@
                                 <div class="group/loc flex flex-wrap items-center gap-1.5 transition-all">
                                     @if($lokasiCount > 0)
                                         @foreach($stokLokasi->take(2) as $sl)
-                                            @php $loc = $sl->lokasi; @endphp
+                                            @php 
+                                                $loc = $sl->lokasi; 
+                                                $isHighlighted = $selectedLokasi && $selectedLokasi->id === $loc->id;
+                                            @endphp
                                             @if(str_contains(strtoupper($loc->kode_lokasi), 'TKO') || str_contains(strtoupper($loc->kode_lokasi), 'TOKO'))
-                                                <span class="px-2.5 py-0.5 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-full text-[10px] font-bold uppercase tracking-wider">{{ $loc->kode_lokasi }}</span>
+                                                <span class="px-2.5 py-0.5 bg-tertiary/10 text-tertiary border {{ $isHighlighted ? 'border-tertiary ring-1 ring-tertiary/50 font-black' : 'border-tertiary/20' }} rounded-full text-[10px] font-bold uppercase tracking-wider" title="{{ $loc->nama_lokasi }}: {{ $sl->qty }} {{ $p->satuan }}">{{ $loc->kode_lokasi }} ({{ $sl->qty }})</span>
                                             @else
-                                                <span class="px-2.5 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-[10px] font-bold uppercase tracking-wider">{{ $loc->kode_lokasi }}</span>
+                                                <span class="px-2.5 py-0.5 bg-primary/10 text-primary border {{ $isHighlighted ? 'border-primary ring-1 ring-primary/50 font-black' : 'border-primary/20' }} rounded-full text-[10px] font-bold uppercase tracking-wider" title="{{ $loc->nama_lokasi }}: {{ $sl->qty }} {{ $p->satuan }}">{{ $loc->kode_lokasi }} ({{ $sl->qty }})</span>
                                             @endif
                                         @endforeach
                                         @if($lokasiCount > 2)
@@ -312,10 +323,41 @@
                             </td>
                             <!-- TOTAL STOK -->
                             <td class="px-6 py-4 text-right">
-                                <div class="flex flex-col items-end">
-                                    <span class="text-sm font-black {{ $p->total_stok <= 5 ? 'text-error' : 'text-primary' }}">{{ number_format($p->total_stok, 0, ',', '.') }}</span>
-                                    <span class="text-[9px] text-on-surface-variant/40 uppercase font-bold tracking-wider mt-0.5">{{ $p->satuan }}</span>
-                                </div>
+                                @if($selectedLokasi)
+                                    @php
+                                        $currentLokasiItem = $p->stokLokasi->first(fn($sl) => $sl->lokasi_id === $selectedLokasi->id);
+                                        $qtyAtLokasi = $currentLokasiItem ? $currentLokasiItem->qty : 0;
+                                    @endphp
+                                    <div class="flex flex-col items-end">
+                                        <span class="text-sm font-black {{ $qtyAtLokasi <= 5 ? 'text-error' : 'text-primary' }}">
+                                            {{ number_format($qtyAtLokasi, 0, ',', '.') }}
+                                            <span class="text-[9px] font-bold text-on-surface-variant/70 uppercase">{{ $p->satuan }}</span>
+                                        </span>
+                                        <span class="text-[9px] text-on-surface-variant/50 mt-0.5">
+                                            Total Semua: <strong class="text-on-surface-variant/80 font-mono">{{ number_format($p->total_stok, 0, ',', '.') }}</strong>
+                                        </span>
+                                    </div>
+                                @else
+                                    <div class="flex flex-col items-end">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-sm font-black {{ $p->isLowStock() ? 'text-error' : 'text-primary' }}">{{ number_format($p->total_stok, 0, ',', '.') }}</span>
+                                            <span class="text-[9px] text-on-surface-variant/40 uppercase font-bold tracking-wider">{{ $p->satuan }}</span>
+                                        </div>
+                                        @if($p->is_threshold_active)
+                                            <div class="mt-1 flex items-center gap-1">
+                                                @if($p->isLowStock())
+                                                    <span class="px-1.5 py-0.5 rounded bg-error/20 border border-error/30 text-error text-[9px] font-black uppercase tracking-wider animate-pulse flex items-center gap-0.5" title="Di bawah batas minimum: {{ $p->min_stok }}">
+                                                        <span class="material-symbols-outlined text-[10px]">warning</span> Menipis (Min: {{ $p->min_stok }})
+                                                    </span>
+                                                @else
+                                                    <span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-on-surface-variant/70 text-[9px] font-mono" title="Ambang Batas Minimum: {{ $p->min_stok }}">
+                                                        Min: {{ $p->min_stok }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
                             </td>
                             <!-- HARGA (Beli / Jual) -->
                             <td class="px-6 py-4 text-right">
@@ -430,7 +472,7 @@
                                                             <span class="ml-auto font-black text-primary">{{ $m->qty }} unit</span>
                                                         </div>
                                                         <div class="flex justify-between text-[9px] text-on-surface-variant/40 mt-1">
-                                                            <span>{{ $m->created_at->format('d/m/Y H:i') }}</span>
+                                                            <span>{{ $m->created_at->format('d/m/Y H:i') }} WIB</span>
                                                             <span>{{ $m->tipe_mutasi }}</span>
                                                         </div>
                                                     </div>
@@ -441,6 +483,149 @@
                                         @endif
                                     </div>
 
+                                </div>
+
+                                <!-- Section 4: Pengaturan Ambang Batas & PIC WhatsApp (Card Lebar Horizontal) -->
+                                <div @click.stop 
+                                     x-data="{ 
+                                        saved: false, 
+                                        saving: false,
+                                        isActive: {{ $p->is_threshold_active ? 'true' : 'false' }},
+                                        minStok: '{{ $p->min_stok ?? '' }}',
+                                        notifPhone: '{{ $p->notif_phone ?? '' }}',
+                                        timeout: null,
+                                        triggerSave(field, val) {
+                                            this.saving = true;
+                                            this.saved = false;
+                                            if (field === 'is_threshold_active' && val && (!this.minStok || parseInt(this.minStok) <= 0)) {
+                                                this.minStok = '{{ $p->kategori_2 === "TOP 20" ? "20" : "10" }}';
+                                            }
+                                            $wire.updateThresholdInline({{ $p->id }}, field, val).then(() => {
+                                                this.saving = false;
+                                                this.saved = true;
+                                                clearTimeout(this.timeout);
+                                                this.timeout = setTimeout(() => { this.saved = false; }, 3000);
+                                            });
+                                        }
+                                     }"
+                                     class="mt-6 p-5 rounded-2xl bg-gradient-to-r from-surface-container-low/90 to-surface-container/70 border border-white/10 shadow-lg relative overflow-hidden space-y-4">
+                                    
+                                    <!-- Header Card -->
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/5">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                                                <span class="material-symbols-outlined text-lg">notifications_active</span>
+                                            </div>
+                                            <div>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-xs font-black uppercase tracking-wider text-on-surface">PENGATURAN AMBANG BATAS & PIC WHATSAPP</span>
+                                                    @if($p->kategori_2 === 'TOP 20')
+                                                        <span class="px-2 py-0.5 bg-primary/20 text-primary border border-primary/30 rounded text-[9px] font-bold uppercase tracking-wider">TOP 20</span>
+                                                    @endif
+                                                </div>
+                                                <p class="text-[10px] text-on-surface-variant/60 mt-0.5">Pantau batas minimum stok produk ini dan hubungkan dengan nomor PIC penerima peringatan WhatsApp.</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center gap-3">
+                                            <!-- Inline Auto-Save Feedback -->
+                                            <div class="h-6 flex items-center">
+                                                <span x-show="saving" x-cloak class="text-[11px] text-amber-400 flex items-center gap-1.5 font-mono">
+                                                    <div class="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+                                                    Menyimpan...
+                                                </span>
+                                                <span x-show="saved" x-cloak class="text-[11px] text-emerald-400 flex items-center gap-1 font-mono font-bold transition-all">
+                                                    <span class="material-symbols-outlined text-sm">check_circle</span>
+                                                    Tersimpan otomatis
+                                                </span>
+                                            </div>
+
+                                            <!-- Status Pill -->
+                                            @if($p->isLowStock())
+                                                <span class="px-2.5 py-1 rounded-full bg-error/20 border border-error/30 text-error text-[10px] font-black uppercase tracking-wider animate-pulse flex items-center gap-1" title="Stok di bawah batas minimum!">
+                                                    <span class="material-symbols-outlined text-xs">warning</span>
+                                                    Menipis (Defisit {{ max(0, $p->min_stok - $p->total_stok) }} {{ $p->satuan }})
+                                                </span>
+                                            @elseif($p->is_threshold_active)
+                                                <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1" title="Stok aman di atas batas minimum">
+                                                    <span class="material-symbols-outlined text-xs">verified</span>
+                                                    Stok Aman ({{ $p->total_stok }} {{ $p->satuan }})
+                                                </span>
+                                            @else
+                                                <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-on-surface-variant/50 text-[10px] font-bold uppercase tracking-wider">
+                                                    Nonaktif
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <!-- Body Form Inputs Grid -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                                        <!-- Field 1: Toggle Switch -->
+                                        <div class="space-y-1.5">
+                                            <label class="text-[10px] uppercase tracking-wider text-on-surface-variant/80 font-bold block">Status Pemantauan</label>
+                                            <div class="h-10 px-3 bg-surface-dark/60 border border-white/10 rounded-xl flex items-center justify-between">
+                                                <span class="text-xs text-on-surface font-semibold">Pantau Ambang Batas</span>
+                                                <label class="relative inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" x-model="isActive" @change="triggerSave('is_threshold_active', isActive)" class="sr-only peer">
+                                                    <div class="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Field 2: Minimum Stock (Qty) -->
+                                        <div class="space-y-1.5">
+                                            <div class="flex items-center justify-between">
+                                                <label class="text-[10px] uppercase tracking-wider text-on-surface-variant/80 font-bold block">Batas Minimum (Qty)</label>
+                                                <span class="text-[9px] text-on-surface-variant/50 font-mono">{{ $p->satuan }}</span>
+                                            </div>
+                                            <div class="relative">
+                                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">inventory_2</span>
+                                                <input type="number" 
+                                                       min="1" 
+                                                       x-model="minStok" 
+                                                       @input.debounce.500ms="triggerSave('min_stok', minStok)" 
+                                                       :disabled="!isActive" 
+                                                       placeholder="{{ $p->kategori_2 === 'TOP 20' ? '20' : '10' }}" 
+                                                       class="w-full h-10 bg-surface-dark/60 border border-white/10 rounded-xl py-2 pl-9 pr-3 text-xs text-on-surface focus:ring-1 focus:ring-primary focus:border-primary font-mono transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                                            </div>
+                                        </div>
+
+                                        <!-- Field 3: PIC WhatsApp Phone -->
+                                        <div class="space-y-1.5">
+                                            <div class="flex items-center justify-between">
+                                                <label class="text-[10px] uppercase tracking-wider text-on-surface-variant/80 font-bold block">Nomor WA PIC (Opsional)</label>
+                                                <span class="text-[9px] text-emerald-400 font-mono">Fonnte</span>
+                                            </div>
+                                            <div class="relative">
+                                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">call</span>
+                                                <input type="text" 
+                                                       x-model="notifPhone" 
+                                                       @input.debounce.500ms="triggerSave('notif_phone', notifPhone)" 
+                                                       :disabled="!isActive" 
+                                                       placeholder="08xxxxxxxxxx (Default Sistem)" 
+                                                       class="w-full h-10 bg-surface-dark/60 border border-white/10 rounded-xl py-2 pl-9 pr-3 text-xs text-on-surface focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 font-mono transition-all disabled:opacity-40 disabled:cursor-not-allowed placeholder:text-on-surface-variant/30">
+                                            </div>
+                                        </div>
+
+                                        <!-- Field 4: Quick Action / Info -->
+                                        <div class="space-y-1.5">
+                                            <label class="text-[10px] uppercase tracking-wider text-on-surface-variant/80 font-bold block">Tindakan Cepat</label>
+                                            @if($p->isLowStock())
+                                                <button wire:click.stop="openWaModalSingleProduct({{ $p->id }})" 
+                                                        type="button" 
+                                                        class="w-full h-10 px-4 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10">
+                                                    <span class="material-symbols-outlined text-base">chat</span>
+                                                    <span>Kirim WA Produk Ini</span>
+                                                </button>
+                                            @else
+                                                <div class="h-10 px-3 bg-white/5 border border-white/5 rounded-xl flex items-center gap-2 text-on-surface-variant/50 text-[10px]">
+                                                    <span class="material-symbols-outlined text-sm text-emerald-400/70">auto_mode</span>
+                                                    <span>Tersimpan otomatis saat diedit.</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -455,12 +640,23 @@
             </table>
         </div>
 
-        <!-- Custom Styled Pagination -->
-        <div class="px-6 py-4 border-t border-white/5 flex items-center justify-between">
-            <p class="text-xs text-on-surface-variant">
-                Menampilkan {{ $products->firstItem() ?? 0 }} s.d. {{ $products->lastItem() ?? 0 }} dari {{ $products->total() }} hasil
-            </p>
-            <div class="flex gap-2">
+        <!-- Custom Styled Pagination & Per Page Selector -->
+        <div class="px-6 py-4 border-t border-white/5 bg-white/[0.01] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center gap-4">
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                    <span class="font-medium text-slate-400">Tampilkan:</span>
+                    <select wire:model.live="perPage" class="bg-surface-container-low border border-white/10 rounded-xl py-1.5 px-3 text-xs text-on-surface font-semibold focus:ring-1 focus:ring-primary focus:border-primary transition-all">
+                        <option value="10">10 per halaman</option>
+                        <option value="25">25 per halaman</option>
+                        <option value="50">50 per halaman</option>
+                        <option value="100">100 per halaman</option>
+                    </select>
+                </div>
+                <p class="text-xs text-on-surface-variant font-mono">
+                    Menampilkan {{ $products->firstItem() ?? 0 }} s.d. {{ $products->lastItem() ?? 0 }} dari {{ $products->total() }} hasil
+                </p>
+            </div>
+            <div class="flex gap-2 items-center">
                 @if ($products->onFirstPage())
                     <button class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-on-surface-variant/50 cursor-not-allowed" disabled>Sebelumnya</button>
                 @else
@@ -484,161 +680,338 @@
         </div>
     </section>
 
-    <!-- CRUD Modal -->
+    <!-- CRUD Modal (Rebuilt Wide 2-Column Layout) -->
     @if ($isOpen)
-    <div class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
-        <!-- Backdrop -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none p-4 md:p-6">
+        <!-- Backdrop with Blur -->
         <div class="fixed inset-0 bg-background/80 backdrop-blur-md transition-opacity" wire:click="closeModal"></div>
 
-        <!-- Modal Content -->
-        <div class="relative w-full max-w-lg mx-auto my-6 z-50 px-4">
+        <!-- Modal Content (max-w-4xl for wide, comfortable 2-column layout) -->
+        <div class="relative w-full max-w-4xl mx-auto my-auto z-50">
             <div class="relative flex flex-col w-full glass-card rounded-3xl shadow-2xl border border-white/10 outline-none focus:outline-none overflow-hidden bg-surface-dark/95">
+                
                 <!-- Modal Header -->
-                <div class="flex items-center justify-between px-6 py-5 border-b border-white/5">
-                    <h3 class="text-base font-bold text-primary">{{ $isEdit ? 'Ubah Produk' : 'Tambah Produk Baru' }}</h3>
-                    <button wire:click="closeModal" class="text-on-surface-variant hover:text-on-surface">
+                <div class="flex items-center justify-between px-6 py-5 border-b border-white/10 bg-white/[0.02]">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-inner">
+                            <span class="material-symbols-outlined text-xl">inventory_2</span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-on-surface flex items-center gap-2">
+                                <span>{{ $isEdit ? 'Ubah Data Produk' : 'Tambah Produk Baru' }}</span>
+                                @if($isEdit)
+                                    <span class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-mono text-[10px] font-bold">Edit Mode</span>
+                                @endif
+                            </h3>
+                            <p class="text-xs text-on-surface-variant/70">Lengkapi data master produk, spesifikasi varian, penetapan harga, dan pemantauan stok.</p>
+                        </div>
+                    </div>
+                    <button wire:click="closeModal" class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-all cursor-pointer border border-white/5">
                         <span class="material-symbols-outlined text-lg">close</span>
                     </button>
                 </div>
 
-                <!-- Modal Body -->
-                <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                    <!-- Nama Produk -->
-                    <div>
-                        <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">Nama Produk (Model Utama)</label>
-                        <input wire:model.live.debounce.300ms="nama_produk" type="text" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30" placeholder="Contoh: Sandal Slide Black">
-                        @error('nama_produk') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
+                <!-- Modal Body: 2-Column Responsive Grid -->
+                <div class="p-6 max-h-[78vh] overflow-y-auto custom-scrollbar">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        
+                        <!-- LEFT COLUMN: Identitas & Varian Produk -->
+                        <div class="space-y-5">
+                            
+                            <!-- Card 1: Identitas & Klasifikasi -->
+                            <div class="p-5 rounded-2xl bg-surface-container-low/60 border border-white/5 space-y-4">
+                                <div class="flex items-center gap-2 pb-2.5 border-b border-white/5">
+                                    <span class="material-symbols-outlined text-primary text-base">category</span>
+                                    <span class="text-xs font-bold text-on-surface uppercase tracking-wider">Identitas & Klasifikasi</span>
+                                </div>
+
+                                <!-- Nama Model Utama -->
+                                <div>
+                                    <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-1.5">
+                                        Nama Produk (Model Utama) <span class="text-primary">*</span>
+                                    </label>
+                                    <input wire:model.live.debounce.300ms="nama_produk" type="text" class="w-full bg-surface-container border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30 font-medium" placeholder="Contoh: Sandal Slide Black">
+                                    @if($errors->has('nama_produk')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('nama_produk') }}</span> @endif
+                                </div>
+
+                                <!-- Nama Display Rak -->
+                                <div>
+                                    <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-1.5">
+                                        Nama Display (Etalase / Rak) <span class="text-primary">*</span>
+                                    </label>
+                                    <input wire:model="nama_barang" type="text" class="w-full bg-surface-container border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30 font-medium" placeholder="Contoh: Sandal Slide Hitam Kasual">
+                                    @if($errors->has('nama_barang')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('nama_barang') }}</span> @endif
+                                </div>
+
+                                <!-- Kategori 1 & Kategori 2 in 2-Col -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-1.5">
+                                            Kategori (1) <span class="text-primary">*</span>
+                                        </label>
+                                        <select wire:model.live="kategori" class="w-full bg-surface-container border border-white/10 rounded-xl py-2.5 px-3 text-xs text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer">
+                                            <option value="">Pilih Kategori</option>
+                                            <option value="Sandal Anak">Sandal Anak</option>
+                                            <option value="Sepatu Anak">Sepatu Anak</option>
+                                            <option value="Sandal Dewasa">Sandal Dewasa</option>
+                                            <option value="Sepatu Dewasa">Sepatu Dewasa</option>
+                                            <option value="Tas">Tas</option>
+                                            <option value="Aksesoris">Aksesoris</option>
+                                            <option value="Apparel">Apparel</option>
+                                            <option value="Packaging">Packaging</option>
+                                        </select>
+                                        @if($errors->has('kategori')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('kategori') }}</span> @endif
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-1.5">
+                                            Status Siklus (Kategori 2)
+                                        </label>
+                                        <select wire:model.live="kategori_2" class="w-full bg-surface-container border border-white/10 rounded-xl py-2.5 px-3 text-xs text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer">
+                                            <option value="">Pilih Status Siklus</option>
+                                            <option value="TOP 20">TOP 20</option>
+                                            <option value="On Hold">On Hold</option>
+                                            <option value="Produk Berjalan">Produk Berjalan</option>
+                                            <option value="Deadstock">Deadstock</option>
+                                        </select>
+                                        @if($errors->has('kategori_2')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('kategori_2') }}</span> @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Varian & SKU Otomatis -->
+                            <div class="p-5 rounded-2xl bg-surface-container-low/60 border border-white/5 space-y-4">
+                                <div class="flex items-center gap-2 pb-2.5 border-b border-white/5">
+                                    <span class="material-symbols-outlined text-primary text-base">palette</span>
+                                    <span class="text-xs font-bold text-on-surface uppercase tracking-wider">Spesifikasi Varian & Kode SKU</span>
+                                </div>
+
+                                <!-- Warna & Size -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-1.5">Warna</label>
+                                        <input wire:model.live.debounce.300ms="warna" type="text" class="w-full bg-surface-container border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30" placeholder="Contoh: Hitam">
+                                        @if($errors->has('warna')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('warna') }}</span> @endif
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-1.5">Ukuran / Size</label>
+                                        <input wire:model.live.debounce.300ms="size" type="text" class="w-full bg-surface-container border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30" placeholder="Contoh: 40">
+                                        @if($errors->has('size')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('size') }}</span> @endif
+                                    </div>
+                                </div>
+
+                                <!-- Variasi Otomatis & Satuan -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-1.5">Variasi (Otomatis)</label>
+                                        <div class="relative flex items-center">
+                                            <input wire:model="variasi_barang" type="text" class="w-full bg-white/[0.03] border border-white/10 rounded-xl py-2.5 pl-3 pr-8 text-xs text-primary font-mono font-semibold transition-all" placeholder="Hitam / 40" readonly>
+                                            <span class="material-symbols-outlined absolute right-2.5 text-sm text-primary/60" title="Terisi otomatis dari warna & ukuran">auto_fix_high</span>
+                                        </div>
+                                        @if($errors->has('variasi_barang')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('variasi_barang') }}</span> @endif
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-1.5">Satuan</label>
+                                        <input wire:model="satuan" type="text" class="w-full bg-surface-container border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30" placeholder="pasang / pcs">
+                                        @if($errors->has('satuan')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('satuan') }}</span> @endif
+                                    </div>
+                                </div>
+
+                                <!-- SKU Smart Card -->
+                                <div class="p-3.5 rounded-xl bg-surface-container border border-white/10 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+                                            <span class="material-symbols-outlined text-sm text-primary">qr_code_2</span>
+                                            Kode Barang (SKU) <span class="text-primary">*</span>
+                                        </label>
+                                        @if(!$isEdit)
+                                        <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/25 text-[11px] text-primary font-bold cursor-pointer select-none hover:bg-primary/20 transition-all">
+                                            <input type="checkbox" wire:model.live="autoGenerateSku" class="h-3.5 w-3.5 rounded bg-surface-container border-white/20 text-primary focus:ring-0 focus:ring-offset-0 cursor-pointer" />
+                                            Auto-Generate SKU
+                                        </label>
+                                        @endif
+                                    </div>
+
+                                    <div class="relative flex items-center">
+                                        <input wire:model="kode_barang" type="text" class="w-full {{ ($isEdit || $autoGenerateSku) ? 'bg-primary/[0.04] text-primary border-primary/30 font-bold' : 'bg-surface-container-low text-on-surface border-white/10' }} border rounded-xl py-2.5 px-3.5 text-xs font-mono tracking-wider focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="Contoh: SDL-SLI-BLK-001" {{ ($isEdit || $autoGenerateSku) ? 'readonly' : '' }}>
+                                    </div>
+
+                                    @if($autoGenerateSku && !$isEdit)
+                                        <div class="flex items-center gap-1.5 text-[10px] text-primary/80 pt-0.5">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                                            <span>SKU otomatis mengikuti format kategori terpilih pada menu Pengkodean.</span>
+                                        </div>
+                                    @endif
+                                    @if($errors->has('kode_barang')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('kode_barang') }}</span> @endif
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- RIGHT COLUMN: Lokasi, Finansial & Ambang Batas -->
+                        <div class="space-y-5">
+                            
+                            <!-- Card 3: Lokasi & Finansial -->
+                            <div class="p-5 rounded-2xl bg-surface-container-low/60 border border-white/5 space-y-4">
+                                <div class="flex items-center gap-2 pb-2.5 border-b border-white/5">
+                                    <span class="material-symbols-outlined text-primary text-base">payments</span>
+                                    <span class="text-xs font-bold text-on-surface uppercase tracking-wider">Lokasi & Finansial</span>
+                                </div>
+
+                                <!-- Lokasi Default -->
+                                <div>
+                                    <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-1.5">
+                                        Lokasi Simpan Default <span class="text-primary">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <select wire:model="lokasi" class="w-full bg-surface-container border border-white/10 rounded-xl py-2.5 px-3 text-xs text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer">
+                                            @foreach ($locationsList as $loc)
+                                                <option value="{{ $loc->kode_lokasi }}">{{ $loc->kode_lokasi }} — {{ $loc->nama_lokasi }} ({{ $loc->tipe_lokasi }})</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @if($errors->has('lokasi')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('lokasi') }}</span> @endif
+                                </div>
+
+                                <!-- HPP & Harga Jual in 2-Col -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-1.5">
+                                            HPP Beli (Rp) <span class="text-primary">*</span>
+                                        </label>
+                                        <div class="relative flex items-center">
+                                            <span class="absolute left-3 text-xs font-mono font-bold text-on-surface-variant/50">Rp</span>
+                                            <input wire:model.live.debounce.300ms="hpp" type="number" min="0" class="w-full bg-surface-container border border-white/10 rounded-xl py-2.5 pl-9 pr-3 text-xs text-on-surface font-mono font-medium focus:ring-1 focus:ring-primary focus:border-primary transition-all {{ $isEdit ? 'opacity-60 cursor-not-allowed' : '' }}" placeholder="0" {{ $isEdit ? 'readonly' : '' }}>
+                                        </div>
+                                        @if($errors->has('hpp')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('hpp') }}</span> @endif
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-1.5">
+                                            Harga Jual (Rp) <span class="text-primary">*</span>
+                                        </label>
+                                        <div class="relative flex items-center">
+                                            <span class="absolute left-3 text-xs font-mono font-bold text-primary">Rp</span>
+                                            <input wire:model.live.debounce.300ms="harga_jual" type="number" min="0" class="w-full bg-surface-container border border-white/10 rounded-xl py-2.5 pl-9 pr-3 text-xs text-on-surface font-mono font-bold focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="0">
+                                        </div>
+                                        @if($errors->has('harga_jual')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('harga_jual') }}</span> @endif
+                                    </div>
+                                </div>
+
+                                <!-- Profit & Margin Live Calculator Pill -->
+                                @php
+                                    $hppNum = (float)($hpp ?? 0);
+                                    $jualNum = (float)($harga_jual ?? 0);
+                                    $profitNominal = $jualNum - $hppNum;
+                                    $marginPercent = $hppNum > 0 ? round(($profitNominal / $hppNum) * 100, 1) : ($jualNum > 0 ? 100 : 0);
+                                    $isProfitable = $profitNominal >= 0;
+                                @endphp
+                                <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-base {{ $isProfitable ? 'text-emerald-400' : 'text-error' }}">
+                                            {{ $isProfitable ? 'trending_up' : 'trending_down' }}
+                                        </span>
+                                        <span class="text-on-surface-variant font-medium">Estimasi Margin:</span>
+                                        <strong class="{{ $isProfitable ? 'text-emerald-400' : 'text-error' }} font-bold font-mono">
+                                            {{ $marginPercent > 0 ? '+' : '' }}{{ $marginPercent }}%
+                                        </strong>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-[10px] text-on-surface-variant/60 block">Profit per Unit:</span>
+                                        <strong class="{{ $isProfitable ? 'text-emerald-400' : 'text-error' }} font-mono font-bold">
+                                            Rp {{ number_format($profitNominal, 0, ',', '.') }}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 4: Pemantauan Ambang Batas & WhatsApp PIC -->
+                            <div class="p-5 rounded-2xl bg-surface-container-low/60 border border-white/5 space-y-4">
+                                <div class="flex items-center justify-between pb-2.5 border-b border-white/5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-emerald-400 text-base">notifications_active</span>
+                                        <span class="text-xs font-bold text-on-surface uppercase tracking-wider">Pemantauan Ambang Batas</span>
+                                    </div>
+                                    @if($kategori_2 === 'TOP 20')
+                                        <span class="px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30 text-[9px] font-extrabold uppercase">TOP 20 Auto</span>
+                                    @endif
+                                </div>
+
+                                <!-- Toggle Pantau Ambang Batas -->
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container border border-white/10">
+                                    <div>
+                                        <p class="text-xs font-bold text-on-surface">Pantau Ambang Batas Stok</p>
+                                        <p class="text-[10px] text-on-surface-variant/60">Picu notifikasi otomatis saat stok mendekati batas minimum.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" wire:model.live="is_threshold_active" class="sr-only peer">
+                                        <div class="w-10 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                                    </label>
+                                </div>
+
+                                <!-- Detail Ambang Batas & WA PIC (Saat Aktif) -->
+                                @if($is_threshold_active)
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                                        <div>
+                                            <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-1.5">
+                                                Batas Min. Stok (Qty) <span class="text-emerald-400">*</span>
+                                            </label>
+                                            <div class="relative flex items-center">
+                                                <span class="material-symbols-outlined absolute left-3 text-sm text-emerald-400">inventory_2</span>
+                                                <input wire:model="min_stok" type="number" min="1" class="w-full bg-surface-dark border border-white/10 rounded-xl py-2.5 pl-9 pr-3 text-xs text-on-surface font-mono font-bold focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 transition-all" placeholder="Contoh: 10">
+                                            </div>
+                                            @if($errors->has('min_stok')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('min_stok') }}</span> @endif
+                                        </div>
+
+                                        <div>
+                                            <div class="flex items-center justify-between mb-1.5">
+                                                <label class="text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider">No. WA PIC</label>
+                                                <span class="text-[9px] text-emerald-400 font-mono font-semibold">Fonnte WA</span>
+                                            </div>
+                                            <div class="relative flex items-center">
+                                                <span class="material-symbols-outlined absolute left-3 text-sm text-emerald-400">call</span>
+                                                <input wire:model="notif_phone" type="text" class="w-full bg-surface-dark border border-white/10 rounded-xl py-2.5 pl-9 pr-3 text-xs text-on-surface font-mono focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 transition-all placeholder:text-on-surface-variant/30" placeholder="08xxxxxxxxxx">
+                                            </div>
+                                            @if($errors->has('notif_phone')) <span class="text-[11px] text-error mt-1 block font-medium">{{ $errors->first('notif_phone') }}</span> @endif
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!-- Status Aktif Produk -->
+                                <div class="flex items-center justify-between pt-2 border-t border-white/5">
+                                    <div>
+                                        <p class="text-xs font-bold text-on-surface">Status Keaktifan Produk</p>
+                                        <p class="text-[10px] text-on-surface-variant/60">Produk aktif dapat dipilih dalam transaksi penjualan dan pembelian.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" wire:model="is_active" class="sr-only peer">
+                                        <div class="w-10 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
-
-                    <!-- Nama Display -->
-                    <div>
-                        <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">Nama Display Barang (Nama di Rak/Etalase)</label>
-                        <input wire:model="nama_barang" type="text" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30" placeholder="Contoh: Sandal Slide Hitam Kasual">
-                        @error('nama_barang') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                       <div>
-                           <div class="flex items-center justify-between mb-2">
-                               <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider">Kode Barang (SKU)</label>
-                               @if(!$isEdit)
-                               <label class="flex items-center text-[10px] text-primary font-bold gap-1 cursor-pointer select-none">
-                                   <input type="checkbox" wire:model.live="autoGenerateSku" class="h-3.5 w-3.5 rounded bg-surface-container-low border-white/10 text-primary focus:ring-0 focus:ring-offset-0" />
-                                   Auto-Generate
-                               </label>
-                               @endif
-                           </div>
-                           <input wire:model="kode_barang" type="text" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 px-4 text-sm font-mono text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30" placeholder="Contoh: SDL-SLI-BLK-001" {{ ($isEdit || $autoGenerateSku) ? 'readonly bg-white/5 text-primary/70 font-semibold' : '' }}>
-                           @if($autoGenerateSku && !$isEdit)
-                               <span class="text-[9px] text-primary/70 mt-1 block">Dihasilkan otomatis berdasarkan aturan pengkodean.</span>
-                           @endif
-                           @error('kode_barang') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
-                       </div>
-
-                                 <div>
-                            <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">Kategori (1)</label>
-                            <select wire:model="kategori" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all">
-                                <option value="">Pilih Kategori</option>
-                                <option value="Sandal Anak">Sandal Anak</option>
-                                <option value="Sepatu Anak">Sepatu Anak</option>
-                                <option value="Sandal Dewasa">Sandal Dewasa</option>
-                                <option value="Sepatu Dewasa">Sepatu Dewasa</option>
-                                <option value="Tas">Tas</option>
-                                <option value="Aksesoris">Aksesoris</option>
-                                <option value="Apparel">Apparel</option>
-                                <option value="Packaging">Packaging</option>
-                            </select>
-                            @error('kategori') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
-                        </div>
-                     </div>
-
-                     <!-- Kategori 2 / Status Siklus -->
-                     <div>
-                         <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">Kategori (2) / Status Siklus</label>
-                         <select wire:model="kategori_2" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all">
-                             <option value="">Pilih Status Siklus</option>
-                             <option value="TOP 20">TOP 20</option>
-                             <option value="On Hold">On Hold</option>
-                             <option value="Produk Berjalan">Produk Berjalan</option>
-                             <option value="Deadstock">Deadstock</option>
-                         </select>
-                         @error('kategori_2') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
-                     </div>
-
-                     <!-- Varian & Satuan -->
-                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">Variasi Barang (Otomatis)</label>
-                            <input wire:model="variasi_barang" type="text" class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-sm text-primary/70 transition-all font-semibold font-mono" placeholder="Terisi otomatis dari warna & ukuran" readonly>
-                            @error('variasi_barang') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">Satuan</label>
-                            <input wire:model="satuan" type="text" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30" placeholder="Contoh: pasang / pcs">
-                            @error('satuan') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
-                        </div>
-                     </div>
-
-                     <!-- Warna & Size -->
-                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">Warna</label>
-                            <input wire:model.live.debounce.300ms="warna" type="text" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30" placeholder="Contoh: Hitam">
-                            @error('warna') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">Ukuran / Size</label>
-                            <input wire:model.live.debounce.300ms="size" type="text" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30" placeholder="Contoh: 40">
-                            @error('size') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
-                        </div>
-                     </div>
-
-                     <!-- Lokasi, HPP & Harga Jual -->
-                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                         <div>
-                             <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">Lokasi Default</label>
-                             <select wire:model="lokasi" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all">
-                                 @foreach ($locationsList as $loc)
-                                     <option value="{{ $loc->kode_lokasi }}">{{ $loc->kode_lokasi }} ({{ $loc->tipe_lokasi }})</option>
-                                 @endforeach
-                             </select>
-                             @error('lokasi') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
-                         </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">HPP (Rp)</label>
-                            <input wire:model="hpp" type="number" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30" placeholder="0" {{ $isEdit ? 'readonly bg-white/5 text-on-surface-variant/50' : '' }}>
-                            @error('hpp') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">Harga Jual (Rp)</label>
-                            <input wire:model="harga_jual" type="number" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-on-surface-variant/30" placeholder="0">
-                            @error('harga_jual') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
-                        </div>
-                     </div>
-
-                     <!-- Status Aktif -->
-                     <div class="flex items-center gap-2 pt-2">
-                         <label class="flex items-center text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider gap-2 cursor-pointer select-none">
-                             <input type="checkbox" wire:model="is_active" class="h-4 w-4 rounded bg-surface-container-low border-white/10 text-primary focus:ring-0 focus:ring-offset-0" />
-                             Produk Aktif / Dijual
-                         </label>
-                         @error('is_active') <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> @enderror
-                     </div>
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="flex items-center justify-end px-6 py-5 border-t border-white/5 gap-3 bg-surface-container-low/50">
-                    <button wire:click="closeModal" type="button" class="px-6 py-2.5 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all text-on-surface">
-                        Batal
-                    </button>
-                    <button wire:click="store" type="button" class="px-6 py-2.5 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong">
-                        Simpan
-                    </button>
+                <div class="flex flex-col sm:flex-row items-center justify-between px-8 py-4.5 border-t border-white/10 bg-surface-container-low/80 gap-3">
+                    <p class="text-[11px] text-on-surface-variant/60 hidden sm:block">
+                        <span class="text-primary">*</span> Kolom bertanda bintang wajib diisi sebelum menyimpan.
+                    </p>
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                        <button wire:click="closeModal" type="button" class="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-semibold transition-all text-on-surface cursor-pointer">
+                            Batal
+                        </button>
+                        <button wire:click="store" type="button" class="px-6 py-2.5 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-xl font-bold text-xs shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong cursor-pointer flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm font-bold">check</span>
+                            <span>{{ $isEdit ? 'Perbarui Produk' : 'Simpan Produk Baru' }}</span>
+                        </button>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -744,9 +1117,9 @@
                             @endif
                         </div>
                         
-                        @error('importFile') 
-                            <span class="text-xs text-error mt-1.5 block font-medium">{{ $message }}</span> 
-                        @enderror
+                        @if($errors->has('importFile')) 
+                            <span class="text-xs text-error mt-1.5 block font-medium">{{ $errors->first('importFile') }}</span> 
+                        @endif
                     </div>
 
                     <!-- Validation Errors List -->
@@ -774,6 +1147,97 @@
                         <div class="animate-spin rounded-full h-4 w-4 border-2 border-on-primary-container border-t-transparent" wire:loading></div>
                         <span>Impor Sekarang</span>
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- WhatsApp Stock Alert Modal -->
+    @if ($isWaModalOpen)
+    <div class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-background/80 backdrop-blur-md transition-opacity" wire:click="closeWaModal"></div>
+
+        <!-- Modal Content -->
+        <div class="relative w-full max-w-xl mx-auto my-6 z-50 px-4">
+            <div class="relative flex flex-col w-full glass-card rounded-3xl shadow-2xl border border-white/10 outline-none focus:outline-none overflow-hidden bg-surface-dark/95">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-6 py-5 border-b border-white/5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                            <span class="material-symbols-outlined text-2xl">chat</span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-on-surface">Peringatan Stok Menipis WhatsApp</h3>
+                            <p class="text-[11px] text-on-surface-variant/70">{{ $lowStockCount }} produk aktif di bawah ambang batas minimum</p>
+                        </div>
+                    </div>
+                    <button wire:click="closeWaModal" class="text-on-surface-variant hover:text-on-surface">
+                        <span class="material-symbols-outlined text-lg">close</span>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                    <!-- Target Phone Input -->
+                    <div>
+                        <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">
+                            Nomor WhatsApp Tujuan (PIC / Tim Gudang)
+                        </label>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">call</span>
+                            <input wire:model.live.debounce.300ms="waTargetPhone" type="text" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-sm font-mono text-on-surface focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all placeholder:text-on-surface-variant/30" placeholder="08xxxxxxxxxx atau 628xxxxxxxxxx">
+                        </div>
+                        @if($errors->has('waTargetPhone')) <span class="text-xs text-error mt-1 block font-medium">{{ $errors->first('waTargetPhone') }}</span> @endif
+                    </div>
+
+                    <!-- Message Preview Box -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider">
+                                Preview Pesan Notifikasi
+                            </label>
+                            <span class="text-[10px] text-emerald-400/80 font-mono">Format Otomatis</span>
+                        </div>
+                        <div class="relative">
+                            <textarea readonly rows="8" class="w-full bg-black/40 border border-emerald-500/20 rounded-2xl p-4 text-xs font-mono text-emerald-400/90 focus:ring-0 leading-relaxed custom-scrollbar resize-none">{{ $waMessagePreview }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Info Tip -->
+                    <div class="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-3.5 flex items-start gap-3">
+                        <span class="material-symbols-outlined text-emerald-400 text-lg shrink-0 mt-0.5">info</span>
+                        <div class="text-[11px] text-on-surface-variant leading-relaxed">
+                            <p class="font-bold text-emerald-400 mb-0.5">Dua Metode Pengiriman Tersedia:</p>
+                            <ul class="list-disc pl-4 space-y-0.5">
+                                <li><strong>Buka Chat WhatsApp:</strong> Langsung membuka link wa.me di browser/aplikasi WA Anda tanpa perlu setup API bot.</li>
+                                <li><strong>Kirim via Fonnte:</strong> Otomatis dikirim dari background server menggunakan Fonnte Bot (pastikan token <code class="px-1 py-0.2 bg-white/5 rounded text-emerald-300">FONNTE_TOKEN</code> aktif di .env).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="flex flex-col sm:flex-row items-center justify-between px-6 py-5 border-t border-white/5 gap-3 bg-surface-container-low/50">
+                    <button wire:click="closeWaModal" type="button" class="w-full sm:w-auto px-5 py-2.5 bg-white/5 border border-white/10 rounded-2xl text-xs font-semibold hover:bg-white/10 transition-all text-on-surface">
+                        Tutup
+                    </button>
+                    
+                    <div class="flex flex-col sm:flex-row items-center gap-2.5 w-full sm:w-auto">
+                        <!-- Direct wa.me link -->
+                        <a href="{{ $this->waDirectUrl }}" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 rounded-2xl text-xs font-bold hover:bg-emerald-500/25 transition-all active:scale-95">
+                            <span class="material-symbols-outlined text-base">open_in_new</span>
+                            Buka Chat WhatsApp
+                        </a>
+
+                        <!-- Fonnte API Dispatch -->
+                        <button wire:click="sendWaFonnte" type="button" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-black rounded-2xl text-xs font-extrabold shadow-lg hover:shadow-emerald-500/20 transition-all active:scale-95" wire:loading.attr="disabled">
+                            <span class="material-symbols-outlined text-base" wire:loading.remove>send</span>
+                            <div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-black border-t-transparent" wire:loading></div>
+                            <span>Kirim via Fonnte</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

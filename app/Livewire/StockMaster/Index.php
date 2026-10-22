@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use App\Traits\HasAlerts;
+use App\Services\WhatsAppNotificationService;
+use Illuminate\Support\Facades\Auth;
 
 #[Layout('layouts.app')]
 class Index extends Component
@@ -36,12 +38,28 @@ class Index extends Component
     public $sizeFilter = '';
     public $sortField = 'nama_barang';
     public $sortDirection = 'asc';
+    public int $perPage = 10; // 10, 25, 50, 100
+
+    public function updatedPerPage(): void
+    {
+        $this->resetPage();
+    }
 
     // Form modal state
     public bool $isOpen = false;
     public bool $isEdit = false;
     public ?int $productId = null;
     public bool $autoGenerateSku = true;
+
+    // Threshold fields
+    public bool $is_threshold_active = false;
+    public ?int $min_stok = null;
+    public $notif_phone = '';
+
+    // WhatsApp Notification modal state
+    public bool $isWaModalOpen = false;
+    public string $waTargetPhone = '';
+    public string $waMessagePreview = '';
 
     // Import Excel state
     public bool $isImportOpen = false;
@@ -82,6 +100,7 @@ class Index extends Component
         'statusFilter' => ['except' => ''],
         'warnaFilter' => ['except' => ''],
         'sizeFilter' => ['except' => ''],
+        'perPage' => ['except' => 10],
     ];
 
     protected $rules = [
@@ -98,6 +117,9 @@ class Index extends Component
         'hpp' => 'required|numeric|min:0',
         'harga_jual' => 'required|numeric|min:0',
         'is_active' => 'boolean',
+        'is_threshold_active' => 'boolean',
+        'min_stok' => 'nullable|integer|min:0',
+        'notif_phone' => 'nullable|string|max:30',
     ];
 
     public function updatingSearch()
@@ -187,6 +209,9 @@ class Index extends Component
         $this->harga_jual = 0;
         $this->is_active = true;
         $this->autoGenerateSku = true;
+        $this->is_threshold_active = false;
+        $this->min_stok = null;
+        $this->notif_phone = '';
     }
 
     public function create()
@@ -209,6 +234,9 @@ class Index extends Component
         }
 
         $validatedData = $this->validate($rules);
+        $validatedData['min_stok'] = $this->is_threshold_active ? (int)$this->min_stok : null;
+        $validatedData['is_threshold_active'] = (bool)$this->is_threshold_active;
+        $validatedData['notif_phone'] = !empty($this->notif_phone) ? trim($this->notif_phone) : null;
 
         DB::transaction(function () use ($validatedData) {
             if ($this->isEdit) {
@@ -216,9 +244,19 @@ class Index extends Component
                 $oldValues = $product->toArray();
                 $product->update($validatedData);
 
+                if ($product->is_threshold_active && $product->min_stok > 0) {
+                    AnalyticsProduk::updateOrCreate(
+                        ['produk_id' => $product->id],
+                        [
+                            'minimal_stock' => (int)$product->min_stok,
+                            'is_manual_stock' => true
+                        ]
+                    );
+                }
+
                 \App\Models\AuditLog::create([
-                    'user_id' => \Illuminate\Support\Facades\Auth::id(),
-                    'username' => \Illuminate\Support\Facades\Auth::user() ? \Illuminate\Support\Facades\Auth::user()->name : 'System',
+                    'user_id' => Auth::id(),
+                    'username' => Auth::user() ? Auth::user()->name : 'System',
                     'action' => 'UPDATE',
                     'auditable_type' => get_class($product),
                     'auditable_id' => $product->id,
@@ -241,14 +279,15 @@ class Index extends Component
                     'penjualan_mei' => 0,
                     'rata_rata_harian' => 0.00,
                     'leadtime_produksi' => 14,
-                    'minimal_stock' => 0,
-                    'safety_stock' => 0,
-                    'maximum_stock' => 0,
+                    'minimal_stock' => $product->min_stok ?? 0,
+                    'safety_stock' => (int)ceil(($product->min_stok ?? 0) * 1.5),
+                    'maximum_stock' => (int)ceil(($product->min_stok ?? 0) * 2.25),
+                    'is_manual_stock' => (bool)$product->is_threshold_active,
                 ]);
 
                 \App\Models\AuditLog::create([
-                    'user_id' => \Illuminate\Support\Facades\Auth::id(),
-                    'username' => \Illuminate\Support\Facades\Auth::user() ? \Illuminate\Support\Facades\Auth::user()->name : 'System',
+                    'user_id' => Auth::id(),
+                    'username' => Auth::user() ? Auth::user()->name : 'System',
                     'action' => 'CREATE',
                     'auditable_type' => get_class($product),
                     'auditable_id' => $product->id,
@@ -287,6 +326,9 @@ class Index extends Component
         $this->hpp = $product->hpp;
         $this->harga_jual = $product->harga_jual;
         $this->is_active = (bool)$product->is_active;
+        $this->is_threshold_active = (bool)$product->is_threshold_active;
+        $this->min_stok = $product->min_stok ?? 10;
+        $this->notif_phone = $product->notif_phone ?? '';
 
         $this->openModal();
     }
@@ -297,7 +339,13 @@ class Index extends Component
      */
     public function updated(string $propertyName)
     {
-        if (in_array($propertyName, ['nama_produk', 'kategori', 'warna', 'size', 'variasi_barang', 'autoGenerateSku'])) {
+        if (in_array($propertyName, ['nama_produk', 'kategori', 'warna', 'size', 'variasi_barang', 'autoGenerateSku', 'kategori_2'])) {
+            if ($propertyName === 'kategori_2') {
+                if (strtoupper(trim((string)$this->kategori_2)) === 'TOP 20') {
+                    $this->is_threshold_active = true;
+                    $this->min_stok = 20;
+                }
+            }
             if (in_array($propertyName, ['warna', 'size'])) {
                 $this->generateVariasiBarang();
             } elseif ($propertyName === 'variasi_barang') {
@@ -416,8 +464,8 @@ class Index extends Component
                 $product->delete();
 
                 \App\Models\AuditLog::create([
-                    'user_id' => \Illuminate\Support\Facades\Auth::id(),
-                    'username' => \Illuminate\Support\Facades\Auth::user() ? \Illuminate\Support\Facades\Auth::user()->name : 'System',
+                    'user_id' => Auth::id(),
+                    'username' => Auth::user() ? Auth::user()->name : 'System',
                     'action' => 'DELETE',
                     'auditable_type' => get_class($product),
                     'auditable_id' => $product->id,
@@ -467,7 +515,7 @@ class Index extends Component
 
     public function exportExcel()
     {
-        return Excel::download(new ProductsExport, 'stock_master_' . date('Ymd_His') . '.xlsx');
+        return Excel::download(new ProductsExport, 'stock_master_' . now()->format('Ymd_His') . '.xlsx');
     }
 
     public function openImportModal(): void
@@ -525,7 +573,109 @@ class Index extends Component
     public function logout(\App\Livewire\Actions\Logout $logout): void
     {
         $logout();
-        $this->redirect('/', navigate: true);
+        $this->redirect('/');
+    }
+
+    public function openWaModal(): void
+    {
+        $lowStockProducts = Produk::lowStock()->get();
+
+        if ($lowStockProducts->isEmpty()) {
+            $this->alertWarning("Tidak ada produk ber-ambang batas yang stoknya menipis saat ini.");
+            return;
+        }
+
+        $this->waTargetPhone = config('services.fonnte.default_phone', '') ?: '';
+        $this->waMessagePreview = WhatsAppNotificationService::formatLowStockMessage(
+            $lowStockProducts,
+            Auth::user() ? Auth::user()->name : 'Admin'
+        );
+        $this->isWaModalOpen = true;
+    }
+
+    public function closeWaModal(): void
+    {
+        $this->isWaModalOpen = false;
+    }
+
+    public function sendWaFonnte(): void
+    {
+        if (empty(trim($this->waTargetPhone))) {
+            $this->alertError("Silakan masukkan nomor WhatsApp tujuan.");
+            return;
+        }
+
+        $result = WhatsAppNotificationService::sendViaFonnte(
+            $this->waTargetPhone,
+            $this->waMessagePreview
+        );
+
+        if ($result['success']) {
+            $this->toastSuccess("Peringatan stok menipis berhasil dikirim ke {$this->waTargetPhone} via Fonnte.");
+            $this->closeWaModal();
+        } else {
+            $this->alertError($result['message']);
+        }
+    }
+
+    public function getWaDirectUrlProperty(): string
+    {
+        if (empty($this->waTargetPhone)) {
+            return '#';
+        }
+        return WhatsAppNotificationService::generateWhatsAppUrl(
+            $this->waTargetPhone,
+            $this->waMessagePreview
+        );
+    }
+
+    public function openWaModalSingleProduct(int $productId): void
+    {
+        $product = Produk::findOrFail($productId);
+
+        $defaultPhone = !empty($product->notif_phone)
+            ? $product->notif_phone
+            : config('services.fonnte.default_phone', '');
+
+        $this->waTargetPhone = $defaultPhone;
+        $this->waMessagePreview = WhatsAppNotificationService::formatLowStockMessage([$product]);
+        $this->isWaModalOpen = true;
+    }
+
+    public function updateThresholdInline(int $productId, string $field, mixed $value): void
+    {
+        Gate::authorize('manage master');
+
+        $product = Produk::findOrFail($productId);
+
+        if ($field === 'is_threshold_active') {
+            $isActive = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            $product->is_threshold_active = $isActive;
+            if ($isActive && (empty($product->min_stok) || $product->min_stok <= 0)) {
+                $product->min_stok = ($product->kategori_2 === 'TOP 20') ? 20 : 10;
+            }
+        } elseif ($field === 'min_stok') {
+            $val = trim((string)$value);
+            $product->min_stok = ($val === '' || !is_numeric($val)) ? null : max(0, (int)$val);
+        } elseif ($field === 'notif_phone') {
+            $product->notif_phone = !empty(trim((string)$value)) ? trim((string)$value) : null;
+        }
+
+        $product->save();
+
+        // Sync to analytics_produk
+        if ($product->is_threshold_active && $product->min_stok > 0) {
+            $analytics = AnalyticsProduk::firstOrNew(['produk_id' => $product->id]);
+            $analytics->kategori = $product->kategori ?? 'UMUM';
+            $analytics->is_manual_stock = true;
+            $analytics->minimal_stock = (int)$product->min_stok;
+            $analytics->safety_stock = (int)ceil($product->min_stok * 1.5);
+            $analytics->maximum_stock = (int)ceil($product->min_stok * 2.25);
+            $analytics->save();
+        }
+
+        $this->dispatch('threshold-saved-' . $productId);
+        $this->toastSuccess("Ambang batas {$product->nama_barang} diperbarui.");
     }
 
     public function formatRupiahAbbr(float|int $value): string
@@ -541,6 +691,10 @@ class Index extends Component
 
     public function render()
     {
+        $selectedLokasi = !empty($this->locationFilter)
+            ? \App\Models\Lokasi::where('kode_lokasi', $this->locationFilter)->first()
+            : null;
+
         $query = Produk::with([
             'stokLokasi.lokasi',
             'mutasiLokasi' => function ($q) {
@@ -563,18 +717,48 @@ class Index extends Component
             $query->whereRaw('kategori = ?', [$this->categoryFilter]);
         }
 
-        // Apply location filter
-        if (!empty($this->locationFilter)) {
-            $query->where('lokasi', $this->locationFilter);
-        }
-
-        // Apply stock filter
-        if ($this->stockFilter === 'menipis') {
-            $query->where('total_stok', '<=', 5)->where('total_stok', '>', 0);
-        } elseif ($this->stockFilter === 'habis') {
-            $query->where('total_stok', '=', 0);
-        } elseif ($this->stockFilter === 'melimpah') {
-            $query->where('total_stok', '>', 5);
+        // Apply location & stock filter based on trx_stok_lokasi
+        if ($selectedLokasi) {
+            if ($this->stockFilter === 'menipis') {
+                $query->where('is_threshold_active', true)
+                      ->where('min_stok', '>', 0)
+                      ->whereHas('stokLokasi', function ($q) use ($selectedLokasi) {
+                          $q->where('lokasi_id', $selectedLokasi->id)
+                            ->whereColumn('qty', '<=', 'mst_produk.min_stok');
+                      });
+            } elseif ($this->stockFilter === 'threshold_only') {
+                $query->where('is_threshold_active', true);
+            } elseif ($this->stockFilter === 'habis') {
+                $query->whereHas('stokLokasi', function ($q) use ($selectedLokasi) {
+                    $q->where('lokasi_id', $selectedLokasi->id)
+                      ->where('qty', '<=', 0);
+                });
+            } elseif ($this->stockFilter === 'melimpah') {
+                $query->whereHas('stokLokasi', function ($q) use ($selectedLokasi) {
+                    $q->where('lokasi_id', $selectedLokasi->id)
+                      ->where('qty', '>', 5);
+                });
+            } else {
+                // Default when location filter is selected: show products with active stock in this location
+                $query->whereHas('stokLokasi', function ($q) use ($selectedLokasi) {
+                    $q->where('lokasi_id', $selectedLokasi->id)
+                      ->where('qty', '>', 0);
+                });
+            }
+        } else {
+            // Apply global stock filter on total_stok
+            if ($this->stockFilter === 'menipis') {
+                $query->lowStock();
+            } elseif ($this->stockFilter === 'threshold_only') {
+                $query->where('is_threshold_active', true);
+            } elseif ($this->stockFilter === 'habis') {
+                $query->where('total_stok', '=', 0);
+            } elseif ($this->stockFilter === 'melimpah') {
+                $query->where(function ($q) {
+                    $q->where('is_threshold_active', false)
+                      ->orWhereColumn('total_stok', '>', 'min_stok');
+                });
+            }
         }
 
         // Apply status filter
@@ -595,8 +779,19 @@ class Index extends Component
         }
 
         // Apply sorting
-        $products = $query->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(10);
+        if ($selectedLokasi && $this->sortField === 'total_stok') {
+            $query->select('mst_produk.*')
+                  ->leftJoin('trx_stok_lokasi', function ($join) use ($selectedLokasi) {
+                      $join->on('trx_stok_lokasi.produk_id', '=', 'mst_produk.id')
+                           ->where('trx_stok_lokasi.lokasi_id', '=', $selectedLokasi->id);
+                  })
+                  ->orderBy(DB::raw('COALESCE(trx_stok_lokasi.qty, 0)'), $this->sortDirection);
+        } else {
+            $query->orderBy($this->sortField, $this->sortDirection);
+        }
+
+        $validPerPage = in_array((int)$this->perPage, [10, 25, 50, 100]) ? (int)$this->perPage : 10;
+        $products = $query->paginate($validPerPage);
 
         // Fetch categories list for filter
         $categories = Produk::distinct()->whereNotNull('kategori')->pluck('kategori');
@@ -605,13 +800,54 @@ class Index extends Component
         $colors = Produk::distinct()->whereNotNull('warna')->where('warna', '!=', '')->orderBy('warna')->pluck('warna');
         $sizes = Produk::distinct()->whereNotNull('size')->where('size', '!=', '')->orderByRaw('CAST(size AS UNSIGNED), size')->pluck('size');
 
-        // Fetch KPIs
-        $totalSkus = Produk::count();
-        $stokMenipis = Produk::query()->whereRaw('total_stok <= 5')->count();
-        $totalNilaiStokVal = Produk::query()->select(DB::raw('SUM(total_stok * hpp) as total'))->value('total') ?? 0;
+        // Low stock count for WhatsApp badge and KPIs
+        $lowStockCount = Produk::lowStock()->count();
+
+        // Fetch KPIs (Dynamic when locationFilter is active)
+        if ($selectedLokasi) {
+            $totalSkus = \App\Models\StokLokasi::where('lokasi_id', $selectedLokasi->id)
+                ->where('qty', '>', 0)
+                ->count();
+
+            $stokMenipis = Produk::where('is_threshold_active', true)
+                ->where('min_stok', '>', 0)
+                ->whereHas('stokLokasi', function ($q) use ($selectedLokasi) {
+                    $q->where('lokasi_id', $selectedLokasi->id)
+                      ->whereColumn('qty', '<=', 'mst_produk.min_stok');
+                })
+                ->count();
+
+            $totalNilaiStokVal = \App\Models\StokLokasi::where('lokasi_id', $selectedLokasi->id)
+                ->join('mst_produk', 'mst_produk.id', '=', 'trx_stok_lokasi.produk_id')
+                ->select(DB::raw('SUM(trx_stok_lokasi.qty * mst_produk.hpp) as total'))
+                ->value('total') ?? 0;
+
+            $topMutasi = \App\Models\MutasiLokasi::where('lokasi_asal_id', $selectedLokasi->id)
+                ->whereIn('tipe_mutasi', ['KELUAR', 'TRANSFER'])
+                ->select('produk_id', DB::raw('SUM(qty) as total_out'))
+                ->groupBy('produk_id')
+                ->orderByDesc('total_out')
+                ->first();
+
+            $fastMovingProduct = $topMutasi ? Produk::find($topMutasi->produk_id) : null;
+            if ($fastMovingProduct && $topMutasi) {
+                $fastMovingProduct->lokasi_keluar = $topMutasi->total_out;
+            }
+            if (!$fastMovingProduct) {
+                $topStok = \App\Models\StokLokasi::where('lokasi_id', $selectedLokasi->id)
+                    ->where('qty', '>', 0)
+                    ->orderByDesc('qty')
+                    ->first();
+                $fastMovingProduct = $topStok ? Produk::find($topStok->produk_id) : null;
+            }
+        } else {
+            $totalSkus = Produk::count();
+            $stokMenipis = $lowStockCount;
+            $totalNilaiStokVal = Produk::query()->select(DB::raw('SUM(total_stok * hpp) as total'))->value('total') ?? 0;
+            $fastMovingProduct = Produk::query()->orderBy('stok_keluar', 'desc')->first();
+        }
+
         $totalNilaiStok = $this->formatRupiahAbbr($totalNilaiStokVal);
-        $columnKeluar = 'stok_keluar';
-        $fastMovingProduct = Produk::query()->orderBy($columnKeluar, 'desc')->first();
 
         $this->locationsList = \App\Models\Lokasi::query()
             ->whereRaw('is_active = ?', [true])
@@ -625,9 +861,11 @@ class Index extends Component
             'sizes' => $sizes,
             'totalSkus' => $totalSkus,
             'stokMenipis' => $stokMenipis,
+            'lowStockCount' => $lowStockCount,
             'totalNilaiStok' => $totalNilaiStok,
             'fastMovingProduct' => $fastMovingProduct,
             'locationsList' => $this->locationsList,
+            'selectedLokasi' => $selectedLokasi,
         ]);
     }
 }

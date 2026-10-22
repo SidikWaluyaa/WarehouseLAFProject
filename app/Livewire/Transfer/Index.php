@@ -14,13 +14,6 @@ class Index extends Component
     use WithPagination;
     use HasAlerts;
 
-    public function mount()
-    {
-        if (session()->has('success_message')) {
-            $this->toastSuccess(session('success_message'));
-        }
-    }
-
     public $search = '';
     public $statusFilter = '';
 

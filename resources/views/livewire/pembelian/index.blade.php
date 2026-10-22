@@ -8,16 +8,16 @@
 
     <!-- Tab Navigation -->
     <div class="flex border-b border-white/10 mb-6 space-x-8">
-        <a href="{{ route('barang-masuk') }}" wire:navigate class="relative pb-4 text-sm font-bold text-purple-400 flex items-center gap-2">
+        <a href="{{ route('barang-masuk') }}" class="relative pb-4 text-sm font-bold text-purple-400 flex items-center gap-2">
             <span class="material-symbols-outlined text-lg text-purple-400">receipt_long</span>
             Daftar Transaksi (Header)
             <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-purple-500 rounded-full shadow-[0_0_12px_#a855f7]"></div>
         </a>
-        <a href="{{ route('barang-masuk.riwayat') }}" wire:navigate class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
+        <a href="{{ route('barang-masuk.riwayat') }}" class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
             <span class="material-symbols-outlined text-lg">history</span>
             Riwayat Detail Barang (Itemized)
         </a>
-        <a href="{{ route('barang-masuk.riwayat-tanggal') }}" wire:navigate class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
+        <a href="{{ route('barang-masuk.riwayat-tanggal') }}" class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
             <span class="material-symbols-outlined text-lg">payments</span>
             Riwayat Masuk / Tanggal (Laporan Nilai)
         </a>
@@ -41,6 +41,7 @@
                 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">filter_alt</span>
                 <select wire:model.live="tipeFilter" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm text-on-surface appearance-none focus:ring-1 focus:ring-primary focus:border-primary transition-all">
                     <option value="">Semua Tipe Nota</option>
+                    <option value="Purchase Order">Purchase Order (PO)</option>
                     <option value="Stock Awal">Stok Awal</option>
                     <option value="Pembelian">Pembelian</option>
                     <option value="Retur Masuk">Retur Masuk</option>
@@ -104,7 +105,7 @@
             </div>
         </div>
 
-        <a href="{{ route('barang-masuk.create') }}" wire:navigate class="flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong justify-center">
+        <a href="{{ route('barang-masuk.create') }}" class="flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong justify-center">
             <span class="material-symbols-outlined">add</span>
             Input Barang Masuk
         </a>
@@ -139,6 +140,7 @@
                             <td class="px-6 py-4 whitespace-nowrap font-medium text-on-surface">{{ $t->tanggal->format('d/m/Y') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-3 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider
+                                    {{ $t->tipe_nota === 'Purchase Order' ? 'bg-amber-500/15 text-amber-400 border-amber-500/30' : '' }}
                                     {{ $t->tipe_nota === 'Pembelian' ? 'bg-green-500/10 text-green-400 border-green-500/20' : '' }}
                                     {{ $t->tipe_nota === 'Stock Awal' ? 'bg-primary/10 text-primary border border-primary/20' : '' }}
                                     {{ $t->tipe_nota === 'Retur Masuk' ? 'bg-tertiary/10 text-tertiary border border-tertiary/20' : '' }}
@@ -147,7 +149,20 @@
                                     {{ $t->tipe_nota }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap font-mono text-primary/80 font-bold">{{ $t->nomor_nota ?? '-' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap font-mono text-primary/80 font-bold">
+                                <div>{{ $t->nomor_nota ?? '-' }}</div>
+                                @if($t->po_header_id && $t->poHeader)
+                                    <div class="flex items-center gap-1 mt-1 font-sans">
+                                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20" title="Terhubung ke Purchase Order">
+                                            <span class="material-symbols-outlined text-[10px]">receipt_long</span>
+                                            {{ $t->poHeader->nomor_po ?? 'PO #'.$t->poHeader->id }}
+                                        </span>
+                                        @if($t->poHeader->artikel)
+                                            <span class="text-[9px] text-on-surface-variant/60 font-mono">({{ $t->poHeader->artikel }})</span>
+                                        @endif
+                                    </div>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-on-surface font-semibold">{{ $t->supplier->nama_supplier ?? '-' }}</td>
                             <td class="px-6 py-4 text-center">{{ $t->details->count() }} item</td>
                             <td class="px-6 py-4 text-center font-bold text-on-surface">{{ number_format($t->details->sum('qty_masuk')) }} pasang</td>
@@ -171,7 +186,7 @@
                                                 Cetak PDF
                                             </a>
                                             @if (auth()->user()->hasPermissionTo('manage master') || auth()->user()->hasPermissionTo('input masuk'))
-                                                <a href="{{ route('barang-masuk.edit', $t->id) }}" wire:navigate class="flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-lg border border-amber-500 text-amber-500 hover:bg-amber-500/10 transition-colors" title="Ubah Transaksi">
+                                                <a href="{{ route('barang-masuk.edit', $t->id) }}" class="flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-lg border border-amber-500 text-amber-500 hover:bg-amber-500/10 transition-colors" title="Ubah Transaksi">
                                                     <span class="material-symbols-outlined text-[12px]">edit</span>
                                                     Edit
                                                 </a>
@@ -243,7 +258,7 @@
                                                                 Oleh: <span class="text-on-surface font-bold">{{ $log->username }}</span> 
                                                                 | IP: <span class="font-mono text-on-surface">{{ $log->ip_address ?? '-' }}</span>
                                                             </div>
-                                                            <div class="font-mono text-[10px]">{{ $log->created_at->format('d/m/Y H:i:s') }}</div>
+                                                            <div class="font-mono text-[10px]">{{ $log->created_at->format('d/m/Y H:i:s') }} WIB</div>
                                                         </div>
                                                         <div class="text-on-surface-variant leading-relaxed">
                                                             @if (!empty($log->old_values) && !empty($log->new_values))

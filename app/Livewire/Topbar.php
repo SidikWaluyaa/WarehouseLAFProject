@@ -13,15 +13,9 @@ class Topbar extends Component
 
     public function render()
     {
-        // 1. Fetch low stock alerts dynamically
-        $colTotalStok = 'mst_produk.total_stok';
-        $colMinimalStock = 'analytics_produk.minimal_stock';
+        // 1. Fetch low stock alerts dynamically using selective threshold
 
-        $lowStockProducts = Produk::with('analyticsProduk')
-            ->whereHas('analyticsProduk', function ($query) use ($colTotalStok, $colMinimalStock) {
-                $query->whereColumn($colTotalStok, '<=', $colMinimalStock)
-                      ->where($colMinimalStock, '>', 0);
-            })
+        $lowStockProducts = Produk::lowStock()
             ->take(10)
             ->get()
             ->map(function ($product) {
@@ -29,7 +23,7 @@ class Topbar extends Component
                     'id' => 'low-stock-' . $product->id,
                     'type' => 'low_stock',
                     'title' => 'Stok Menipis',
-                    'message' => "Produk {$product->nama_produk} ({$product->kode_barang}) tersisa {$product->total_stok} {$product->satuan} (min: " . ($product->analyticsProduk->minimal_stock ?? 0) . ").",
+                    'message' => "Produk {$product->nama_barang} ({$product->kode_barang}) tersisa {$product->total_stok} {$product->satuan} (min: {$product->min_stok}).",
                     'time' => 'Batas Minimum',
                     'timestamp' => now()->timestamp,
                     'link' => route('stock-master', ['search' => $product->kode_barang]),

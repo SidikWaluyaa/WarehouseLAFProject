@@ -17,6 +17,21 @@
             color: #9ca3af;
             border: 1px solid rgba(107, 114, 128, 0.2);
         }
+        html.light .abc-badge-a {
+            background-color: #FEE2E2 !important;
+            color: #B91C1C !important;
+            border-color: #FCA5A5 !important;
+        }
+        html.light .abc-badge-b {
+            background-color: #FEF3C7 !important;
+            color: #B45309 !important;
+            border-color: #FCD34D !important;
+        }
+        html.light .abc-badge-c {
+            background-color: #F1F5F9 !important;
+            color: #475569 !important;
+            border-color: #CBD5E1 !important;
+        }
     </style>
 
     <!-- KPI Section -->
@@ -299,7 +314,7 @@
                     <span class="inline-block w-2.5 h-2.5 rounded-full bg-green-500 mr-2 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
                     Barang Masuk Terbaru (Pembelian)
                 </h4>
-                <a href="{{ route('barang-masuk') }}" wire:navigate class="text-xs font-semibold text-primary hover:underline">Kelola &rarr;</a>
+                <a href="{{ route('barang-masuk') }}" class="text-xs font-semibold text-primary hover:underline">Kelola &rarr;</a>
             </div>
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-left border-collapse text-xs">
@@ -341,7 +356,7 @@
                     <span class="inline-block w-2.5 h-2.5 rounded-full bg-primary-container mr-2 shadow-[0_0_8px_rgba(255,178,44,0.5)]"></span>
                     Barang Keluar Terbaru (Penjualan)
                 </h4>
-                <a href="{{ route('barang-keluar') }}" wire:navigate class="text-xs font-semibold text-primary hover:underline">Kelola &rarr;</a>
+                <a href="{{ route('barang-keluar') }}" class="text-xs font-semibold text-primary hover:underline">Kelola &rarr;</a>
             </div>
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-left border-collapse text-xs">

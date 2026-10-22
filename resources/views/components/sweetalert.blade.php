@@ -53,6 +53,24 @@
             });
         });
 
+        // Listener for warning popup alert
+        window.addEventListener('alert:warning', event => {
+            const data = event.detail[0] || event.detail;
+            Swal.fire({
+                icon: 'warning',
+                title: data.title || 'Peringatan',
+                text: data.text || '',
+                background: '#1f1f1f',
+                color: '#e2e2e2',
+                confirmButtonText: 'OK',
+                customClass: {
+                    popup: 'rounded-3xl border border-white/10 glass-card',
+                    confirmButton: 'rounded-2xl px-6 py-2.5 font-bold text-sm bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container shadow-xl hover:scale-105 transition-all duration-200 focus:ring-0',
+                },
+                buttonsStyling: false
+            });
+        });
+
         // Listener for confirm popup alert
         window.addEventListener('alert:confirm', event => {
             const data = event.detail[0] || event.detail;
@@ -96,5 +114,13 @@
                 title: data.text || ''
             });
         });
+
+        // Flash message dari redirect server (session()->flash)
+        @if (session('success_message'))
+            Toast.fire({ icon: 'success', title: @js(session('success_message')) });
+        @endif
+        @if (session('error_message'))
+            Toast.fire({ icon: 'error', title: @js(session('error_message')) });
+        @endif
     });
 </script>

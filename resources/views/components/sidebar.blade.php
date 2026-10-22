@@ -14,7 +14,7 @@
                  return this.isActive('/stock-master') || this.isActive('/lokasi') || this.isActive('/pengkodean') || this.isActive('/supplier') || this.isActive('/pelanggan');
              }
              if (name === 'transaksi') {
-                 return this.isActive('/barang-masuk') || this.isActive('/barang-keluar') || this.isActive('/purchase-order');
+                 return this.isActive('/barang-masuk') || this.isActive('/barang-keluar') || this.isActive('/purchase-order') || this.isActive('/kalender');
              }
              return false;
          },
@@ -46,7 +46,6 @@
              window.safeStorage.setItem('sidebar_collapsed', collapsed);
          }
      "
-     x-on:livewire:navigated.window="currentPath = window.location.pathname; mobileOpen = false; initDropdowns()"
      @toggle-sidebar.window="collapsed = !collapsed"
      @toggle-mobile-sidebar.window="mobileOpen = !mobileOpen"
      @open-mobile-sidebar.window="mobileOpen = true"
@@ -74,7 +73,7 @@
            x-transition:leave="transition transform ease-in-out duration-200"
            x-transition:leave-start="translate-x-0"
            x-transition:leave-end="-translate-x-full"
-           class="fixed inset-y-0 left-0 w-64 bg-surface-dark border-r border-white/10 z-50 p-5 flex flex-col lg:hidden shadow-2xl shadow-accent-glow"
+           class="wms-sidebar fixed inset-y-0 left-0 w-64 bg-[#121418] border-r border-white/10 z-50 p-5 flex flex-col lg:hidden shadow-2xl shadow-black/50"
            style="display: none;">
         
         <!-- Mobile Header (Logo & Close) -->
@@ -96,7 +95,6 @@
         <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scrollbar pr-1">
             <!-- Dashboard -->
             <a wire:key="sidebar-mobile-dashboard"
-               wire:navigate
                class="flex items-center gap-3 px-4 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="isActive('/') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                href="{{ route('dashboard') }}">
@@ -130,7 +128,6 @@
                      class="pl-4 ml-6 border-l border-white/5 space-y-1">
                     <!-- Master Stok -->
                     <a wire:key="sidebar-mobile-stock-master"
-                       wire:navigate
                        class="flex items-center gap-2.5 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                        :class="isActive('/stock-master') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('stock-master') }}">
@@ -141,7 +138,6 @@
                     </a>
                     <!-- Lokasi -->
                     <a wire:key="sidebar-mobile-lokasi"
-                       wire:navigate
                        class="flex items-center gap-2.5 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                        :class="isActive('/lokasi') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('lokasi') }}">
@@ -153,7 +149,6 @@
                     <!-- Pengkodean Barang -->
                     @can('manage master')
                     <a wire:key="sidebar-mobile-pengkodean"
-                       wire:navigate
                        class="flex items-center gap-2.5 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                        :class="isActive('/pengkodean') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('pengkodean') }}">
@@ -165,7 +160,6 @@
                     @endcan
                     <!-- Supplier -->
                     <a wire:key="sidebar-mobile-supplier"
-                       wire:navigate
                        class="flex items-center gap-2.5 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                        :class="isActive('/supplier') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('supplier') }}">
@@ -176,7 +170,6 @@
                     </a>
                     <!-- Pelanggan -->
                     <a wire:key="sidebar-mobile-pelanggan"
-                       wire:navigate
                        class="flex items-center gap-2.5 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                        :class="isActive('/pelanggan') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('pelanggan') }}">
@@ -190,7 +183,6 @@
 
             <!-- Audit Stok -->
             <a wire:key="sidebar-mobile-audit"
-               wire:navigate
                class="flex items-center gap-3 px-4 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="isActive('/audit') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                href="{{ route('audit') }}">
@@ -203,7 +195,6 @@
             <!-- Manajemen Pengguna & Akses -->
             @can('manage system')
             <a wire:key="sidebar-mobile-user-management"
-               wire:navigate
                class="flex items-center gap-3 px-4 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="isActive('/user-management') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                href="{{ route('user-management') }}">
@@ -239,7 +230,6 @@
                      class="pl-4 ml-6 border-l border-white/5 space-y-1">
                     <!-- Barang Masuk -->
                     <a wire:key="sidebar-mobile-barang-masuk"
-                       wire:navigate
                        class="flex items-center gap-2.5 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                        :class="isActive('/barang-masuk') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('barang-masuk') }}">
@@ -250,7 +240,6 @@
                     </a>
                     <!-- Barang Keluar -->
                     <a wire:key="sidebar-mobile-barang-keluar"
-                       wire:navigate
                        class="flex items-center gap-2.5 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                        :class="isActive('/barang-keluar') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('barang-keluar') }}">
@@ -261,7 +250,6 @@
                     </a>
                     <!-- Purchase Order -->
                     <a wire:key="sidebar-mobile-purchase-order"
-                       wire:navigate
                        class="flex items-center gap-2.5 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                        :class="isActive('/purchase-order') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('purchase-order') }}">
@@ -270,12 +258,19 @@
                         </svg>
                         <span>Purchase Order</span>
                     </a>
+                    <!-- Kalender Transaksi -->
+                    <a wire:key="sidebar-mobile-kalender"
+                       class="flex items-center gap-2.5 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
+                       :class="isActive('/kalender') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
+                       href="{{ route('kalender') }}">
+                        <span class="material-symbols-outlined text-base flex-shrink-0">calendar_month</span>
+                        <span>Kalender Transaksi</span>
+                    </a>
                 </div>
             </div>
 
             <!-- Forecast & Analisis -->
             <a wire:key="sidebar-mobile-analytics"
-               wire:navigate
                class="flex items-center gap-3 px-4 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="isActive('/analytics') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                href="{{ route('analytics') }}">
@@ -292,7 +287,6 @@
 
             <!-- Transfer Gudang -->
             <a wire:key="sidebar-mobile-transfer"
-               wire:navigate
                class="flex items-center gap-3 px-4 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="isActive('/transfer') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                href="{{ route('transfer') }}">
@@ -304,7 +298,6 @@
 
             <!-- Replenishment Toko -->
             <a wire:key="sidebar-mobile-replenishment"
-               wire:navigate
                class="flex items-center gap-3 px-4 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="isActive('/replenishment') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                href="{{ route('replenishment') }}">
@@ -316,7 +309,6 @@
 
             <!-- Picking Barang -->
             <a wire:key="sidebar-mobile-picking"
-               wire:navigate
                class="flex items-center gap-3 px-4 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="isActive('/picking') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                href="{{ route('picking') }}">
@@ -328,7 +320,6 @@
 
             <!-- Packing & QC -->
             <a wire:key="sidebar-mobile-packing"
-               wire:navigate
                class="flex items-center gap-3 px-4 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="isActive('/packing') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                href="{{ route('packing') }}">
@@ -345,7 +336,6 @@
 
             <!-- Laporan & Analitik -->
             <a wire:key="sidebar-mobile-reports"
-               wire:navigate
                class="flex items-center gap-3 px-4 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="isActive('/reports') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                href="{{ route('reports') }}">
@@ -358,7 +348,6 @@
             @can('manage master')
             <!-- Log Perubahan -->
             <a wire:key="sidebar-mobile-audit-log"
-               wire:navigate
                class="flex items-center gap-3 px-4 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="isActive('/audit-log') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                href="{{ route('audit-log') }}">
@@ -412,7 +401,7 @@
     </aside>
 
     <!-- Desktop Sidebar (Sticky, always visible on >= lg) -->
-    <aside class="hidden lg:flex lg:flex-col bg-surface-dark border-r border-white/10 shadow-2xl shadow-accent-glow h-full transition-all duration-300 w-full"
+    <aside class="wms-sidebar hidden lg:flex lg:flex-col bg-[#121418] border-r border-white/10 shadow-2xl shadow-black/50 h-full transition-all duration-300 w-full"
            :class="collapsed ? 'p-2' : 'px-3.5 py-5'">
         
         <!-- Desktop Header (Logo & Toggle) -->
@@ -435,7 +424,6 @@
         <nav class="flex-1 space-y-1.5 overflow-y-auto pr-1.5 pl-1 custom-sidebar-nav-scrollbar" :class="collapsed ? 'px-0' : ''">
             <!-- Dashboard -->
             <a wire:key="sidebar-desktop-dashboard"
-               wire:navigate
                class="group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="[
                    isActive('/') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium',
@@ -487,7 +475,6 @@
                      class="pl-4 ml-5 border-l border-white/5 space-y-1">
                     <!-- Master Stok -->
                     <a wire:key="sidebar-desktop-stock-master"
-                       wire:navigate
                        class="flex items-center gap-2 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-xs"
                        :class="isActive('/stock-master') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('stock-master') }}">
@@ -498,7 +485,6 @@
                     </a>
                     <!-- Lokasi -->
                     <a wire:key="sidebar-desktop-lokasi"
-                       wire:navigate
                        class="flex items-center gap-2 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-xs"
                        :class="isActive('/lokasi') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('lokasi') }}">
@@ -510,7 +496,6 @@
                     <!-- Pengkodean Barang -->
                     @can('manage master')
                     <a wire:key="sidebar-desktop-pengkodean"
-                       wire:navigate
                        class="flex items-center gap-2 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-xs"
                        :class="isActive('/pengkodean') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('pengkodean') }}">
@@ -522,7 +507,6 @@
                     @endcan
                     <!-- Supplier -->
                     <a wire:key="sidebar-desktop-supplier"
-                       wire:navigate
                        class="flex items-center gap-2 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-xs"
                        :class="isActive('/supplier') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('supplier') }}">
@@ -533,7 +517,6 @@
                     </a>
                     <!-- Pelanggan -->
                     <a wire:key="sidebar-desktop-pelanggan"
-                       wire:navigate
                        class="flex items-center gap-2 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-xs"
                        :class="isActive('/pelanggan') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('pelanggan') }}">
@@ -547,7 +530,6 @@
 
             <!-- Audit Stok -->
             <a wire:key="sidebar-desktop-audit"
-               wire:navigate
                class="group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="[
                    isActive('/audit') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium',
@@ -599,7 +581,6 @@
                      class="pl-4 ml-5 border-l border-white/5 space-y-1">
                     <!-- Barang Masuk -->
                     <a wire:key="sidebar-desktop-barang-masuk"
-                       wire:navigate
                        class="flex items-center gap-2 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-xs"
                        :class="isActive('/barang-masuk') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('barang-masuk') }}">
@@ -610,7 +591,6 @@
                     </a>
                     <!-- Barang Keluar -->
                     <a wire:key="sidebar-desktop-barang-keluar"
-                       wire:navigate
                        class="flex items-center gap-2 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-xs"
                        :class="isActive('/barang-keluar') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('barang-keluar') }}">
@@ -621,7 +601,6 @@
                     </a>
                     <!-- Purchase Order -->
                     <a wire:key="sidebar-desktop-purchase-order"
-                       wire:navigate
                        class="flex items-center gap-2 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-xs"
                        :class="isActive('/purchase-order') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
                        href="{{ route('purchase-order') }}">
@@ -630,12 +609,19 @@
                         </svg>
                         <span>Purchase Order</span>
                     </a>
+                    <!-- Kalender Transaksi -->
+                    <a wire:key="sidebar-desktop-kalender"
+                       class="flex items-center gap-2 px-3 py-2 rounded-xl active:scale-[0.98] transition-all duration-200 text-xs"
+                       :class="isActive('/kalender') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium'"
+                       href="{{ route('kalender') }}">
+                        <span class="material-symbols-outlined text-base flex-shrink-0">calendar_month</span>
+                        <span>Kalender Transaksi</span>
+                    </a>
                 </div>
             </div>
 
             <!-- Forecast & Analisis -->
             <a wire:key="sidebar-desktop-analytics"
-               wire:navigate
                class="group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="[
                    isActive('/analytics') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium',
@@ -661,7 +647,6 @@
 
             <!-- Transfer Gudang -->
             <a wire:key="sidebar-desktop-transfer"
-               wire:navigate
                class="group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="[
                    isActive('/transfer') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium',
@@ -680,7 +665,6 @@
 
             <!-- Replenishment Toko -->
             <a wire:key="sidebar-desktop-replenishment"
-               wire:navigate
                class="group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="[
                    isActive('/replenishment') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium',
@@ -699,7 +683,6 @@
 
             <!-- Picking Barang -->
             <a wire:key="sidebar-desktop-picking"
-               wire:navigate
                class="group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="[
                    isActive('/picking') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium',
@@ -718,7 +701,6 @@
 
             <!-- Packing & QC -->
             <a wire:key="sidebar-desktop-packing"
-               wire:navigate
                class="group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="[
                    isActive('/packing') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium',
@@ -743,7 +725,6 @@
 
             <!-- Laporan & Analitik -->
             <a wire:key="sidebar-desktop-reports"
-               wire:navigate
                class="group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="[
                    isActive('/reports') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium',
@@ -763,7 +744,6 @@
             @can('manage master')
             <!-- Log Perubahan -->
             <a wire:key="sidebar-desktop-audit-log"
-               wire:navigate
                class="group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="[
                    isActive('/audit-log') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium',
@@ -784,7 +764,6 @@
             <!-- Manajemen Akses -->
             @can('manage system')
             <a wire:key="sidebar-desktop-user-management"
-               wire:navigate
                class="group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm"
                :class="[
                    isActive('/user-management') ? 'bg-primary-container text-on-primary-container shadow-accent-glow font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 font-medium',

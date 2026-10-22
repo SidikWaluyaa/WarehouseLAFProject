@@ -707,4 +707,138 @@ class PrintController extends Controller
             'lokasiFilter'
         ));
     }
+
+    /**
+     * Print Berita Acara Stock Opname.
+     */
+    public function auditOpname(int $id)
+    {
+        $session = \App\Models\OpnameHeader::with(['lokasi', 'details.produk'])->findOrFail($id);
+
+        $totalItems = $session->details->count();
+        $matchedItems = $session->details->where('selisih', 0)->count();
+        $surplusItems = $session->details->where('selisih', '>', 0)->count();
+        $deficitItems = $session->details->where('selisih', '<', 0)->count();
+
+        $totalQtySistem = (int) $session->details->sum('qty_sistem');
+        $totalQtyFisik = (int) $session->details->sum('qty_fisik');
+        $netSelisihQty = $totalQtyFisik - $totalQtySistem;
+
+        $totalNilaiSistem = 0;
+        $totalNilaiFisik = 0;
+        $netNilaiSelisih = 0;
+
+        foreach ($session->details as $d) {
+            $hpp = $d->produk ? (float) $d->produk->hpp : 0;
+            $totalNilaiSistem += $d->qty_sistem * $hpp;
+            $totalNilaiFisik += $d->qty_fisik * $hpp;
+            $netNilaiSelisih += $d->selisih * $hpp;
+        }
+
+        return view('print.audit-opname', compact(
+            'session',
+            'totalItems',
+            'matchedItems',
+            'surplusItems',
+            'deficitItems',
+            'totalQtySistem',
+            'totalQtyFisik',
+            'netSelisihQty',
+            'totalNilaiSistem',
+            'totalNilaiFisik',
+            'netNilaiSelisih'
+        ));
+    }
+
+    /**
+     * Print Official Purchase Order (Surat Pesanan PO) document.
+     */
+    public function purchaseOrder(int $id)
+    {
+        $po = \App\Models\PoHeader::with(['supplier', 'poDetails.produk'])->findOrFail($id);
+
+        $totalDipesan = (int) $po->poDetails->sum('jumlah');
+        $totalDiterima = (int) $po->poDetails->sum('barang_masuk');
+        $totalSisa = (int) $po->poDetails->sum('sisa');
+        $totalDitutup = (int) $po->poDetails->sum('qty_ditutup');
+        $totalEstimasiHpp = (float) $po->poDetails->sum(fn($d) => $d->jumlah * (float) $d->hpp);
+        $totalNilaiSisa = (float) $po->poDetails->sum(fn($d) => $d->sisa * (float) $d->hpp);
+
+        $receipts = \App\Models\BarangMasukDetail::with(['barangMasukHeader', 'produk'])
+            ->whereIn('po_detail_id', $po->poDetails->pluck('id'))
+            ->orderBy('id', 'asc')
+            ->get();
+
+        return view('print.purchase-order', compact(
+            'po',
+            'totalDipesan',
+            'totalDiterima',
+            'totalSisa',
+            'totalDitutup',
+            'totalEstimasiHpp',
+            'totalNilaiSisa',
+            'receipts'
+        ));
+    }
+
+    /**
+     * Print Rekap Tracking & Sisa Purchase Order.
+     */
+    public function purchaseOrderRekap(Request $request)
+    {
+        $tab = $request->query('tab', 'po_tracking');
+        $search = trim($request->query('search', ''));
+        $filter = $request->query('filter', $request->query('only_variance') ? 'variance' : 'all');
+
+        $query = \App\Models\PoDetail::with(['poHeader.supplier', 'produk'])
+            ->withCount(['barangMasuk as jumlah_adjust' => fn($q) => $q->whereNotNull('selisih_po')->where('selisih_po', '!=', 0)])
+            ->withSum('barangMasuk as total_selisih', 'selisih_po');
+
+        if ($filter === 'outstanding') {
+            $query->where('sisa', '>', 0);
+        } elseif ($filter === 'variance') {
+            $query->where(function ($q) {
+                $q->where('qty_ditutup', '>', 0)
+                  ->orWhereHas('barangMasuk', fn($b) => $b->whereNotNull('selisih_po')->where('selisih_po', '!=', 0));
+            });
+        } elseif ($filter === 'closed') {
+            $query->where('qty_ditutup', '>', 0);
+        }
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('poHeader.supplier', function ($sQ) use ($search) {
+                    $sQ->where('nama_supplier', 'like', '%' . $search . '%');
+                })
+                ->orWhereHas('produk', function ($pQ) use ($search) {
+                    $pQ->where('nama_barang', 'like', '%' . $search . '%')
+                       ->orWhere('kode_barang', 'like', '%' . $search . '%');
+                })
+                ->orWhereHas('poHeader', function ($hQ) use ($search) {
+                    $hQ->where('artikel', 'like', '%' . $search . '%')
+                       ->orWhere('nomor_po', 'like', '%' . $search . '%');
+                });
+            });
+        }
+
+        $items = $query->latest('id')->get();
+
+        $totalJumlah = (int) $items->sum('jumlah');
+        $totalMasuk = (int) $items->sum('barang_masuk');
+        $totalSisa = (int) $items->sum('sisa');
+        $totalDitutup = (int) $items->sum('qty_ditutup');
+        $totalNilaiSisa = (float) $items->sum(fn($i) => $i->sisa * (float) $i->hpp);
+
+        return view('print.purchase-order-rekap', compact(
+            'items',
+            'tab',
+            'search',
+            'filter',
+            'totalJumlah',
+            'totalMasuk',
+            'totalSisa',
+            'totalDitutup',
+            'totalNilaiSisa'
+        ));
+    }
 }

@@ -89,7 +89,7 @@
 
             <!-- Back & Submit buttons for Desktop -->
             <div class="hidden lg:flex items-center space-x-3">
-                <a href="{{ route('barang-keluar') }}" wire:navigate class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all text-on-surface text-center">
+                <a href="{{ route('barang-keluar') }}" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all text-on-surface text-center">
                     Batal / Kembali
                 </a>
                 <button type="button" wire:click="store" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong">
@@ -227,7 +227,7 @@
 
             <!-- Back & Submit buttons for Mobile -->
             <div class="flex lg:hidden items-center space-x-3 mt-4">
-                <a href="{{ route('barang-keluar') }}" wire:navigate class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all text-on-surface text-center">
+                <a href="{{ route('barang-keluar') }}" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all text-on-surface text-center">
                     Batal / Kembali
                 </a>
                 <button type="button" wire:click="store" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong">
@@ -609,25 +609,10 @@
             });
         }
 
-        // Hentikan kamera secara otomatis jika pengguna berpindah halaman via wire:navigate
-        function handleNavigation(event) {
-            const targetUrl = event.detail.url;
-            if (html5QrcodeScanner && html5QrcodeScanner.isScanning && targetUrl) {
-                event.preventDefault();
-                stopCameraScannerOnly().then(() => {
-                    html5QrcodeScanner = null;
-                    document.removeEventListener('livewire:navigate', handleNavigation);
-                    Livewire.navigate(targetUrl);
-                }).catch(err => {
-                    console.error("Gagal menghentikan kamera saat navigasi:", err);
-                    html5QrcodeScanner = null;
-                    document.removeEventListener('livewire:navigate', handleNavigation);
-                    Livewire.navigate(targetUrl);
-                });
-            } else {
-                document.removeEventListener('livewire:navigate', handleNavigation);
+        window.addEventListener('beforeunload', () => {
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                stopCameraScannerOnly();
             }
-        }
-        document.addEventListener('livewire:navigate', handleNavigation);
+        });
     </script>
 </div>

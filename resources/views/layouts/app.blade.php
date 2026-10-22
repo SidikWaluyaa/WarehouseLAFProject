@@ -4,6 +4,9 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>WMS LAF PROJECT</title>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}"/>
 
@@ -59,25 +62,37 @@
         }
 
         html.light {
-            --color-background: 255, 255, 255; /* #FFFFFF (Off-White) */
-            --color-on-surface: 0, 0, 0; /* #000000 */
-            --color-surface-dark: 237, 237, 237; /* #EDEDED (Light Grey) */
+            /* Background: Modern Slate Grey (#F1F5F9) */
+            --color-background: 241, 245, 249; /* #F1F5F9 */
+            --color-on-surface: 15, 23, 42; /* #0F172A (Slate 900) */
+            --color-surface-dark: 255, 255, 255; /* #FFFFFF (Crisp White for cards & containers) */
             --color-surface-container: 255, 255, 255; /* #FFFFFF */
-            --color-surface-container-low: 237, 237, 237; /* #EDEDED (Light Grey) */
-            --color-surface-container-high: 226, 226, 226; /* #E2E2E2 */
-            --color-surface-container-highest: 211, 211, 211; /* #D3D3D3 */
-            --color-on-surface-variant: 51, 51, 51; /* #333333 */
+            --color-surface-container-low: 248, 250, 252; /* #F8FAFC (Slate 50) */
+            --color-surface-container-high: 226, 232, 240; /* #E2E8F0 (Slate 200) */
+            --color-surface-container-highest: 203, 213, 225; /* #CBD5E1 (Slate 300) */
+            --color-on-surface-variant: 71, 85, 105; /* #475569 (Slate 600) */
             
             --color-glass-border: rgba(0, 0, 0, 0.08);
-            --color-glass-bg: rgba(255, 255, 255, 0.85);
+            --color-glass-bg: #FFFFFF;
             --color-border-subtle: rgba(0, 0, 0, 0.08);
-            --color-scrollbar-thumb: rgba(0, 0, 0, 0.15);
-            --color-active-nav-bg: rgba(255, 221, 50, 0.12); /* Gold Yellow active nav */
+            --color-scrollbar-thumb: rgba(0, 0, 0, 0.18);
+            --color-active-nav-bg: rgba(255, 221, 50, 0.15);
             
             --color-on-primary-container: #000000; /* black text on Gold Yellow */
             --color-primary: #FFDD32; /* Gold Yellow */
-            --color-secondary: #000000; /* Black */
+            --color-secondary: #0F172A; /* Dark Slate */
             --accent-rgb: 255, 221, 50; /* Gold Yellow */
+        }
+
+        html {
+            font-size: 13.25px; /* Skala 82% UI Density: Browser 100% tampil pas & lega setara zoom 80% */
+            scroll-behavior: smooth;
+        }
+
+        @media (max-width: 640px) {
+            html {
+                font-size: 14.5px; /* Tetap nyaman dan proporsional di layar handphone */
+            }
         }
 
         html, body {
@@ -97,55 +112,422 @@
             border: 1px solid var(--color-glass-border);
         }
 
-        /* Light Mode CSS Helper Overrides for Dark-First HTML structures */
-        html.light .border-white\/10 {
+        /* Sidebar Dark Contrast Preserved in both Light & Dark Mode */
+        .wms-sidebar {
+            background-color: #121418 !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #94A3B8 !important;
+        }
+        .wms-sidebar a, 
+        .wms-sidebar button {
+            color: #94A3B8;
+        }
+        .wms-sidebar a:hover, 
+        .wms-sidebar button:hover {
+            color: #FFFFFF !important;
+            background-color: rgba(255, 255, 255, 0.06) !important;
+        }
+        .wms-sidebar a.bg-primary-container,
+        .wms-sidebar a.bg-primary-container:hover {
+            background-color: #FFDD32 !important;
+            color: #000000 !important;
+        }
+        .wms-sidebar .text-primary {
+            color: #FFDD32 !important;
+        }
+        .wms-sidebar .border-white\/10,
+        .wms-sidebar .border-white\/5 {
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+        .wms-sidebar .bg-white\/5 {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+        .wms-sidebar .text-on-surface {
+            color: #FFFFFF !important;
+        }
+        .wms-sidebar .text-on-surface-variant {
+            color: #94A3B8 !important;
+        }
+        .wms-sidebar .text-on-surface-variant\/40 {
+            color: rgba(255, 255, 255, 0.35) !important;
+        }
+
+        /* Light Mode Specific Overrides */
+        html.light header {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        html.light header .bg-surface-dark\/95,
+        html.light header .bg-surface-dark,
+        html.light .settings-drawer-panel {
+            background-color: #FFFFFF !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        html.light header .text-on-surface,
+        html.light .settings-drawer-panel .text-on-surface {
+            color: #0F172A !important;
+        }
+
+        html.light header .text-on-surface-variant,
+        html.light .settings-drawer-panel .text-on-surface-variant {
+            color: #64748B !important;
+        }
+
+        html.light header .hover\:bg-white\/5:hover,
+        html.light .settings-drawer-panel .hover\:bg-white\/5:hover {
+            background-color: #F1F5F9 !important;
+        }
+
+        html.light header .border-white\/5,
+        html.light header .border-white\/10,
+        html.light .settings-drawer-panel .border-white\/5,
+        html.light .settings-drawer-panel .border-white\/10 {
+            border-color: rgba(0, 0, 0, 0.07) !important;
+        }
+
+        html.light .settings-drawer-panel .bg-white\/5 {
+            background-color: #F8FAFC !important;
+        }
+
+        html.light .glass-card {
+            background: #FFFFFF !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 4px 18px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -2px rgba(0, 0, 0, 0.02) !important;
+        }
+
+        html.light .amber-glow {
+            box-shadow: 0 4px 18px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -2px rgba(0, 0, 0, 0.02) !important;
+        }
+
+        html.light .amber-glow-strong {
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 10px -2px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        /* ====================================================================
+           LIGHT MODE COMPREHENSIVE COLOR CONTRAST SYSTEM (HIGH READABILITY)
+           Semua warna (Kuning, Orange, Ijo, Biru, Merah) dibuat solid, tebal,
+           dan berstandar WCAG AA/AAA sehingga TIDAK SAMAR di background putih/abu.
+           ==================================================================== */
+
+        /* 1. KUNING & AMBER (Deep Amber #92400E / #B45309 - Super Tajam) */
+        html.light main .text-primary,
+        html.light main [class*="text-primary"],
+        html.light header .text-primary,
+        html.light main .text-amber-400,
+        html.light main .text-amber-500,
+        html.light main .text-yellow-400,
+        html.light main .text-yellow-500,
+        html.light main .text-yellow-600 {
+            color: #92400E !important;
+            font-weight: 600;
+        }
+        html.light main .text-amber-600,
+        html.light main .text-amber-700 {
+            color: #78350F !important;
+        }
+        html.light main [class*="bg-amber-500"],
+        html.light main [class*="bg-yellow-500"],
+        html.light main [class*="bg-primary/"],
+        html.light main .bg-primary\/10,
+        html.light main .bg-primary\/15,
+        html.light main .bg-primary\/20 {
+            background-color: #FEF3C7 !important;
+            border-color: #FBBF24 !important;
+            color: #78350F !important;
+            font-weight: 700;
+        }
+        html.light main [class*="bg-amber-500"] *,
+        html.light main [class*="bg-yellow-500"] *,
+        html.light main [class*="bg-primary/"] *,
+        html.light main .bg-primary\/10 *,
+        html.light main .bg-primary\/15 *,
+        html.light main .bg-primary\/20 * {
+            color: #78350F !important;
+        }
+        html.light main [class*="border-amber-500"],
+        html.light main [class*="border-primary"],
+        html.light main .border-primary {
+            border-color: #D97706 !important;
+        }
+
+        /* 2. ORANGE (Deep Burnt Orange #9A3412) */
+        html.light main .text-orange-400,
+        html.light main .text-orange-500,
+        html.light main .text-orange-600 {
+            color: #9A3412 !important;
+            font-weight: 600;
+        }
+        html.light main [class*="bg-orange-500"],
+        html.light main [class*="bg-orange-400"] {
+            background-color: #FFEDD5 !important;
+            border-color: #FB923C !important;
+            color: #7C2D12 !important;
+            font-weight: 700;
+        }
+        html.light main [class*="bg-orange-500"] *,
+        html.light main [class*="bg-orange-400"] * {
+            color: #7C2D12 !important;
+        }
+        html.light main [class*="border-orange-500"],
+        html.light main [class*="border-orange-400"] {
+            border-color: #EA580C !important;
+        }
+
+        /* 3. IJO / HIJAU (Deep Forest Emerald #166534) */
+        html.light main .text-green-400,
+        html.light main .text-green-500,
+        html.light main .text-emerald-400,
+        html.light main .text-emerald-500,
+        html.light main .text-teal-400,
+        html.light main .text-teal-500 {
+            color: #166534 !important;
+            font-weight: 600;
+        }
+        html.light main [class*="bg-green-500"],
+        html.light main [class*="bg-emerald-500"],
+        html.light main [class*="bg-teal-500"] {
+            background-color: #DCFCE7 !important;
+            border-color: #86EFAC !important;
+            color: #14532D !important;
+            font-weight: 700;
+        }
+        html.light main [class*="bg-green-500"] *,
+        html.light main [class*="bg-emerald-500"] *,
+        html.light main [class*="bg-teal-500"] * {
+            color: #14532D !important;
+        }
+        html.light main [class*="border-green-500"],
+        html.light main [class*="border-emerald-500"],
+        html.light main [class*="border-teal-500"] {
+            border-color: #16A34A !important;
+        }
+
+        /* 4. BIRU / CYAN / TERTIARY (Deep Royal Blue #1E40AF / Cyan #155E75) */
+        html.light main .text-blue-400,
+        html.light main .text-blue-500,
+        html.light main .text-cyan-400,
+        html.light main .text-cyan-500,
+        html.light main .text-sky-400,
+        html.light main .text-sky-500,
+        html.light main .text-indigo-400,
+        html.light main .text-indigo-500,
+        html.light main .text-tertiary,
+        html.light main .text-tertiary-container,
+        html.light main [class*="text-tertiary"] {
+            color: #1E40AF !important;
+            font-weight: 600;
+        }
+        html.light main [class*="bg-blue-500"],
+        html.light main [class*="bg-cyan-500"],
+        html.light main [class*="bg-sky-500"],
+        html.light main [class*="bg-indigo-500"],
+        html.light main [class*="bg-tertiary"],
+        html.light main .bg-tertiary\/10,
+        html.light main .bg-tertiary\/20 {
+            background-color: #DBEAFE !important;
+            border-color: #93C5FD !important;
+            color: #1E3A8A !important;
+            font-weight: 700;
+        }
+        html.light main [class*="bg-blue-500"] *,
+        html.light main [class*="bg-cyan-500"] *,
+        html.light main [class*="bg-sky-500"] *,
+        html.light main [class*="bg-indigo-500"] *,
+        html.light main [class*="bg-tertiary"] *,
+        html.light main .bg-tertiary\/10 *,
+        html.light main .bg-tertiary\/20 * {
+            color: #1E3A8A !important;
+        }
+        html.light main [class*="border-blue-500"],
+        html.light main [class*="border-cyan-500"],
+        html.light main [class*="border-sky-500"],
+        html.light main [class*="border-indigo-500"],
+        html.light main [class*="border-tertiary"],
+        html.light main .border-tertiary,
+        html.light main .border-tertiary\/20 {
+            border-color: #2563EB !important;
+        }
+
+        /* 5. MERAH / ERROR (Crimson Ruby #991B1B) */
+        html.light main .text-red-400,
+        html.light main .text-red-500,
+        html.light main .text-rose-400,
+        html.light main .text-rose-500,
+        html.light main .text-error,
+        html.light main [class*="text-error"] {
+            color: #991B1B !important;
+            font-weight: 600;
+        }
+        html.light main [class*="bg-red-500"],
+        html.light main [class*="bg-rose-500"],
+        html.light main [class*="bg-error"],
+        html.light main .bg-error\/5,
+        html.light main .bg-error\/10,
+        html.light main .bg-error\/20 {
+            background-color: #FEE2E2 !important;
+            border-color: #FCA5A5 !important;
+            color: #7F1D1D !important;
+            font-weight: 700;
+        }
+        html.light main [class*="bg-red-500"] *,
+        html.light main [class*="bg-rose-500"] *,
+        html.light main [class*="bg-error"] *,
+        html.light main .bg-error\/5 *,
+        html.light main .bg-error\/10 *,
+        html.light main .bg-error\/20 * {
+            color: #7F1D1D !important;
+        }
+        html.light main [class*="border-red-500"],
+        html.light main [class*="border-rose-500"],
+        html.light main [class*="border-error"],
+        html.light main .border-error\/20 {
+            border-color: #DC2626 !important;
+        }
+
+        /* 6. VIOLET / PURPLE (#5B21B6) */
+        html.light main .text-purple-400,
+        html.light main .text-purple-500,
+        html.light main .text-violet-400,
+        html.light main .text-violet-500 {
+            color: #5B21B6 !important;
+            font-weight: 600;
+        }
+        html.light main [class*="bg-purple-500"],
+        html.light main [class*="bg-violet-500"] {
+            background-color: #EDE9FE !important;
+            border-color: #C4B5FD !important;
+            color: #4C1D95 !important;
+            font-weight: 700;
+        }
+        html.light main [class*="bg-purple-500"] *,
+        html.light main [class*="bg-violet-500"] * {
+            color: #4C1D95 !important;
+        }
+
+        /* Buttons & Badges with Solid Primary Background keep vibrant Gold + Black Text */
+        html.light .bg-primary,
+        html.light .bg-primary-container,
+        html.light button.bg-primary,
+        html.light a.bg-primary {
+            background-color: #FFDD32 !important;
+            color: #000000 !important;
+            border-color: transparent !important;
+        }
+        html.light .bg-primary *,
+        html.light .bg-primary-container * {
+            color: #000000 !important;
+        }
+
+        /* Content Area Element Helpers in Light Mode */
+        html.light main .border-white\/10 {
             border-color: rgba(0, 0, 0, 0.08) !important;
         }
-        html.light .border-white\/5 {
+        html.light main .border-white\/5 {
             border-color: rgba(0, 0, 0, 0.05) !important;
         }
-        html.light .border-white\/20 {
+        html.light main .border-white\/20 {
             border-color: rgba(0, 0, 0, 0.15) !important;
         }
-        html.light .divide-white\/5 > * + * {
+        html.light main .divide-white\/5 > * + * {
             border-color: rgba(0, 0, 0, 0.05) !important;
         }
-        html.light .bg-white\/5 {
-            background-color: rgba(255, 221, 50, 0.08) !important;
+        html.light main .divide-white\/10 > * + * {
+            border-color: rgba(0, 0, 0, 0.08) !important;
         }
-        html.light .bg-white\/2 {
-            background-color: rgba(255, 221, 50, 0.03) !important;
+        html.light main .bg-white\/5 {
+            background-color: #F8FAFC !important;
         }
-        html.light .hover:bg-white\/5:hover {
-            background-color: rgba(255, 221, 50, 0.12) !important;
+        html.light main .bg-white\/2 {
+            background-color: #F8FAFC !important;
         }
-        html.light .bg-surface-dark\/95 {
-            background-color: rgba(255, 255, 255, 0.95) !important;
+        html.light main .bg-white\/10 {
+            background-color: #F1F5F9 !important;
+        }
+        html.light main .bg-white\/20 {
+            background-color: #E2E8F0 !important;
+        }
+        html.light main .hover\:bg-white\/5:hover {
+            background-color: #F1F5F9 !important;
+        }
+        html.light main .bg-surface-dark\/95,
+        html.light main .bg-surface-dark,
+        html.light main [class*="bg-surface-dark"] {
+            background-color: #FFFFFF !important;
+        }
+        html.light main [class*="bg-white\/[0."] {
+            background-color: #F8FAFC !important;
+        }
+        html.light main .bg-black\/35,
+        html.light main .bg-black\/20,
+        html.light main .bg-black\/30 {
+            background-color: #F8FAFC !important;
         }
         
-        html.light .text-slate-400 {
-            color: #555555 !important;
+        html.light main .text-slate-400 {
+            color: #64748B !important;
         }
-        html.light .text-slate-300 {
-            color: #333333 !important;
+        html.light main .text-slate-300 {
+            color: #334155 !important;
         }
-        html.light .text-slate-200 {
-            color: #111111 !important;
+        html.light main .text-slate-200 {
+            color: #0F172A !important;
         }
-        html.light .text-slate-500 {
-            color: #666666 !important;
+        html.light main .text-slate-500 {
+            color: #64748B !important;
         }
-        html.light .text-on-surface-variant\/60 {
-            color: rgba(0, 0, 0, 0.5) !important;
+        html.light main .text-on-surface-variant\/60 {
+            color: #64748B !important;
         }
-        html.light .text-white\/10 {
-            color: rgba(0, 0, 0, 0.1) !important;
+        html.light main .text-white {
+            color: #0F172A !important;
         }
-        html.light .bg-white\/10 {
-            background-color: rgba(0, 0, 0, 0.08) !important;
+        html.light main .text-white\/90 {
+            color: #0F172A !important;
         }
-        html.light .bg-white\/20 {
-            background-color: rgba(0, 0, 0, 0.15) !important;
+        html.light main .text-white\/80 {
+            color: #1E293B !important;
+        }
+        html.light main .text-white\/60 {
+            color: #475569 !important;
+        }
+        html.light main .text-white\/40 {
+            color: #64748B !important;
+        }
+        html.light main .text-white\/20 {
+            color: #94A3B8 !important;
+        }
+        html.light main .text-white\/10 {
+            color: #CBD5E1 !important;
+        }
+
+        /* Inputs & Form Controls in Light Mode */
+        html.light main input,
+        html.light main select,
+        html.light main textarea {
+            background-color: #FFFFFF !important;
+            border-color: #CBD5E1 !important;
+            color: #0F172A !important;
+        }
+        html.light main input::placeholder,
+        html.light main textarea::placeholder {
+            color: #94A3B8 !important;
+        }
+
+        /* Table Components in Light Mode */
+        html.light main thead th {
+            background-color: #F8FAFC !important;
+            color: #475569 !important;
+            border-bottom: 1px solid #E2E8F0 !important;
+        }
+        html.light main tbody tr {
+            border-bottom: 1px solid #F1F5F9 !important;
+        }
+        html.light main tbody tr:hover {
+            background-color: #F8FAFC !important;
         }
 
         .amber-glow {
@@ -221,9 +603,16 @@
             box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.2);
         }
 
-        /* Hide Livewire navigation progress bar globally */
+        /* Hide Livewire navigation progress bar and nprogress globally */
+        #nprogress,
+        #nprogress .bar,
+        #nprogress .peg,
+        #nprogress .spinner,
         .livewire-progress-bar {
             display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
 
         /* Custom Flatpickr Dark Theme Override — Matches App Design System */
@@ -521,7 +910,7 @@
              x-transition:leave="transform transition ease-in duration-200"
              x-transition:leave-start="translate-x-0"
              x-transition:leave-end="translate-x-full"
-             class="fixed inset-y-0 right-0 w-80 sm:w-96 bg-surface-dark border-l border-white/10 shadow-2xl z-50 p-6 flex flex-col backdrop-blur-xl">
+             class="settings-drawer-panel fixed inset-y-0 right-0 w-80 sm:w-96 bg-surface-dark border-l border-white/10 shadow-2xl z-50 p-6 flex flex-col backdrop-blur-xl">
              
             <!-- Drawer Header -->
             <div class="flex items-center justify-between pb-5 border-b border-white/10">

@@ -44,7 +44,7 @@ class ProductsTemplateExport implements FromArray, WithHeadings, WithStyles, Wit
                 'Hitam',
                 '36',
                 'pasang',
-                'GUDANG',
+                'GDG-A01',
                 25000,
                 37500,
                 100,
@@ -57,7 +57,7 @@ class ProductsTemplateExport implements FromArray, WithHeadings, WithStyles, Wit
                 'Abu-abu',
                 '39',
                 'pasang',
-                'GUDANG',
+                'GDG-A01',
                 25000,
                 37500,
                 50,
@@ -70,7 +70,7 @@ class ProductsTemplateExport implements FromArray, WithHeadings, WithStyles, Wit
                 'Army',
                 '40',
                 'pasang',
-                'GUDANG',
+                'GDG-A01',
                 25000,
                 37500,
                 80,
@@ -111,14 +111,12 @@ class ProductsTemplateExport implements FromArray, WithHeadings, WithStyles, Wit
                     $sheet->getColumnDimension($col)->setAutoSize(true);
                 }
 
-                // Get list of active locations in DB
-                $locations = Lokasi::where('is_active', true)->pluck('kode_lokasi')->toArray();
+                // Get list of active locations in DB (only actual location codes)
+                $locations = Lokasi::where('is_active', true)->orderBy('kode_lokasi')->pluck('kode_lokasi')->toArray();
                 if (empty($locations)) {
-                    $locations = ['GUDANG', 'TOKO', 'GDG-A01', 'TKO-R01'];
-                } else {
-                    $locations = array_merge($locations, ['GUDANG', 'TOKO']);
+                    $locations = ['GDG-A01', 'TKO-R01'];
                 }
-                $locations = array_unique(array_map('strtoupper', $locations));
+                $locations = array_values(array_unique(array_map('strtoupper', $locations)));
 
                 // Data Validation (Dropdowns) for rows 2 to 100
                 for ($row = 2; $row <= 100; $row++) {
@@ -161,7 +159,7 @@ class ProductsTemplateExport implements FromArray, WithHeadings, WithStyles, Wit
                     $validationLoc->setErrorTitle('Lokasi Tidak Valid');
                     $validationLoc->setError('Silakan pilih lokasi dari daftar yang tersedia.');
                     $validationLoc->setPromptTitle('Pilih Lokasi');
-                    $validationLoc->setPrompt('Pilih lokasi yang valid di sistem.');
+                    $validationLoc->setPrompt('Pilih salah satu kode lokasi: ' . implode(', ', $locations));
                     $validationLoc->setFormula1('"' . implode(',', $locations) . '"');
                 }
 

@@ -14,16 +14,16 @@
 
     <!-- Tab Navigation -->
     <div class="flex border-b border-white/10 mb-6 space-x-8">
-        <a href="{{ route('barang-keluar') }}" wire:navigate class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
+        <a href="{{ route('barang-keluar') }}" class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
             <span class="material-symbols-outlined text-lg">receipt_long</span>
             Daftar Transaksi (Header)
         </a>
-        <a href="{{ route('barang-keluar.riwayat') }}" wire:navigate class="relative pb-4 text-sm font-bold text-rose-400 flex items-center gap-2">
+        <a href="{{ route('barang-keluar.riwayat') }}" class="relative pb-4 text-sm font-bold text-rose-400 flex items-center gap-2">
             <span class="material-symbols-outlined text-lg text-rose-400">history</span>
             Riwayat Detail Barang (Itemized)
             <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-rose-500 rounded-full shadow-[0_0_12px_#f43f5e]"></div>
         </a>
-        <a href="{{ route('barang-keluar.riwayat-tanggal') }}" wire:navigate class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
+        <a href="{{ route('barang-keluar.riwayat-tanggal') }}" class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
             <span class="material-symbols-outlined text-lg">payments</span>
             Riwayat Keluar / Tanggal (Laporan Nilai)
         </a>
@@ -260,74 +260,64 @@
         <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-white/5 bg-rose-500/5 text-[10px] font-bold tracking-[0.2em] text-rose-300 uppercase">
-                        <th class="px-6 py-4.5">Tanggal</th>
-                        <th class="px-6 py-4.5">Tipe</th>
-                        <th class="px-6 py-4.5">Nama Langganan</th>
-                        <th class="px-6 py-4.5">No. Nota</th>
-                        <th class="px-6 py-4.5">Keterangan</th>
-                        <th class="px-6 py-4.5">Produk</th>
-                        <th class="px-6 py-4.5 text-center">QTY</th>
-                        <th class="px-6 py-4.5 text-center">Satuan</th>
-                        <th class="px-6 py-4.5">Operator</th>
-                        <th class="px-6 py-4.5 text-center">Lokasi</th>
-                        <th class="px-6 py-4.5 text-right">HPP</th>
+                    <tr class="border-b border-white/5 bg-rose-500/5 text-[10px] font-bold tracking-[0.2em] text-rose-400 uppercase">
+                        <th class="px-4 py-3.5">No. Nota & Tanggal</th>
+                        <th class="px-3 py-3.5">Tipe</th>
+                        <th class="px-4 py-3.5">Pelanggan & Ket.</th>
+                        <th class="px-4 py-3.5">Produk & SKU</th>
+                        <th class="px-4 py-3.5 text-center">QTY Keluar</th>
+                        <th class="px-4 py-3.5 text-center">Lokasi & Operator</th>
+                        <th class="px-4 py-3.5 text-right">Nilai HPP</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5 text-xs text-on-surface-variant">
                     @forelse ($history as $h)
                         <tr class="hover:bg-white/5 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap font-medium text-on-surface">
-                                {{ $h->barangKeluarHeader->tanggal->format('d/m/Y') }}
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="font-mono font-bold text-rose-500 dark:text-rose-400 text-xs">{{ $h->barangKeluarHeader->nomor_nota ?? '-' }}</div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{{ $h->barangKeluarHeader->tanggal->format('d/m/Y') }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2.5 py-0.5 rounded-full text-[9px] font-bold border uppercase tracking-wider
-                                    {{ $h->barangKeluarHeader->tipe_nota === 'Penjualan' ? 'bg-green-500/10 text-green-400 border-green-500/20' : '' }}
-                                    {{ $h->barangKeluarHeader->tipe_nota === 'Sample' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : '' }}
-                                    {{ $h->barangKeluarHeader->tipe_nota === 'Retur Keluar' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : '' }}
-                                    {{ $h->barangKeluarHeader->tipe_nota === 'Penyesuaian' ? 'bg-red-500/15 text-red-400 border border-red-500/20' : '' }}
+                            <td class="px-3 py-3 whitespace-nowrap">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold border uppercase tracking-wider
+                                    {{ $h->barangKeluarHeader->tipe_nota === 'Penjualan' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30' : '' }}
+                                    {{ $h->barangKeluarHeader->tipe_nota === 'Sample' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30' : '' }}
+                                    {{ $h->barangKeluarHeader->tipe_nota === 'Retur Keluar' ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30' : '' }}
+                                    {{ $h->barangKeluarHeader->tipe_nota === 'Penyesuaian' ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30' : '' }}
                                 ">
                                     {{ $h->barangKeluarHeader->tipe_nota }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 font-semibold text-on-surface">
-                                {{ $h->barangKeluarHeader->pelanggan->nama_pelanggan ?? '-' }}
+                            <td class="px-4 py-3">
+                                <div class="font-bold text-slate-800 dark:text-slate-100 text-xs">{{ $h->barangKeluarHeader->pelanggan->nama_pelanggan ?? '-' }}</div>
+                                @if($h->barangKeluarHeader->keterangan_tambahan)
+                                    <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-[180px] mt-0.5" title="{{ $h->barangKeluarHeader->keterangan_tambahan }}">
+                                        {{ $h->barangKeluarHeader->keterangan_tambahan }}
+                                    </div>
+                                @endif
                             </td>
-                            <td class="px-6 py-4 font-mono font-bold text-rose-400/80">
-                                {{ $h->barangKeluarHeader->nomor_nota ?? '-' }}
+                            <td class="px-4 py-3">
+                                <div class="font-bold text-slate-900 dark:text-white text-xs">{{ $h->produk->nama_barang }}</div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">{{ $h->produk->kode_barang }} • {{ $h->produk->variasi_barang }}</div>
                             </td>
-                            <td class="px-6 py-4 max-w-xs truncate text-on-surface-variant/80" title="{{ $h->barangKeluarHeader->keterangan_tambahan }}">
-                                {{ $h->barangKeluarHeader->keterangan_tambahan ?? '-' }}
+                            <td class="px-4 py-3 text-center whitespace-nowrap">
+                                <span class="font-bold text-rose-600 dark:text-rose-400 font-mono text-xs">{{ number_format($h->qty_keluar) }}</span>
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400 ml-1">{{ $h->satuan }}</span>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="font-bold text-on-surface">{{ $h->produk->nama_barang }}</div>
-                                <div class="text-[9px] text-on-surface-variant/50 font-mono">{{ $h->produk->kode_barang }} • {{ $h->produk->variasi_barang }}</div>
-                            </td>
-                            <td class="px-6 py-4 text-center font-bold text-rose-300 font-mono text-sm">
-                                {{ number_format($h->qty_keluar) }}
-                            </td>
-                            <td class="px-6 py-4 text-center text-on-surface-variant/70">
-                                {{ $h->satuan }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-0.5 bg-white/5 border border-white/5 rounded-lg text-[10px] text-on-surface-variant">
-                                    {{ $h->barangKeluarHeader->dikeluarkan_oleh }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-center whitespace-nowrap">
-                                <span class="px-2.5 py-0.5 text-[9px] font-bold rounded-full border 
-                                    {{ $h->lokasi_pengambilan === 'GUDANG' ? 'bg-rose-500/10 text-rose-300 border-rose-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20' }}
+                            <td class="px-4 py-3 text-center whitespace-nowrap">
+                                <div class="inline-block px-2 py-0.5 text-[9px] font-bold rounded-md border mb-0.5
+                                    {{ $h->lokasi_pengambilan === 'GUDANG' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-300 border-rose-500/20' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' }}
                                 ">
                                     {{ $h->lokasi_pengambilan }}
-                                </span>
+                                </div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400">{{ $h->barangKeluarHeader->dikeluarkan_oleh ?? '-' }}</div>
                             </td>
-                            <td class="px-6 py-4 text-right font-bold text-rose-300 font-mono text-sm whitespace-nowrap">
+                            <td class="px-4 py-3 text-right font-bold text-rose-600 dark:text-rose-300 font-mono text-xs whitespace-nowrap">
                                 Rp{{ number_format($h->hpp, 0, ',', '.') }}
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="px-6 py-12 text-center text-on-surface-variant">
+                            <td colspan="7" class="px-6 py-12 text-center text-on-surface-variant">
                                 <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2">history</span>
                                 <p>Tidak ada riwayat detail barang keluar ditemukan</p>
                             </td>

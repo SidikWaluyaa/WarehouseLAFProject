@@ -104,12 +104,6 @@ class Riwayat extends Component
         $this->resetPage();
     }
 
-    public function clearAlerts(): void
-    {
-        $this->toastSuccess('');
-        $this->alertError('');
-    }
-
     public function render()
     {
         $query = BarangMasukDetail::with(['barangMasukHeader.supplier', 'produk']);

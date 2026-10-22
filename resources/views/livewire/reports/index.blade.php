@@ -204,7 +204,7 @@
                         <tbody class="divide-y divide-white/5">
                             @foreach($movementData as $m)
                                 <tr class="hover:bg-white/5 transition-colors text-on-surface-variant">
-                                    <td class="py-2.5 px-4 text-on-surface whitespace-nowrap text-[11px]">{{ \Carbon\Carbon::parse($m['created_at'])->format('d/m/Y H:i') }}</td>
+                                    <td class="py-2.5 px-4 text-on-surface whitespace-nowrap text-[11px]">{{ \Carbon\Carbon::parse($m['created_at'])->format('d/m/Y H:i') }} WIB</td>
                                     <td class="py-2.5 px-4">
                                         <div class="font-bold text-on-surface">{{ $m['produk']['nama_barang'] ?? '-' }}</div>
                                         <div class="text-[10px] text-primary/80 font-mono mt-0.5">{{ $m['produk']['kode_barang'] ?? '' }}</div>

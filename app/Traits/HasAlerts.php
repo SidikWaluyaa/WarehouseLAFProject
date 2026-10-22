@@ -27,6 +27,17 @@ trait HasAlerts
     }
 
     /**
+     * Dispatch a warning popup alert.
+     */
+    public function alertWarning(string $message, string $title = 'Peringatan'): void
+    {
+        $this->dispatch('alert:warning', [
+            'title' => $title,
+            'text' => $message,
+        ]);
+    }
+
+    /**
      * Dispatch a confirmation alert.
      * When confirmed, it will trigger the specified $action Livewire event with the $params payload.
      */

@@ -1,4 +1,4 @@
-<div x-init="$dispatch('update-header-title', 'Manajemen Lokasi')" class="flex-1 overflow-y-auto p-margin-desktop space-y-stack-lg custom-scrollbar">
+﻿<div x-init="$dispatch('update-header-title', 'Manajemen Lokasi')" class="flex-1 overflow-y-auto p-margin-desktop space-y-stack-lg custom-scrollbar">
     <template x-teleport="#header-search-placeholder">
         <div class="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-1.5 border border-white/5 ml-4">
             <span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
@@ -89,7 +89,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex justify-center gap-2">
-                                    <a href="{{ route('lokasi.detail', $loc->id) }}" wire:navigate class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-primary/20 text-primary transition-all" title="Detail Barang">
+                                    <a href="{{ route('lokasi.detail', $loc->id) }}" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-primary/20 text-primary transition-all" title="Detail Barang">
                                         <span class="material-symbols-outlined text-lg">visibility</span>
                                     </a>
                                     <button wire:click="showBarcode({{ $loc->id }})" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-primary/20 text-primary transition-all" title="Barcode">

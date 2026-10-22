@@ -1,4 +1,4 @@
-<div x-init="$dispatch('update-header-title', 'Barang Keluar')" class="flex-1 overflow-y-auto p-6 lg:p-margin-desktop space-y-stack-lg custom-scrollbar">
+﻿<div x-init="$dispatch('update-header-title', 'Barang Keluar')" class="flex-1 overflow-y-auto p-6 lg:p-margin-desktop space-y-stack-lg custom-scrollbar">
     <template x-teleport="#header-search-placeholder">
         <div class="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-1.5 border border-white/5 ml-4">
             <span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
@@ -8,16 +8,16 @@
 
     <!-- Tab Navigation -->
     <div class="flex border-b border-white/10 mb-6 space-x-8">
-        <a href="{{ route('barang-keluar') }}" wire:navigate class="relative pb-4 text-sm font-bold text-rose-400 flex items-center gap-2">
+        <a href="{{ route('barang-keluar') }}" class="relative pb-4 text-sm font-bold text-rose-400 flex items-center gap-2">
             <span class="material-symbols-outlined text-lg text-rose-400">receipt_long</span>
             Daftar Transaksi (Header)
             <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-rose-500 rounded-full shadow-[0_0_12px_#f43f5e]"></div>
         </a>
-        <a href="{{ route('barang-keluar.riwayat') }}" wire:navigate class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
+        <a href="{{ route('barang-keluar.riwayat') }}" class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
             <span class="material-symbols-outlined text-lg">history</span>
             Riwayat Detail Barang (Itemized)
         </a>
-        <a href="{{ route('barang-keluar.riwayat-tanggal') }}" wire:navigate class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
+        <a href="{{ route('barang-keluar.riwayat-tanggal') }}" class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
             <span class="material-symbols-outlined text-lg">payments</span>
             Riwayat Keluar / Tanggal (Laporan Nilai)
         </a>
@@ -107,7 +107,7 @@
             </div>
         </div>
 
-        <a href="{{ route('barang-keluar.create') }}" wire:navigate class="flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong justify-center">
+        <a href="{{ route('barang-keluar.create') }}" class="flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong justify-center">
             <span class="material-symbols-outlined">add</span>
             Input Barang Keluar
         </a>

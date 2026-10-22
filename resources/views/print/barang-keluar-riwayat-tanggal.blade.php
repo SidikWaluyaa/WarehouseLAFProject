@@ -202,7 +202,7 @@
         </div>
         <div class="invoice-title">
             <h2>LAPORAN NILAI TRANSAKSI BARANG KELUAR</h2>
-            <p>Dicetak pada: {{ now()->format('d/m/Y H:i') }}</p>
+            <p>Dicetak pada: {{ now()->format('d/m/Y H:i') }} WIB</p>
         </div>
     </div>
 

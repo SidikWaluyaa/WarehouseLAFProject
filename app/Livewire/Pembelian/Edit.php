@@ -47,7 +47,7 @@ class Edit extends Component
     {
         return [
             'tanggal' => 'required|date',
-            'tipe_nota' => 'required|in:Stock Awal,Pembelian,Retur Masuk,Penyesuaian',
+            'tipe_nota' => 'required|in:Stock Awal,Pembelian,Purchase Order,Retur Masuk,Penyesuaian',
             'supplier_id' => $this->tipe_nota === 'Stock Awal' ? 'nullable|exists:mst_supplier,id' : 'required|exists:mst_supplier,id',
             'nomor_nota' => 'required|string|max:100',
             'keterangan_tambahan' => 'nullable|string',
@@ -57,6 +57,7 @@ class Edit extends Component
             'items.*.lokasi_simpan' => 'required|exists:mst_lokasi,kode_lokasi',
             'items.*.hpp' => 'required|numeric|min:0',
             'items.*.po_detail_id' => 'nullable|exists:po_detail,id',
+            'items.*.alasan_selisih' => 'nullable|string|max:255',
         ];
     }
 
@@ -97,6 +98,7 @@ class Edit extends Component
                 'hpp' => (float)$detail->hpp,
                 'lokasi_simpan' => $detail->lokasi_simpan,
                 'po_detail_id' => $detail->po_detail_id,
+                'alasan_selisih' => $detail->alasan_selisih,
             ];
         }
 
@@ -252,7 +254,7 @@ class Edit extends Component
             });
 
             session()->flash('success_message', "Transaksi barang masuk berhasil diubah dan stok terupdate.");
-            return $this->redirect('/barang-masuk', navigate: true);
+            return $this->redirect('/barang-masuk', navigate: false);
         } catch (Exception $e) {
             $this->alertError("Terjadi kesalahan: " . $e->getMessage());
         }

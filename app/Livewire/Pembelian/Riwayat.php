@@ -114,14 +114,14 @@ class Riwayat extends Component
 
     public function render()
     {
-        $query = BarangMasukDetail::with(['barangMasukHeader.supplier', 'produk']);
+        $query = BarangMasukDetail::with(['barangMasukHeader.supplier', 'barangMasukHeader.poHeader', 'produk']);
 
         // Filter by product
         if ($this->selectedProductId) {
             $query->whereRaw('produk_id = ?', [$this->selectedProductId]);
         }
 
-        // Filter by general search (supplier name, nomor_nota, keterangan_tambahan)
+        // Filter by general search (supplier name, nomor_nota, keterangan_tambahan, PO)
         if (!empty($this->search)) {
             $query->whereHas('barangMasukHeader', function ($q) {
                 $term = '%' . $this->search . '%';
@@ -129,6 +129,9 @@ class Riwayat extends Component
                     $inner->whereRaw('nomor_nota LIKE ? OR keterangan_tambahan LIKE ? OR data_dimasukan_oleh LIKE ?', [$term, $term, $term])
                           ->orWhereHas('supplier', function ($s) use ($term) {
                               $s->whereRaw('nama_supplier LIKE ?', [$term]);
+                          })
+                          ->orWhereHas('poHeader', function ($poQ) use ($term) {
+                              $poQ->whereRaw('nomor_po LIKE ? OR artikel LIKE ?', [$term, $term]);
                           });
                 });
             });

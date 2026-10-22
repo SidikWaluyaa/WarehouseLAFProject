@@ -13,6 +13,7 @@ class PoHeader extends Model
 
     protected $table = 'po_header';
     protected $fillable = [
+        'nomor_po',
         'tanggal',
         'supplier_id',
         'artikel',
@@ -31,5 +32,25 @@ class PoHeader extends Model
     public function poDetails(): HasMany
     {
         return $this->hasMany(PoDetail::class, 'po_header_id');
+    }
+
+    public function barangMasukHeaders(): HasMany
+    {
+        return $this->hasMany(BarangMasuk::class, 'po_header_id');
+    }
+
+    public function totalSisa(): int
+    {
+        return (int) $this->poDetails()->sum('sisa');
+    }
+
+    public function totalBarangMasuk(): int
+    {
+        return (int) $this->poDetails()->sum('barang_masuk');
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->totalSisa() === 0;
     }
 }

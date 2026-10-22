@@ -47,6 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/barang-masuk/riwayat-tanggal/print', [PrintController::class, 'barangMasukRiwayatTanggal'])->name('barang-masuk.riwayat-tanggal.print');
         Route::get('/barang-masuk/{id}/print', [PrintController::class, 'barangMasuk'])->name('barang-masuk.print')->where('id', '[0-9]+');
         Route::get('/audit', \App\Livewire\Audit\Index::class)->name('audit');
+        Route::get('/audit/{id}/print', [PrintController::class, 'auditOpname'])->name('audit.print')->where('id', '[0-9]+');
         
         // Transfer and Replenishment (Inbound & Outbound tasks)
         Route::get('/transfer', \App\Livewire\Transfer\Index::class)->name('transfer');
@@ -65,13 +66,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/barang-keluar/riwayat-tanggal/print', [PrintController::class, 'barangKeluarRiwayatTanggal'])->name('barang-keluar.riwayat-tanggal.print');
         Route::get('/barang-keluar/{id}/print', [PrintController::class, 'barangKeluar'])->name('barang-keluar.print')->where('id', '[0-9]+');
         Route::get('/picking', \App\Livewire\Outbound\PickingManager::class)->name('picking');
+        Route::get('/picking/{id}', \App\Livewire\Outbound\PickingRunner::class)->name('picking.process')->where('id', '[0-9]+');
         Route::get('/packing', \App\Livewire\Outbound\PackingManager::class)->name('packing');
     });
 
     // Purchase Order Group
     Route::middleware(['can:view po'])->group(function () {
         Route::get('/purchase-order', PurchaseOrderManager::class)->name('purchase-order');
+        Route::get('/purchase-order/create', \App\Livewire\PurchaseOrder\Create::class)->name('purchase-order.create');
+        Route::get('/purchase-order/rekap/print', [PrintController::class, 'purchaseOrderRekap'])->name('purchase-order.rekap.print');
+        Route::get('/purchase-order/{poHeader}', \App\Livewire\PurchaseOrder\Show::class)->name('purchase-order.show')->where('poHeader', '[0-9]+');
+        Route::get('/purchase-order/{id}/print', [PrintController::class, 'purchaseOrder'])->name('purchase-order.print')->where('id', '[0-9]+');
     });
+
+    // Calendar Operations
+    Route::get('/kalender', \App\Livewire\Calendar\Index::class)->name('kalender');
 
     // Analytics Group
     Route::middleware(['can:view analytics'])->group(function () {

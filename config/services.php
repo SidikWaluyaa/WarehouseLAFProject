@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'fonnte' => [
+        'token' => env('FONNTE_API_TOKEN', env('FONNTE_TOKEN', '')),
+        'url' => env('FONNTE_API_URL', env('FONNTE_URL', 'https://api.fonnte.com/send')),
+        'default_phone' => env('WHATSAPP_NOTIFICATION_DEFAULT_PHONE', env('WHATSAPP_DEFAULT_PHONE', '')),
+    ],
+
 ];

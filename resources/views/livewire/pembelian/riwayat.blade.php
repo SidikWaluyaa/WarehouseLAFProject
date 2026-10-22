@@ -14,16 +14,16 @@
 
     <!-- Tab Navigation -->
     <div class="flex border-b border-white/10 mb-6 space-x-8">
-        <a href="{{ route('barang-masuk') }}" wire:navigate class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
+        <a href="{{ route('barang-masuk') }}" class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
             <span class="material-symbols-outlined text-lg">receipt_long</span>
             Daftar Transaksi (Header)
         </a>
-        <a href="{{ route('barang-masuk.riwayat') }}" wire:navigate class="relative pb-4 text-sm font-bold text-purple-400 flex items-center gap-2">
+        <a href="{{ route('barang-masuk.riwayat') }}" class="relative pb-4 text-sm font-bold text-purple-400 flex items-center gap-2">
             <span class="material-symbols-outlined text-lg text-purple-400">history</span>
             Riwayat Detail Barang (Itemized)
             <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-purple-500 rounded-full shadow-[0_0_12px_#a855f7]"></div>
         </a>
-        <a href="{{ route('barang-masuk.riwayat-tanggal') }}" wire:navigate class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
+        <a href="{{ route('barang-masuk.riwayat-tanggal') }}" class="pb-4 text-sm font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-2 transition-colors">
             <span class="material-symbols-outlined text-lg">payments</span>
             Riwayat Masuk / Tanggal (Laporan Nilai)
         </a>
@@ -173,6 +173,7 @@
             </span>
             <select wire:model.live="tipeFilter" class="w-full bg-surface-container-low border border-white/10 rounded-xl py-2.5 px-3 text-xs text-on-surface appearance-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-all">
                 <option value="">Semua Tipe</option>
+                <option value="Purchase Order">Purchase Order (PO)</option>
                 <option value="Stock Awal">Stok Awal</option>
                 <option value="Pembelian">Pembelian</option>
                 <option value="Retur Masuk">Retur Masuk</option>
@@ -258,69 +259,68 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="border-b border-white/5 bg-purple-500/5 text-[10px] font-bold tracking-[0.2em] text-purple-300 uppercase">
-                        <th class="px-6 py-4.5">Tanggal</th>
-                        <th class="px-6 py-4.5">Tipe</th>
-                        <th class="px-6 py-4.5">Supplier / Pengirim</th>
-                        <th class="px-6 py-4.5">No. Nota</th>
-                        <th class="px-6 py-4.5">Keterangan</th>
-                        <th class="px-6 py-4.5">Produk</th>
-                        <th class="px-6 py-4.5 text-center">QTY</th>
-                        <th class="px-6 py-4.5 text-center">Satuan</th>
-                        <th class="px-6 py-4.5">Operator</th>
-                        <th class="px-6 py-4.5 text-center">Lokasi</th>
+                        <th class="px-4 py-3.5">No. Nota & Tanggal</th>
+                        <th class="px-3 py-3.5">Tipe</th>
+                        <th class="px-4 py-3.5">Supplier & Ket.</th>
+                        <th class="px-4 py-3.5">Produk & SKU</th>
+                        <th class="px-4 py-3.5 text-center">QTY Masuk</th>
+                        <th class="px-4 py-3.5 text-center">Lokasi & Operator</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5 text-xs text-on-surface-variant">
                     @forelse ($history as $h)
                         <tr class="hover:bg-white/5 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap font-medium text-on-surface">
-                                {{ $h->barangMasukHeader->tanggal->format('d/m/Y') }}
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="font-mono font-bold text-purple-400 text-xs">{{ $h->barangMasukHeader->nomor_nota ?? '-' }}</div>
+                                @if($h->barangMasukHeader->po_header_id && $h->barangMasukHeader->poHeader)
+                                    <div class="flex items-center gap-1 mt-0.5 font-sans">
+                                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20" title="Terhubung ke Purchase Order">
+                                            <span class="material-symbols-outlined text-[10px]">receipt_long</span>
+                                            {{ $h->barangMasukHeader->poHeader->nomor_po ?? 'PO #'.$h->barangMasukHeader->poHeader->id }}
+                                        </span>
+                                    </div>
+                                @endif
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{{ $h->barangMasukHeader->tanggal->format('d/m/Y') }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2.5 py-0.5 rounded-full text-[9px] font-bold border uppercase tracking-wider
-                                    {{ $h->barangMasukHeader->tipe_nota === 'Pembelian' ? 'bg-green-500/10 text-green-400 border-green-500/20' : '' }}
-                                    {{ $h->barangMasukHeader->tipe_nota === 'Stock Awal' ? 'bg-purple-500/15 text-purple-300 border border-purple-500/20' : '' }}
-                                    {{ $h->barangMasukHeader->tipe_nota === 'Retur Masuk' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : '' }}
-                                    {{ $h->barangMasukHeader->tipe_nota === 'Penyesuaian' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : '' }}
+                            <td class="px-3 py-3 whitespace-nowrap">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold border uppercase tracking-wider
+                                    {{ $h->barangMasukHeader->tipe_nota === 'Purchase Order' ? 'bg-amber-500/15 text-amber-500 dark:text-amber-400 border-amber-500/30' : '' }}
+                                    {{ $h->barangMasukHeader->tipe_nota === 'Pembelian' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30' : '' }}
+                                    {{ $h->barangMasukHeader->tipe_nota === 'Stock Awal' ? 'bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30' : '' }}
+                                    {{ $h->barangMasukHeader->tipe_nota === 'Retur Masuk' ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30' : '' }}
+                                    {{ $h->barangMasukHeader->tipe_nota === 'Penyesuaian' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30' : '' }}
                                 ">
                                     {{ $h->barangMasukHeader->tipe_nota }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 font-semibold text-on-surface">
-                                {{ $h->barangMasukHeader->supplier->nama_supplier ?? '-' }}
+                            <td class="px-4 py-3">
+                                <div class="font-bold text-slate-800 dark:text-slate-100 text-xs">{{ $h->barangMasukHeader->supplier->nama_supplier ?? '-' }}</div>
+                                @if($h->barangMasukHeader->keterangan_tambahan)
+                                    <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-[180px] mt-0.5" title="{{ $h->barangMasukHeader->keterangan_tambahan }}">
+                                        {{ $h->barangMasukHeader->keterangan_tambahan }}
+                                    </div>
+                                @endif
                             </td>
-                            <td class="px-6 py-4 font-mono font-bold text-purple-400/80">
-                                {{ $h->barangMasukHeader->nomor_nota ?? '-' }}
+                            <td class="px-4 py-3">
+                                <div class="font-bold text-slate-900 dark:text-white text-xs">{{ $h->produk->nama_barang }}</div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">{{ $h->produk->kode_barang }} • {{ $h->produk->variasi_barang }}</div>
                             </td>
-                            <td class="px-6 py-4 max-w-xs truncate text-on-surface-variant/80" title="{{ $h->barangMasukHeader->keterangan_tambahan }}">
-                                {{ $h->barangMasukHeader->keterangan_tambahan ?? '-' }}
+                            <td class="px-4 py-3 text-center whitespace-nowrap">
+                                <span class="font-bold text-purple-600 dark:text-purple-300 font-mono text-xs">{{ number_format($h->qty_masuk) }}</span>
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400 ml-1">{{ $h->satuan }}</span>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="font-bold text-on-surface">{{ $h->produk->nama_barang }}</div>
-                                <div class="text-[9px] text-on-surface-variant/50 font-mono">{{ $h->produk->kode_barang }} • {{ $h->produk->variasi_barang }}</div>
-                            </td>
-                            <td class="px-6 py-4 text-center font-bold text-purple-300 font-mono text-sm">
-                                {{ number_format($h->qty_masuk) }}
-                            </td>
-                            <td class="px-6 py-4 text-center text-on-surface-variant/70">
-                                {{ $h->satuan }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-0.5 bg-white/5 border border-white/5 rounded-lg text-[10px] text-on-surface-variant">
-                                    {{ $h->barangMasukHeader->data_dimasukan_oleh }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-center whitespace-nowrap">
-                                <span class="px-2.5 py-0.5 text-[9px] font-bold rounded-full border 
-                                    {{ $h->lokasi_simpan === 'GUDANG' ? 'bg-purple-500/10 text-purple-300 border-purple-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20' }}
+                            <td class="px-4 py-3 text-center whitespace-nowrap">
+                                <div class="inline-block px-2 py-0.5 text-[9px] font-bold rounded-md border mb-0.5
+                                    {{ $h->lokasi_simpan === 'GUDANG' ? 'bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/20' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' }}
                                 ">
                                     {{ $h->lokasi_simpan }}
-                                </span>
+                                </div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400">{{ $h->barangMasukHeader->data_dimasukan_oleh ?? '-' }}</div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="px-6 py-12 text-center text-on-surface-variant">
+                            <td colspan="6" class="px-6 py-12 text-center text-on-surface-variant">
                                 <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2">history</span>
                                 <p>Tidak ada riwayat detail barang masuk ditemukan</p>
                             </td>

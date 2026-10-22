@@ -205,4 +205,82 @@ class PrintTest extends TestCase
         $response->assertSee('Toko Test Pelanggan');
         $response->assertSee('Sandal Test Keren');
     }
+
+    public function test_authenticated_admin_can_access_purchase_order_print()
+    {
+        $supplier = Supplier::first();
+        $produk = Produk::first();
+
+        $po = \App\Models\PoHeader::create([
+            'nomor_po' => 'PO/20261003/9999',
+            'tanggal' => '2026-10-03',
+            'supplier_id' => $supplier->id,
+            'artikel' => 'ART-PRINT-01',
+            'jumlah' => 10,
+        ]);
+
+        \App\Models\PoDetail::create([
+            'po_header_id' => $po->id,
+            'produk_id' => $produk->id,
+            'jumlah' => 10,
+            'barang_masuk' => 4,
+            'sisa' => 6,
+            'hpp' => 50000.00,
+            'total_hpp' => 300000.00,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)
+            ->get(route('purchase-order.print', $po->id));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('print.purchase-order');
+        $response->assertSee('PO/20261003/9999');
+        $response->assertSee($supplier->nama_supplier);
+        $response->assertSee($produk->nama_barang);
+    }
+
+    public function test_authenticated_admin_can_access_purchase_order_rekap_print()
+    {
+        $supplier = Supplier::first();
+        $produk = Produk::first();
+
+        $po = \App\Models\PoHeader::create([
+            'nomor_po' => 'PO/TEST/FILTER',
+            'tanggal' => '2026-10-03',
+            'supplier_id' => $supplier->id,
+            'artikel' => 'ART-FILTER',
+            'jumlah' => 20,
+        ]);
+
+        // Item 1: Sisa 10 (outstanding)
+        \App\Models\PoDetail::create([
+            'po_header_id' => $po->id,
+            'produk_id' => $produk->id,
+            'jumlah' => 10,
+            'barang_masuk' => 0,
+            'sisa' => 10,
+            'hpp' => 50000.00,
+            'total_hpp' => 500000.00,
+        ]);
+
+        // Item 2: Sisa 0 (lengkap)
+        \App\Models\PoDetail::create([
+            'po_header_id' => $po->id,
+            'produk_id' => $produk->id,
+            'jumlah' => 10,
+            'barang_masuk' => 10,
+            'sisa' => 0,
+            'hpp' => 50000.00,
+            'total_hpp' => 0,
+        ]);
+
+        // Print with filter=outstanding
+        $response = $this->actingAs($this->adminUser)
+            ->get(route('purchase-order.rekap.print', ['tab' => 'po_tracking', 'filter' => 'outstanding']));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('print.purchase-order-rekap');
+        $response->assertSee('Laporan Rekap Tracking & Sisa PO');
+        $response->assertSee('Belum Lengkap (Outstanding)');
+    }
 }

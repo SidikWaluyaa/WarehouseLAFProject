@@ -39,6 +39,19 @@
                     Informasi Nota
                 </h3>
 
+                @if ($po_header_id)
+                    <div class="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-2xl flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary text-base">receipt_long</span>
+                            <div>
+                                <p class="text-[11px] font-black text-primary uppercase tracking-wider">Terhubung ke Purchase Order</p>
+                                <p class="text-[10px] text-on-surface-variant/70">{{ $keterangan_tambahan }}</p>
+                            </div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[9px] font-black uppercase tracking-wider">PO Terpilih</span>
+                    </div>
+                @endif
+
                 <div class="space-y-4">
                     <!-- Tanggal -->
                     <div>
@@ -51,7 +64,8 @@
                     <div>
                         <label class="block text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider mb-2">Tipe Nota</label>
                         <select wire:model="tipe_nota" class="w-full bg-surface-container-low border border-white/10 rounded-2xl py-3 px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all">
-                            <option value="Pembelian">Pembelian (PO/Restock)</option>
+                            <option value="Purchase Order">Purchase Order (PO)</option>
+                            <option value="Pembelian">Pembelian Langsung</option>
                             <option value="Stock Awal">Stok Awal</option>
                             <option value="Retur Masuk">Retur Masuk</option>
                             <option value="Penyesuaian">Penyesuaian (Opname)</option>
@@ -89,7 +103,7 @@
 
             <!-- Back & Submit buttons for Desktop -->
             <div class="hidden lg:flex items-center space-x-3">
-                <a href="{{ route('barang-masuk') }}" wire:navigate class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all text-on-surface text-center">
+                <a href="{{ route('barang-masuk') }}" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all text-on-surface text-center">
                     Batal / Kembali
                 </a>
                 <button type="button" wire:click="store" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong">
@@ -183,7 +197,7 @@
                                             @if (count($poList) > 0)
                                                 <div class="mt-2 p-2 bg-green-500/10 border border-green-500/20 rounded-xl">
                                                     <label class="block text-[9px] font-black text-green-400 uppercase mb-1">Hubungkan ke Purchase Order (PO):</label>
-                                                    <select wire:model="items.{{ $index }}.po_detail_id" class="w-full bg-surface-container-low border border-green-500/20 rounded text-[10px] text-green-400 focus:border-green-500 focus:ring-green-500 py-0.5">
+                                                    <select wire:model.live="items.{{ $index }}.po_detail_id" class="w-full bg-surface-container-low border border-green-500/20 rounded text-[10px] text-green-400 focus:border-green-500 focus:ring-green-500 py-0.5">
                                                         <option value="">-- Jangan hubungkan ke PO --</option>
                                                         @foreach ($poList as $poD)
                                                             <option value="{{ $poD['id'] }}">
@@ -191,6 +205,42 @@
                                                             </option>
                                                         @endforeach
                                                     </select>
+                                                </div>
+                                            @endif
+                                        @endif
+
+                                        {{-- Selisih terhadap sisa PO: wajib alasan jika qty terima != sisa --}}
+                                        @if (!empty($item['po_detail_id']) && isset($item['sisa_po']) && $item['sisa_po'] !== null)
+                                            @php
+                                                $selisihPo = (int)($item['qty_masuk'] ?? 0) - (int)$item['sisa_po'];
+                                            @endphp
+                                            <div class="mt-2 flex items-center gap-2 text-[10px] font-bold">
+                                                <span class="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-on-surface-variant">Sisa PO: {{ $item['sisa_po'] }}</span>
+                                                @if ($selisihPo === 0)
+                                                    <span class="px-2 py-0.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400">Sesuai</span>
+                                                @elseif ($selisihPo < 0)
+                                                    <span class="px-2 py-0.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400">Kurang {{ abs($selisihPo) }}</span>
+                                                @else
+                                                    <span class="px-2 py-0.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400">Lebih {{ $selisihPo }}</span>
+                                                @endif
+                                            </div>
+                                            @if ($selisihPo !== 0)
+                                                <div class="mt-2 space-y-1.5" x-data>
+                                                    <input type="text"
+                                                           wire:model="items.{{ $index }}.alasan_selisih"
+                                                           x-ref="alasan{{ $index }}"
+                                                           placeholder="Alasan selisih (wajib)..."
+                                                           class="w-full bg-surface-container-low border border-amber-500/30 rounded-xl py-1.5 px-3 text-[11px] text-on-surface focus:ring-1 focus:ring-amber-400 focus:border-amber-400 placeholder:text-on-surface-variant/40">
+                                                    <div class="flex flex-wrap gap-1">
+                                                        @foreach (($selisihPo < 0 ? ['Kurang kirim', 'Barang rusak/reject', 'Kirim bertahap'] : ['Bonus supplier', 'Lebih kirim']) as $preset)
+                                                            <button type="button"
+                                                                    @click="$refs.alasan{{ $index }}.value = '{{ $preset }}'; $wire.set('items.{{ $index }}.alasan_selisih', '{{ $preset }}', false)"
+                                                                    class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] text-on-surface-variant hover:text-on-surface hover:bg-white/10 transition-colors">
+                                                                {{ $preset }}
+                                                            </button>
+                                                        @endforeach
+                                                    </div>
+                                                    @error("items.{$index}.alasan_selisih") <span class="text-[10px] text-error block font-medium">{{ $message }}</span> @enderror
                                                 </div>
                                             @endif
                                         @endif
@@ -228,7 +278,7 @@
 
             <!-- Back & Submit buttons for Mobile -->
             <div class="flex lg:hidden items-center space-x-3 mt-4">
-                <a href="{{ route('barang-masuk') }}" wire:navigate class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all text-on-surface text-center">
+                <a href="{{ route('barang-masuk') }}" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all text-on-surface text-center">
                     Batal / Kembali
                 </a>
                 <button type="button" wire:click="store" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong">
@@ -606,24 +656,10 @@
             });
         }
 
-        function handleNavigation(event) {
-            const targetUrl = event.detail.url;
-            if (html5QrcodeScanner && html5QrcodeScanner.isScanning && targetUrl) {
-                event.preventDefault();
-                stopCameraScannerOnly().then(() => {
-                    html5QrcodeScanner = null;
-                    document.removeEventListener('livewire:navigate', handleNavigation);
-                    Livewire.navigate(targetUrl);
-                }).catch(err => {
-                    console.error("Gagal menghentikan kamera saat navigasi:", err);
-                    html5QrcodeScanner = null;
-                    document.removeEventListener('livewire:navigate', handleNavigation);
-                    Livewire.navigate(targetUrl);
-                });
-            } else {
-                document.removeEventListener('livewire:navigate', handleNavigation);
+        window.addEventListener('beforeunload', () => {
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                stopCameraScannerOnly();
             }
-        }
-        document.addEventListener('livewire:navigate', handleNavigation);
+        });
     </script>
 </div>

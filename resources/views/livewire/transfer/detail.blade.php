@@ -5,7 +5,7 @@
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
             <div>
                 <h3 class="text-lg font-black text-on-surface font-mono">{{ $transfer->nomor_transfer }}</h3>
-                <p class="text-xs text-on-surface-variant mt-1">Dibuat oleh <span class="font-bold text-primary">{{ $transfer->created_by }}</span> pada {{ $transfer->created_at->format('d/m/Y H:i') }}</p>
+                <p class="text-xs text-on-surface-variant mt-1">Dibuat oleh <span class="font-bold text-primary">{{ $transfer->created_by }}</span> pada {{ $transfer->created_at->format('d/m/Y H:i') }} WIB</p>
             </div>
             <x-status-badge :status="$transfer->status" class="text-sm font-black px-4 py-2" />
         </div>
@@ -91,7 +91,7 @@
 
     {{-- Action Buttons --}}
     <div class="flex flex-wrap gap-3 items-center justify-between">
-        <a href="{{ route('transfer') }}" wire:navigate class="px-6 py-3 rounded-2xl text-sm font-bold text-on-surface-variant hover:text-on-surface transition-colors">
+        <a href="{{ route('transfer') }}" class="px-6 py-3 rounded-2xl text-sm font-bold text-on-surface-variant hover:text-on-surface transition-colors">
             &larr; Kembali ke Daftar
         </a>
 

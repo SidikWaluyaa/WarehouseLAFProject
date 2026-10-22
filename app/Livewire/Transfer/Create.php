@@ -127,7 +127,7 @@ class Create extends Component
             ]);
 
             session()->flash('success_message', "Transfer Order {$header->nomor_transfer} berhasil dibuat.");
-            return $this->redirect('/transfer', navigate: true);
+            return $this->redirect('/transfer', navigate: false);
         } catch (\Illuminate\Database\QueryException $e) {
             \Illuminate\Support\Facades\Log::error("Database Error in Transfer/Create: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             $this->alertError("Terjadi kesalahan pada server. Silakan coba lagi atau hubungi administrator.");

@@ -8,6 +8,32 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * App\Models\Produk
+ *
+ * @property int $id
+ * @property float $hpp
+ * @property float $harga_jual
+ * @property string $nama_produk
+ * @property string $kategori
+ * @property string|null $kategori_2
+ * @property string $kode_barang
+ * @property string $nama_barang
+ * @property string|null $variasi_barang
+ * @property string|null $warna
+ * @property string|null $size
+ * @property string $satuan
+ * @property int $stok_masuk
+ * @property int $stok_keluar
+ * @property int $total_stok
+ * @property int|null $min_stok
+ * @property bool $is_threshold_active
+ * @property string|null $notif_phone
+ * @property string|null $lokasi
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class Produk extends Model
 {
     use HasFactory;
@@ -28,15 +54,27 @@ class Produk extends Model
         'stok_masuk',
         'stok_keluar',
         'total_stok',
+        'min_stok',
+        'is_threshold_active',
+        'notif_phone',
         'lokasi',
         'is_active',
     ];
 
+    protected $casts = [
+        'is_active' => 'boolean',
+        'is_threshold_active' => 'boolean',
+        'min_stok' => 'integer',
+        'hpp' => 'float',
+        'harga_jual' => 'float',
+    ];
+
     protected static function booted()
     {
-        static::created(function ($produk) {
+        static::created(function (self $produk) {
             $lokasiCode = $produk->lokasi ?: 'GDG-A01';
 
+            /** @var \App\Models\Lokasi|null $lokasi */
             $lokasi = \App\Models\Lokasi::where(['kode_lokasi' => $lokasiCode])->first();
             if (!$lokasi) {
                 $tipe = in_array(strtoupper($lokasiCode), ['TOKO', 'GUDANG']) ? strtoupper($lokasiCode) : 'GUDANG';
@@ -99,5 +137,24 @@ class Produk extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope: only products with active threshold whose stock has reached or dropped below minimal threshold
+     */
+    public function scopeLowStock(Builder $query): Builder
+    {
+        return $query->where('is_active', true)
+                     ->where('is_threshold_active', true)
+                     ->where('min_stok', '>', 0)
+                     ->whereColumn('total_stok', '<=', 'min_stok');
+    }
+
+    /**
+     * Check if product is in low stock condition
+     */
+    public function isLowStock(): bool
+    {
+        return (bool)$this->is_threshold_active && (int)$this->min_stok > 0 && (int)$this->total_stok <= (int)$this->min_stok;
     }
 }

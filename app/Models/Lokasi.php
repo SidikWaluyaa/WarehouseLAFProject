@@ -6,6 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * App\Models\Lokasi
+ *
+ * @property int $id
+ * @property string $kode_lokasi
+ * @property string $nama_lokasi
+ * @property string $tipe_lokasi
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class Lokasi extends Model
 {
     use HasFactory;

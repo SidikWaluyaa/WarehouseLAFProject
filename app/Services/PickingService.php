@@ -207,7 +207,7 @@ class PickingService
     /**
      * Start the picking process.
      */
-    public static function startPicking(int $pickingListId, string $pickerName): PickingList
+    public static function startPicking(int $pickingListId, ?string $pickerName = null): PickingList
     {
         try {
             return DB::transaction(function () use ($pickingListId, $pickerName) {
@@ -221,8 +221,10 @@ class PickingService
                     'details' => PickingDetail::where('picking_list_id', $pickingList->id)->get()->toArray()
                 ];
 
+                $resolvedPicker = $pickerName ?: ($pickingList->picker_name ?: (Auth::user() ? Auth::user()->name : 'Operator'));
+
                 $pickingList->status = 'PICKING';
-                $pickingList->picker_name = $pickerName;
+                $pickingList->picker_name = $resolvedPicker;
                 $pickingList->started_at = now();
                 $pickingList->save();
 
@@ -233,7 +235,7 @@ class PickingService
 
                 \App\Models\AuditLog::create([
                     'user_id' => Auth::id(),
-                    'username' => Auth::user() ? Auth::user()->name : $pickerName,
+                    'username' => Auth::user() ? Auth::user()->name : ($resolvedPicker ?? 'System'),
                     'action' => 'UPDATE',
                     'auditable_type' => get_class($pickingList),
                     'auditable_id' => $pickingList->id,
@@ -311,6 +313,51 @@ class PickingService
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error("Error in PickingService::completePicking: " . $e->getMessage(), [
                 'picking_list_id' => $pickingListId,
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Assign or update PIC for a picking list.
+     */
+    public static function assignPicker(int $pickingListId, ?string $pickerName): PickingList
+    {
+        try {
+            return DB::transaction(function () use ($pickingListId, $pickerName) {
+                $pickingList = PickingList::lockForUpdate()->findOrFail($pickingListId);
+
+                if ($pickingList->status === 'COMPLETED') {
+                    throw new \InvalidArgumentException("PIC tidak dapat diubah karena order picking sudah selesai (COMPLETED).");
+                }
+
+                $oldValues = ['picker_name' => $pickingList->picker_name];
+
+                $cleanName = $pickerName ? trim($pickerName) : null;
+                $pickingList->picker_name = $cleanName ?: null;
+                $pickingList->save();
+
+                $newValues = ['picker_name' => $pickingList->picker_name];
+
+                \App\Models\AuditLog::create([
+                    'user_id' => Auth::id(),
+                    'username' => Auth::user() ? Auth::user()->name : ($cleanName ?: 'System'),
+                    'action' => 'ASSIGN_PICKER',
+                    'auditable_type' => get_class($pickingList),
+                    'auditable_id' => $pickingList->id,
+                    'old_values' => $oldValues,
+                    'new_values' => $newValues,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ]);
+
+                return $pickingList;
+            });
+        } catch (Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error in PickingService::assignPicker: " . $e->getMessage(), [
+                'picking_list_id' => $pickingListId,
+                'picker_name' => $pickerName,
                 'trace' => $e->getTraceAsString()
             ]);
             throw $e;

@@ -22,7 +22,7 @@
             }
         }"
         x-init="updateTitle()"
-        x-on:livewire:navigated.window="updateTitle()"
+        x-on:lived.window="updateTitle()"
         class="sticky top-0 z-40 flex justify-between items-center px-6 lg:px-margin-desktop w-full h-16 bg-surface-dark/95 border-b border-white/10 shadow-lg backdrop-blur-md shadow-black/30 flex-shrink-0">
     
     <div class="flex items-center gap-4">
@@ -145,7 +145,7 @@
                                             <span class="text-[10px] text-on-surface-variant" x-text="item.time"></span>
                                         </div>
                                         <p class="text-xs text-on-surface-variant mt-1 leading-relaxed" x-text="item.message"></p>
-                                        <a :href="item.link" wire:navigate class="text-[11px] text-primary hover:underline font-semibold mt-2 inline-block">Lihat Detail &rarr;</a>
+                                        <a :href="item.link" class="text-[11px] text-primary hover:underline font-semibold mt-2 inline-block">Lihat Detail &rarr;</a>
                                     </div>
 
                                     <!-- Dismiss Button -->
@@ -178,7 +178,7 @@
                                             <span class="text-[10px] text-on-surface-variant" x-text="item.time"></span>
                                         </div>
                                         <p class="text-xs text-on-surface-variant mt-1 leading-relaxed" x-text="item.message"></p>
-                                        <a :href="item.link" wire:navigate class="text-[11px] text-primary hover:underline font-semibold mt-2 inline-block">Lihat Detail &rarr;</a>
+                                        <a :href="item.link" class="text-[11px] text-primary hover:underline font-semibold mt-2 inline-block">Lihat Detail &rarr;</a>
                                     </div>
                                     <button @click="dismiss(item.id)" class="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                         <span class="material-symbols-outlined text-sm">close</span>
@@ -198,7 +198,7 @@
                 
                 <!-- View All Audit Link -->
                 <div class="px-5 py-3.5 bg-white/2 border-t border-white/10 text-center">
-                    <a href="{{ route('audit') }}" wire:navigate class="text-xs font-bold text-primary hover:underline">
+                    <a href="{{ route('audit') }}" class="text-xs font-bold text-primary hover:underline">
                         Buka Manajemen Audit Stok &rarr;
                     </a>
                 </div>
@@ -272,13 +272,13 @@
                     <!-- Links Group -->
                     <div class="py-1">
                         <!-- Profil Link -->
-                        <a href="{{ route('profile') }}" wire:navigate class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200">
+                        <a href="{{ route('profile') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200">
                             <span class="material-symbols-outlined text-base">manage_accounts</span>
                             Profil Saya
                         </a>
                         
                         <!-- Opname/Audit Link -->
-                        <a href="{{ route('audit') }}" wire:navigate class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200">
+                        <a href="{{ route('audit') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200">
                             <span class="material-symbols-outlined text-base">fact_check</span>
                             Riwayat Audit
                         </a>

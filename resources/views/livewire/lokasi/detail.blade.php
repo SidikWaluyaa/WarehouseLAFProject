@@ -1,4 +1,4 @@
-<div x-init="$dispatch('update-header-title', 'Detail Lokasi: {{ $lokasi->kode_lokasi }}')" class="flex-1 overflow-y-auto p-margin-desktop space-y-stack-lg custom-scrollbar">
+﻿<div x-init="$dispatch('update-header-title', 'Detail Lokasi: {{ $lokasi->kode_lokasi }}')" class="flex-1 overflow-y-auto p-margin-desktop space-y-stack-lg custom-scrollbar">
     <template x-teleport="#header-search-placeholder">
         <div class="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-1.5 border border-white/5 ml-4">
             <span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
@@ -8,7 +8,7 @@
 
     <!-- Navigation Header -->
     <div class="flex items-center justify-between pb-2">
-        <a href="{{ route('lokasi') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-on-surface font-semibold text-xs rounded-xl transition-all active:scale-95">
+        <a href="{{ route('lokasi') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-on-surface font-semibold text-xs rounded-xl transition-all active:scale-95">
             <span class="material-symbols-outlined text-sm">arrow_back</span>
             Kembali ke Manajemen Lokasi
         </a>

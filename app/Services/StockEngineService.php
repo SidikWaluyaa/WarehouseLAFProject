@@ -31,6 +31,7 @@ class StockEngineService
                     'tipe_nota' => $data['tipe_nota'],
                     'supplier_id' => $data['supplier_id'],
                     'nomor_nota' => $nomorNota,
+                    'po_header_id' => $data['po_header_id'] ?? null,
                     'keterangan_tambahan' => $data['keterangan_tambahan'] ?? null,
                     'data_dimasukan_oleh' => $data['data_dimasukan_oleh'],
                 ]);
@@ -101,15 +102,16 @@ class StockEngineService
                         'data_dimasukan_oleh' => $data['data_dimasukan_oleh'],
                     ]);
 
-                    // Update data PO jika item ini merujuk ke PO
+                    // Update data PO jika item ini merujuk ke PO (+ snapshot riwayat selisih)
+                    $sisaSebelum = null;
+                    $selisih = null;
                     if (!empty($item['po_detail_id'])) {
                         $poDetail = PoDetail::where(['id' => $item['po_detail_id']])->lockForUpdate()->first();
                         if ($poDetail) {
+                            $sisaSebelum = (int) $poDetail->sisa;
+                            $selisih = $qtyMasuk - $sisaSebelum;
                             $poDetail->barang_masuk += $qtyMasuk;
-                            $poDetail->sisa = max(0, $poDetail->jumlah - $poDetail->barang_masuk);
-                            if ($poDetail->hpp) {
-                                $poDetail->total_hpp = $poDetail->sisa * $poDetail->hpp;
-                            }
+                            $poDetail->recalculateSisa();
                             $poDetail->save();
                         }
                     }
@@ -122,6 +124,9 @@ class StockEngineService
                         'lokasi_simpan' => $lokasiCode,
                         'hpp' => $hargaTransaksi,
                         'po_detail_id' => !empty($item['po_detail_id']) ? $item['po_detail_id'] : null,
+                        'sisa_po_sebelum' => $sisaSebelum,
+                        'selisih_po' => $selisih,
+                        'alasan_selisih' => ($selisih !== null && $selisih !== 0) ? (trim($item['alasan_selisih'] ?? '') ?: null) : null,
                     ]);
                 }
 
@@ -315,6 +320,28 @@ class StockEngineService
     }
 
     /**
+     * Generate otomatis nomor Purchase Order (PO/YYYYMMDD/XXXX)
+     */
+    public static function generateNomorPo(string $date): string
+    {
+        $prefix = 'PO/' . date('Ymd', strtotime($date)) . '/';
+        $latest = \App\Models\PoHeader::whereDate('tanggal', $date)
+            ->where('nomor_po', 'like', $prefix . '%')
+            ->orderByRaw('nomor_po desc')
+            ->lockForUpdate()
+            ->first();
+            
+        if ($latest && !empty($latest->nomor_po)) {
+            $lastNumber = (int) substr($latest->nomor_po, -4);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+        
+        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
      * Mengubah transaksi barang masuk (Pembelian, Stock Awal, Retur Masuk, Penyesuaian)
      * dengan metode Reversal dan Re-apply untuk menjaga konsistensi stok dan HPP,
      * serta mencatat riwayat ke dalam Audit Log.
@@ -386,10 +413,7 @@ class StockEngineService
                     $poDetail = PoDetail::where('id', $oldDetail->po_detail_id)->lockForUpdate()->first();
                     if ($poDetail) {
                         $poDetail->barang_masuk -= $qtyOld;
-                        $poDetail->sisa = max(0, $poDetail->jumlah - $poDetail->barang_masuk);
-                        if ($poDetail->hpp) {
-                            $poDetail->total_hpp = $poDetail->sisa * $poDetail->hpp;
-                        }
+                        $poDetail->recalculateSisa();
                         $poDetail->save();
                     }
                 }
@@ -461,14 +485,15 @@ class StockEngineService
                 ]);
 
                 // Update data PO jika item ini merujuk ke PO
+                $sisaSebelum = null;
+                $selisih = null;
                 if (!empty($item['po_detail_id'])) {
                     $poDetail = PoDetail::where('id', $item['po_detail_id'])->lockForUpdate()->first();
                     if ($poDetail) {
+                        $sisaSebelum = (int) $poDetail->sisa;
+                        $selisih = $qtyNew - $sisaSebelum;
                         $poDetail->barang_masuk += $qtyNew;
-                        $poDetail->sisa = max(0, $poDetail->jumlah - $poDetail->barang_masuk);
-                        if ($poDetail->hpp) {
-                            $poDetail->total_hpp = $poDetail->sisa * $poDetail->hpp;
-                        }
+                        $poDetail->recalculateSisa();
                         $poDetail->save();
                     }
                 }
@@ -481,6 +506,9 @@ class StockEngineService
                     'lokasi_simpan' => $lokasiCode,
                     'hpp' => $hargaNew,
                     'po_detail_id' => !empty($item['po_detail_id']) ? $item['po_detail_id'] : null,
+                    'sisa_po_sebelum' => $sisaSebelum,
+                    'selisih_po' => $selisih,
+                    'alasan_selisih' => ($selisih !== null && $selisih !== 0) ? (trim($item['alasan_selisih'] ?? '') ?: null) : null,
                 ]);
 
                 $newDetailsData[] = $newDetail->toArray();
@@ -600,10 +628,7 @@ class StockEngineService
                     $poDetail = PoDetail::where('id', $oldDetail->po_detail_id)->lockForUpdate()->first();
                     if ($poDetail) {
                         $poDetail->barang_masuk -= $qtyOld;
-                        $poDetail->sisa = max(0, $poDetail->jumlah - $poDetail->barang_masuk);
-                        if ($poDetail->hpp) {
-                            $poDetail->total_hpp = $poDetail->sisa * $poDetail->hpp;
-                        }
+                        $poDetail->recalculateSisa();
                         $poDetail->save();
                     }
                 }

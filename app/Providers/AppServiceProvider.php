@@ -2,8 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Standarisasi zona waktu WIB dan lokal Bahasa Indonesia
+        date_default_timezone_set(config('app.timezone', 'Asia/Jakarta'));
+        Carbon::setLocale(config('app.locale', 'id'));
+
         // Register Gate before callback for Super Admin & Admin roles
         Gate::before(function ($user, $ability) {
             if ($user->hasRole('super_admin')) {

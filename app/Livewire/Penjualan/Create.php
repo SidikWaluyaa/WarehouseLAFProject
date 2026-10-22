@@ -259,7 +259,7 @@ class Create extends Component
             });
 
             session()->flash('success_message', "Transaksi barang keluar berhasil disimpan dan stok terupdate.");
-            return $this->redirect('/barang-keluar', navigate: true);
+            return $this->redirect('/barang-keluar', navigate: false);
         } catch (\Illuminate\Database\QueryException $e) {
             \Illuminate\Support\Facades\Log::error("Database Error in Penjualan/Create: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             $this->alertError("Terjadi kesalahan pada server. Silakan coba lagi atau hubungi administrator.");

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use App\Livewire\Forms\LoginForm;
 use Illuminate\Support\Facades\Session;
@@ -36,7 +36,7 @@ new #[Layout('layouts.auth')] class extends Component
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('dashboard', absolute: false));
     }
 }; ?>
 
@@ -289,7 +289,7 @@ new #[Layout('layouts.auth')] class extends Component
                     </label>
 
                     @if (Route::has('password.request'))
-                        <a class="text-xs text-[rgb(var(--color-primary))] font-bold hover:text-[rgba(var(--color-primary),0.8)] transition-colors duration-200 font-outfit" href="{{ route('password.request') }}" wire:navigate>
+                        <a class="text-xs text-[rgb(var(--color-primary))] font-bold hover:text-[rgba(var(--color-primary),0.8)] transition-colors duration-200 font-outfit" href="{{ route('password.request') }}">
                             {{ __('Forgot your password?') }}
                         </a>
                     @endif
