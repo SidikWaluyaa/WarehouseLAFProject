@@ -157,16 +157,23 @@ class Index extends Component
             ->when($this->aging_kategori2, fn($q) => $q->where('kategori_2', $this->aging_kategori2))
             ->get();
 
+        $productIds = $products->pluck('id')->all();
+
+        // Ambil tanggal masuk terakhir untuk seluruh produk sekaligus dalam SATU query agregat
+        $lastIncomingDates = empty($productIds)
+            ? []
+            : DB::table('trx_barang_masuk_detail')
+                ->join('trx_barang_masuk_header', 'trx_barang_masuk_detail.barang_masuk_header_id', '=', 'trx_barang_masuk_header.id')
+                ->whereIn('trx_barang_masuk_detail.produk_id', $productIds)
+                ->groupBy('trx_barang_masuk_detail.produk_id')
+                ->select('trx_barang_masuk_detail.produk_id', DB::raw('MAX(trx_barang_masuk_header.tanggal) as last_tanggal'))
+                ->pluck('last_tanggal', 'produk_id')
+                ->all();
+
         $tempData = [];
         foreach ($products as $p) {
-            $lastIncoming = DB::table('trx_barang_masuk_detail')
-                ->join('trx_barang_masuk_header', 'trx_barang_masuk_detail.barang_masuk_header_id', '=', 'trx_barang_masuk_header.id')
-                ->where('trx_barang_masuk_detail.produk_id', $p->id)
-                ->orderBy('trx_barang_masuk_header.tanggal', 'desc')
-                ->select('trx_barang_masuk_header.tanggal')
-                ->first();
-
-            $lastDate = $lastIncoming ? \Carbon\Carbon::parse($lastIncoming->tanggal) : $p->created_at;
+            $lastDateString = $lastIncomingDates[$p->id] ?? null;
+            $lastDate = $lastDateString ? \Carbon\Carbon::parse($lastDateString) : $p->created_at;
             $age = $lastDate->diffInDays(now());
 
             $kategoriUsia = 'Fresh Stock';

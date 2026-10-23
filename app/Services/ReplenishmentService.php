@@ -26,6 +26,22 @@ class ReplenishmentService
         }
         $tokoLocations = $tokoQuery->get();
 
+        // Ambil ID lokasi bertipe GUDANG sekali per eksekusi
+        $gudangIds = Lokasi::where('tipe_lokasi', 'GUDANG')
+            ->where('is_active', true)
+            ->pluck('id')
+            ->all();
+
+        // Ambil total stok gudang untuk semua produk dalam SATU query agregat
+        $gudangStockMap = empty($gudangIds)
+            ? []
+            : StokLokasi::whereIn('lokasi_id', $gudangIds)
+                ->groupBy('produk_id')
+                ->select('produk_id', DB::raw('SUM(qty) as total_gudang_qty'))
+                ->pluck('total_gudang_qty', 'produk_id')
+                ->map(fn ($qty) => (int) $qty)
+                ->all();
+
         $recommendations = collect();
 
         foreach ($tokoLocations as $toko) {
@@ -54,8 +70,8 @@ class ReplenishmentService
                     $replenishmentQty = max(0, $maxStock - $currentStock);
                     if ($replenishmentQty <= 0) continue;
 
-                    // Cek stok gudang tersedia
-                    $gudangStock = self::getGudangStockForProduct($stokRecord->produk_id);
+                    // Cek stok gudang tersedia via lookup array (O(1))
+                    $gudangStock = (int) ($gudangStockMap[$stokRecord->produk_id] ?? 0);
 
                     $recommendations->push((object)[
                         'produk_id' => $stokRecord->produk_id,
@@ -81,7 +97,8 @@ class ReplenishmentService
 
                 if ($replenishmentQty <= 0) continue;
 
-                $gudangStock = self::getGudangStockForProduct($analytics->produk_id);
+                // Cek stok gudang tersedia via lookup array (O(1))
+                $gudangStock = (int) ($gudangStockMap[$analytics->produk_id] ?? 0);
 
                 $recommendations->push((object)[
                     'produk_id' => $analytics->produk_id,
@@ -106,10 +123,12 @@ class ReplenishmentService
 
     /**
      * Hitung total stok yang tersedia di semua lokasi bertipe GUDANG untuk produk tertentu.
+     * @param int $produkId
+     * @param array|null $gudangIds Opsional jika caller sudah memiliki cache ID lokasi gudang
      */
-    public static function getGudangStockForProduct(int $produkId): int
+    public static function getGudangStockForProduct(int $produkId, ?array $gudangIds = null): int
     {
-        $gudangIds = Lokasi::where('tipe_lokasi', 'GUDANG')->where('is_active', true)->pluck('id');
+        $gudangIds ??= Lokasi::where('tipe_lokasi', 'GUDANG')->where('is_active', true)->pluck('id')->all();
         return (int) StokLokasi::where('produk_id', $produkId)
             ->whereIn('lokasi_id', $gudangIds)
             ->sum('qty');
