@@ -92,8 +92,10 @@
                 <a href="{{ route('barang-keluar') }}" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all text-on-surface text-center">
                     Batal / Kembali
                 </a>
-                <button type="button" wire:click="store" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong">
-                    Simpan Transaksi
+                <button type="button" wire:click="store" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong disabled:opacity-50 disabled:cursor-not-allowed gap-2" wire:loading.attr="disabled" wire:target="store">
+                    <div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-on-primary-container border-t-transparent" wire:loading wire:target="store"></div>
+                    <span wire:loading.remove wire:target="store">Simpan Transaksi</span>
+                    <span wire:loading wire:target="store">Menyimpan...</span>
                 </button>
             </div>
         </div>
@@ -230,8 +232,10 @@
                 <a href="{{ route('barang-keluar') }}" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all text-on-surface text-center">
                     Batal / Kembali
                 </a>
-                <button type="button" wire:click="store" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong">
-                    Simpan Transaksi
+                <button type="button" wire:click="store" class="flex-1 inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong disabled:opacity-50 disabled:cursor-not-allowed gap-2" wire:loading.attr="disabled" wire:target="store">
+                    <div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-on-primary-container border-t-transparent" wire:loading wire:target="store"></div>
+                    <span wire:loading.remove wire:target="store">Simpan Transaksi</span>
+                    <span wire:loading wire:target="store">Menyimpan...</span>
                 </button>
             </div>
         </div>

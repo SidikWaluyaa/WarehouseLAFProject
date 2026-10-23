@@ -1005,9 +1005,11 @@
                         <button wire:click="closeModal" type="button" class="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-semibold transition-all text-on-surface cursor-pointer">
                             Batal
                         </button>
-                        <button wire:click="store" type="button" class="px-6 py-2.5 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-xl font-bold text-xs shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong cursor-pointer flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-sm font-bold">check</span>
-                            <span>{{ $isEdit ? 'Perbarui Produk' : 'Simpan Produk Baru' }}</span>
+                        <button wire:click="store" type="button" class="px-6 py-2.5 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-xl font-bold text-xs shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong cursor-pointer flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed" wire:loading.attr="disabled" wire:target="store">
+                            <span class="material-symbols-outlined text-sm font-bold" wire:loading.remove wire:target="store">check</span>
+                            <div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-on-primary-container border-t-transparent" wire:loading wire:target="store"></div>
+                            <span wire:loading.remove wire:target="store">{{ $isEdit ? 'Perbarui Produk' : 'Simpan Produk Baru' }}</span>
+                            <span wire:loading wire:target="store">Menyimpan...</span>
                         </button>
                     </div>
                 </div>
@@ -1142,10 +1144,11 @@
                     <button wire:click="closeImportModal" type="button" class="px-6 py-2.5 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all text-on-surface">
                         Batal
                     </button>
-                    <button wire:click="importExcel" type="button" class="px-6 py-2.5 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong flex items-center gap-1.5" wire:loading.attr="disabled">
-                        <span class="material-symbols-outlined text-sm" wire:loading.remove>upload</span>
-                        <div class="animate-spin rounded-full h-4 w-4 border-2 border-on-primary-container border-t-transparent" wire:loading></div>
-                        <span>Impor Sekarang</span>
+                    <button wire:click="importExcel" type="button" class="px-6 py-2.5 bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container rounded-2xl font-bold text-sm shadow-xl hover:shadow-primary/20 transition-all active:scale-95 duration-200 amber-glow-strong flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed" wire:loading.attr="disabled" wire:target="importExcel">
+                        <span class="material-symbols-outlined text-sm" wire:loading.remove wire:target="importExcel">upload</span>
+                        <div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-on-primary-container border-t-transparent" wire:loading wire:target="importExcel"></div>
+                        <span wire:loading.remove wire:target="importExcel">Impor Sekarang</span>
+                        <span wire:loading wire:target="importExcel">Memproses...</span>
                     </button>
                 </div>
             </div>
@@ -1232,10 +1235,11 @@
                         </a>
 
                         <!-- Fonnte API Dispatch -->
-                        <button wire:click="sendWaFonnte" type="button" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-black rounded-2xl text-xs font-extrabold shadow-lg hover:shadow-emerald-500/20 transition-all active:scale-95" wire:loading.attr="disabled">
-                            <span class="material-symbols-outlined text-base" wire:loading.remove>send</span>
-                            <div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-black border-t-transparent" wire:loading></div>
-                            <span>Kirim via Fonnte</span>
+                        <button wire:click="sendWaFonnte" type="button" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-black rounded-2xl text-xs font-extrabold shadow-lg hover:shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" wire:loading.attr="disabled" wire:target="sendWaFonnte">
+                            <span class="material-symbols-outlined text-base" wire:loading.remove wire:target="sendWaFonnte">send</span>
+                            <div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-black border-t-transparent" wire:loading wire:target="sendWaFonnte"></div>
+                            <span wire:loading.remove wire:target="sendWaFonnte">Kirim via Fonnte</span>
+                            <span wire:loading wire:target="sendWaFonnte">Memproses...</span>
                         </button>
                     </div>
                 </div>
