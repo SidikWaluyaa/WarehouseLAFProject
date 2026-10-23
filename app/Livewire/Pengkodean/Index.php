@@ -179,7 +179,8 @@ class Index extends Component
             action: 'confirmed-delete-rule',
             params: ['id' => $id],
             title: 'Hapus Aturan?',
-            text: "Apakah Anda yakin ingin menghapus aturan pengkodean untuk kategori '{$aturan->kategori}'? Sistem akan menggunakan aturan global sebagai gantinya."
+            text: "Apakah Anda yakin ingin menghapus aturan pengkodean untuk kategori '{$aturan->kategori}'? Sistem akan menggunakan aturan global sebagai gantinya.",
+            destructive: true
         );
     }
 

@@ -145,7 +145,8 @@ class Index extends Component
             action: 'confirmed-delete-pelanggan',
             params: ['id' => $id],
             title: 'Hapus Pelanggan?',
-            text: "Apakah Anda yakin ingin menghapus pelanggan '{$pelanggan->nama_pelanggan}'?"
+            text: "Apakah Anda yakin ingin menghapus pelanggan '{$pelanggan->nama_pelanggan}'?",
+            destructive: true
         );
     }
 

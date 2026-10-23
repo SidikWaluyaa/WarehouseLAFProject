@@ -48,7 +48,9 @@ trait HasAlerts
         string $text = 'Tindakan ini tidak dapat dibatalkan.',
         string $confirmText = 'Ya, Lanjutkan!',
         string $cancelText = 'Batal',
-        string $icon = 'warning'
+        string $icon = 'warning',
+        bool $destructive = false,
+        bool $focusCancel = false
     ): void {
         $this->dispatch('alert:confirm', [
             'action' => $action,
@@ -58,6 +60,8 @@ trait HasAlerts
             'confirmText' => $confirmText,
             'cancelText' => $cancelText,
             'icon' => $icon,
+            'destructive' => $destructive,
+            'focusCancel' => $focusCancel,
         ]);
     }
 

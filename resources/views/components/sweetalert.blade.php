@@ -74,18 +74,24 @@
         // Listener for confirm popup alert
         window.addEventListener('alert:confirm', event => {
             const data = event.detail[0] || event.detail;
+            const isDestructive = !!data.destructive;
+            const confirmBtnClass = isDestructive
+                ? 'rounded-2xl px-6 py-2.5 font-bold text-sm bg-rose-600 hover:bg-rose-700 text-white shadow-xl shadow-rose-600/30 hover:scale-105 transition-all duration-200 focus:ring-0 mr-3'
+                : 'rounded-2xl px-6 py-2.5 font-bold text-sm bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container shadow-xl hover:scale-105 transition-all duration-200 focus:ring-0 mr-3';
+
             Swal.fire({
                 title: data.title || 'Apakah Anda yakin?',
                 text: data.text || '',
                 icon: data.icon || 'warning',
                 showCancelButton: true,
+                focusCancel: isDestructive || !!data.focusCancel,
                 confirmButtonText: data.confirmText || 'Ya, Lanjutkan!',
                 cancelButtonText: data.cancelText || 'Batal',
                 background: '#1f1f1f',
                 color: '#e2e2e2',
                 customClass: {
                     popup: 'rounded-3xl border border-white/10 glass-card',
-                    confirmButton: 'rounded-2xl px-6 py-2.5 font-bold text-sm bg-gradient-to-r from-primary-container to-[#ff9f00] text-on-primary-container shadow-xl hover:scale-105 transition-all duration-200 focus:ring-0 mr-3',
+                    confirmButton: confirmBtnClass,
                     cancelButton: 'rounded-2xl px-6 py-2.5 font-medium text-sm bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-on-surface focus:ring-0'
                 },
                 buttonsStyling: false

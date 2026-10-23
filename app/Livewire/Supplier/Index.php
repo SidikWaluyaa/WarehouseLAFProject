@@ -150,7 +150,8 @@ class Index extends Component
             action: 'confirmed-delete-supplier',
             params: ['id' => $id],
             title: 'Hapus Supplier?',
-            text: "Apakah Anda yakin ingin menghapus supplier '{$supplier->nama_supplier}'?"
+            text: "Apakah Anda yakin ingin menghapus supplier '{$supplier->nama_supplier}'?",
+            destructive: true
         );
     }
 

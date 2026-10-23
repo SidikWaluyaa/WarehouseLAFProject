@@ -121,13 +121,23 @@ class Index extends Component
         ]);
     }
 
-    public function destroy(int $id): void
+    /**
+     * Satu sumber kebenaran untuk otorisasi hapus transaksi barang masuk.
+     * Dipanggil oleh destroy() DAN confirmedDelete(), karena event
+     * 'confirmed-delete-barang-masuk' bisa dikirim langsung dari browser.
+     */
+    private function authorizeDeleteBarangMasuk(): void
     {
         /** @var \App\Models\User|null $user */
         $user = \Illuminate\Support\Facades\Auth::user();
         if (!$user || (!$user->can('manage master') && !$user->can('input masuk'))) {
             abort(403, 'Unauthorized action.');
         }
+    }
+
+    public function destroy(int $id): void
+    {
+        $this->authorizeDeleteBarangMasuk();
 
         $transaction = BarangMasuk::findOrFail($id);
 
@@ -135,18 +145,15 @@ class Index extends Component
             action: 'confirmed-delete-barang-masuk',
             params: ['id' => $id],
             title: 'Hapus Transaksi?',
-            text: "Apakah Anda yakin ingin menghapus transaksi '{$transaction->nomor_nota}'? Stok produk dan HPP terkait akan dibalikkan secara otomatis."
+            text: "Apakah Anda yakin ingin menghapus transaksi '{$transaction->nomor_nota}'? Stok produk dan HPP terkait akan dibalikkan secara otomatis.",
+            destructive: true
         );
     }
 
     #[On('confirmed-delete-barang-masuk')]
     public function confirmedDelete(array|int|null $params = null, ?int $id = null): void
     {
-        /** @var \App\Models\User|null $user */
-        $user = \Illuminate\Support\Facades\Auth::user();
-        if (!$user || (!$user->hasPermissionTo('manage master') && !$user->hasPermissionTo('input masuk'))) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorizeDeleteBarangMasuk();
 
         if (is_array($params)) {
             $id = $params['id'] ?? $id;

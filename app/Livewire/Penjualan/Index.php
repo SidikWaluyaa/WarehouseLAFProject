@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\BarangKeluar;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 
 #[Layout('layouts.app')]
 class Index extends Component
@@ -62,7 +63,7 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function delete(int $id)
+    public function requestDelete(int $id): void
     {
         /** @var \App\Models\User|null $user */
         $user = \Illuminate\Support\Facades\Auth::user();
@@ -70,17 +71,55 @@ class Index extends Component
             abort(403, 'Unauthorized action.');
         }
 
+        $transaction = BarangKeluar::findOrFail($id);
+
+        if ($transaction->is_qc_passed) {
+            $this->alertError("Transaksi '{$transaction->nomor_nota}' tidak dapat dihapus karena sudah di-QC dan dikirim.");
+            return;
+        }
+
+        $this->alertConfirm(
+            action: 'confirmed-delete-barang-keluar',
+            params: ['id' => $id],
+            title: 'Batalkan Transaksi Penjualan?',
+            text: "Apakah Anda yakin ingin membatalkan transaksi '{$transaction->nomor_nota}'? Stok produk yang telah dikeluarkan akan dikembalikan secara otomatis ke gudang.",
+            confirmText: 'Ya, Batalkan!',
+            cancelText: 'Tutup',
+            icon: 'warning',
+            destructive: true
+        );
+    }
+
+    #[On('confirmed-delete-barang-keluar')]
+    public function confirmedDelete(array|int|null $params = null, ?int $id = null): void
+    {
+        /** @var \App\Models\User|null $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if (!$user || (!$user->can('manage master') && !$user->can('input keluar'))) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if (is_array($params)) {
+            $id = $params['id'] ?? $id;
+        } elseif (is_numeric($params)) {
+            $id = (int)$params;
+        }
+
         try {
+            if (!$id) {
+                throw new \Exception("ID transaksi tidak valid.");
+            }
+
             $transaction = BarangKeluar::findOrFail($id);
 
             // Guard: check if transaction has already been packed (is_qc_passed = true)
             if ($transaction->is_qc_passed) {
-                $this->alertError("Transaksi tidak dapat dihapus karena sudah di-QC dan dikirim.");
+                $this->alertError("Transaksi '{$transaction->nomor_nota}' tidak dapat dihapus karena sudah di-QC dan dikirim.");
                 return;
             }
 
             \App\Services\StockEngineService::hapusBarangKeluar($id);
-            $this->toastSuccess("Transaksi barang keluar berhasil dihapus dan stok dikembalikan.");
+            $this->toastSuccess("Transaksi barang keluar {$transaction->nomor_nota} berhasil dibatalkan dan stok dikembalikan.");
         } catch (\Exception $e) {
             $this->alertError("Terjadi kesalahan: " . $e->getMessage());
         }

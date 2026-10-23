@@ -516,6 +516,8 @@ class Index extends Component
         $matched = 0;
         $surplus = 0;
         $deficit = 0;
+        $totalQtySurplus = 0;
+        $totalQtyDefisit = 0;
         $totalQtySistem = 0;
         $totalQtyFisik = 0;
         $netNominal = 0;
@@ -531,8 +533,10 @@ class Index extends Component
                 $matched++;
             } elseif ($diff > 0) {
                 $surplus++;
+                $totalQtySurplus += $diff;
             } else {
                 $deficit++;
+                $totalQtyDefisit += abs($diff);
             }
         }
 
@@ -541,6 +545,8 @@ class Index extends Component
             'matched' => $matched,
             'surplus' => $surplus,
             'deficit' => $deficit,
+            'totalQtySurplus' => $totalQtySurplus,
+            'totalQtyDefisit' => $totalQtyDefisit,
             'totalQtySistem' => $totalQtySistem,
             'totalQtyFisik' => $totalQtyFisik,
             'netSelisihQty' => $totalQtyFisik - $totalQtySistem,
@@ -548,7 +554,7 @@ class Index extends Component
         ];
     }
 
-    public function cancelSession()
+    public function requestCancelSession(): void
     {
         Gate::authorize('input masuk');
         if (!$this->selectedSession) {
@@ -560,18 +566,92 @@ class Index extends Component
             return;
         }
 
+        $this->alertConfirm(
+            action: 'confirmed-cancel-session',
+            params: ['id' => $this->selectedSession->id],
+            title: 'Batalkan Sesi Audit?',
+            text: "Apakah Anda yakin ingin membatalkan sesi audit '{$this->selectedSession->nomor_opname}'? Seluruh data pencatatan fisik pada sesi ini akan dibatalkan dan tidak dapat dilanjutkan.",
+            confirmText: 'Ya, Batalkan Sesi!',
+            cancelText: 'Tutup',
+            icon: 'warning',
+            destructive: true
+        );
+    }
+
+    #[On('confirmed-cancel-session')]
+    public function cancelSession(?int $id = null)
+    {
+        Gate::authorize('input masuk');
+        if (!$this->selectedSession) {
+            $this->alertError("Sesi audit tidak aktif.");
+            return;
+        }
+        if ($id !== null && (int)$id !== (int)$this->selectedSession->id) {
+            $this->alertError("ID sesi audit tidak cocok dengan dokumen yang sedang dibuka.");
+            return;
+        }
+        if (!in_array($this->selectedSession->status, ['DRAFT', 'COMPLETED'])) {
+            $this->alertError("Hanya sesi audit berstatus DRAFT atau COMPLETED yang dapat dibatalkan.");
+            return;
+        }
+
+        $nomorOpname = $this->selectedSession->nomor_opname;
         $this->selectedSession->status = 'CANCELLED';
         $this->selectedSession->save();
 
         $this->isDiscrepancyModalOpen = false;
         $this->backToList();
-        $this->toastSuccess("Sesi audit dibatalkan.");
+        $this->toastSuccess("Sesi audit {$nomorOpname} dibatalkan.");
     }
 
-    public function executeAdjustment()
+    public function requestExecuteAdjustment(): void
     {
         Gate::authorize('manage master');
-        if (!$this->selectedSession || $this->selectedSession->status !== 'COMPLETED') {
+        if (!$this->selectedSession) {
+            $this->alertError("Sesi audit tidak aktif.");
+            return;
+        }
+        if ($this->selectedSession->status !== 'COMPLETED') {
+            $this->alertError("Hanya sesi audit berstatus COMPLETED yang dapat disinkronkan ke database.");
+            return;
+        }
+
+        $stats = $this->discrepancyStats;
+        $discrepancyCount = $stats['surplus'] + $stats['deficit'];
+
+        if ($discrepancyCount > 0) {
+            $text = "PERINGATAN: Stok master di database akan disinkronkan ke hasil fisik opname '{$this->selectedSession->nomor_opname}'. Rincian selisih: Surplus {$stats['surplus']} item (+{$stats['totalQtySurplus']} unit), Defisit {$stats['deficit']} item (-{$stats['totalQtyDefisit']} unit). Lanjutkan penyesuaian?";
+        } else {
+            $text = "Semua item fisik cocok dengan sistem ({$stats['matched']} item cocok). Status sesi '{$this->selectedSession->nomor_opname}' akan disinkronkan dan diselesaikan.";
+        }
+
+        $this->alertConfirm(
+            action: 'confirmed-execute-adjustment',
+            params: ['id' => $this->selectedSession->id],
+            title: 'Sinkronisasi & Terapkan Penyesuaian Stok?',
+            text: $text,
+            confirmText: 'Ya, Terapkan Sekarang!',
+            cancelText: 'Batal',
+            icon: 'warning',
+            destructive: false,
+            focusCancel: true
+        );
+    }
+
+    #[On('confirmed-execute-adjustment')]
+    public function executeAdjustment(?int $id = null)
+    {
+        Gate::authorize('manage master');
+        if (!$this->selectedSession) {
+            $this->alertError("Sesi audit tidak aktif.");
+            return;
+        }
+        if ($id !== null && (int)$id !== (int)$this->selectedSession->id) {
+            $this->alertError("ID sesi audit tidak cocok dengan dokumen yang sedang dibuka.");
+            return;
+        }
+        if ($this->selectedSession->status !== 'COMPLETED') {
+            $this->alertError("Hanya sesi audit berstatus COMPLETED yang dapat disinkronkan ke database.");
             return;
         }
 

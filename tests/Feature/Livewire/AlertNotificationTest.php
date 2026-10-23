@@ -146,12 +146,16 @@ class AlertNotificationTest extends TestCase
         $component = Livewire::actingAs($this->user)
             ->test(PickingRunner::class, ['id' => $picking->id]);
 
-        // 1. Scan SKU salah: harus menetapkan errorMessage inline dan muncul di blade, bukan toast atau notify
+        // Verifikasi listener Alpine focus-product terpasang di HTML view
+        $component->assertSeeHtml("x-on:focus-product.window");
+
+        // 1. Scan SKU salah: harus menetapkan errorMessage inline dan muncul di blade, dispatch focus-product, bukan toast atau notify
         $component->set('scanProduct', 'SKU-SALAH-999')
             ->set('scanQty', 1)
             ->call('scanBarcode')
             ->assertSet('errorMessage', "Produk dengan SKU 'SKU-SALAH-999' tidak ditemukan.")
             ->assertSee("Produk dengan SKU 'SKU-SALAH-999' tidak ditemukan.")
+            ->assertDispatched('focus-product')
             ->assertNotDispatched('toast:error')
             ->assertNotDispatched('notify');
 
@@ -162,12 +166,13 @@ class AlertNotificationTest extends TestCase
                 return str_contains($data['text'] ?? '', 'belum diambil/diverifikasi');
             });
 
-        // 3. Scan SKU benar: errorMessage harus di-clear dan dispatch toast:success
+        // 3. Scan SKU benar: errorMessage harus di-clear, dispatch toast:success, dan dispatch focus-product
         $component->set('scanProduct', 'SPT-PIK-001')
             ->set('scanQty', 2)
             ->call('scanBarcode')
             ->assertSet('errorMessage', null)
-            ->assertDispatched('toast:success');
+            ->assertDispatched('toast:success')
+            ->assertDispatched('focus-product');
     }
 
     /**

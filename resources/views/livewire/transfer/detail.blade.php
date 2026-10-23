@@ -97,25 +97,25 @@
 
         <div class="flex flex-wrap gap-3">
             @if($transfer->status === 'DRAFT')
-                <button wire:click="processShipment" wire:confirm="Kirim semua barang dari lokasi asal? Stok asal akan berkurang." class="flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-colors border border-amber-500/20">
+                <button wire:click="requestProcessShipment" class="flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-colors border border-amber-500/20">
                     <span class="material-symbols-outlined text-lg">local_shipping</span>
                     Proses Pengiriman
                 </button>
-                <button wire:click="cancelTransfer" wire:confirm="Batalkan transfer order ini?" class="flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20">
+                <button wire:click="requestCancelTransfer" class="flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20">
                     <span class="material-symbols-outlined text-lg">cancel</span>
                     Batalkan
                 </button>
             @endif
 
             @if($transfer->status === 'IN_TRANSIT')
-                <button wire:click="processReceive" wire:confirm="Konfirmasi semua barang diterima di lokasi tujuan?" class="flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors border border-green-500/20">
+                <button wire:click="requestProcessReceive" class="flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors border border-green-500/20">
                     <span class="material-symbols-outlined text-lg">fact_check</span>
                     Konfirmasi Penerimaan
                 </button>
             @endif
 
             @if($transfer->status === 'RECEIVED')
-                <button wire:click="closeTransfer" wire:confirm="Tutup dan selesaikan transfer order ini?" class="flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-primary text-on-primary hover:bg-primary/90 transition-colors shadow-lg">
+                <button wire:click="requestCloseTransfer" class="flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-primary text-on-primary hover:bg-primary/90 transition-colors shadow-lg">
                     <span class="material-symbols-outlined text-lg">task_alt</span>
                     Selesaikan Transfer
                 </button>

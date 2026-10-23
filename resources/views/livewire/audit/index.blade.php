@@ -204,7 +204,7 @@
                             Rangkuman
                         </button>
                         @can('input masuk')
-                        <button wire:click="cancelSession" wire:confirm="Yakin ingin membatalkan sesi audit ini?" class="flex items-center gap-1 px-4 py-2.5 bg-red-500/10 border border-red-500/20 text-error hover:bg-red-500/20 rounded-2xl text-xs font-bold transition-all" title="Batalkan seluruh sesi audit ini">
+                        <button wire:click="requestCancelSession" class="flex items-center gap-1 px-4 py-2.5 bg-red-500/10 border border-red-500/20 text-error hover:bg-red-500/20 rounded-2xl text-xs font-bold transition-all" title="Batalkan seluruh sesi audit ini">
                             <span class="material-symbols-outlined text-sm">cancel</span>
                             Batalkan
                         </button>
@@ -228,12 +228,15 @@
                             <span class="material-symbols-outlined text-sm">undo</span>
                             Kembalikan ke Draft
                         </button>
-                        <button wire:click="cancelSession" wire:confirm="Yakin ingin membatalkan sesi audit ini?" class="px-4 py-2.5 bg-white/5 border border-red-500/20 text-error hover:bg-red-500/10 rounded-2xl text-xs font-bold transition-all" title="Batalkan seluruh sesi audit ini">
+                        <button wire:click="requestCancelSession" class="px-4 py-2.5 bg-white/5 border border-red-500/20 text-error hover:bg-red-500/10 rounded-2xl text-xs font-bold transition-all" title="Batalkan seluruh sesi audit ini">
                             Batalkan Sesi
                         </button>
                         @endcan
                         @can('manage master')
-                        <button wire:click="executeAdjustment" wire:confirm="PERINGATAN: Stok master di database akan disinkronkan ke hasil fisik opname ini. Lanjutkan?" class="px-5 py-2.5 bg-green-600 text-white rounded-2xl font-bold text-xs shadow-xl transition-all hover:bg-green-700 active:scale-95 duration-200">
+                        <button wire:click="requestExecuteAdjustment"
+                                wire:loading.attr="disabled"
+                                wire:target="requestExecuteAdjustment, executeAdjustment"
+                                class="px-5 py-2.5 bg-green-600 text-white rounded-2xl font-bold text-xs shadow-xl transition-all hover:bg-green-700 active:scale-95 duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                             Sinkronisasi & Terapkan Stok
                         </button>
                         @endcan
@@ -709,7 +712,11 @@
                             </button>
                             @endcan
                             @can('manage master')
-                            <button wire:click="executeAdjustment" wire:confirm="PERINGATAN: Stok master di database akan disinkronkan ke hasil fisik opname ini. Lanjutkan?" type="button" class="flex items-center gap-1.5 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-bold text-xs shadow-xl transition-all active:scale-95">
+                            <button wire:click="requestExecuteAdjustment"
+                                    wire:loading.attr="disabled"
+                                    wire:target="requestExecuteAdjustment"
+                                    type="button"
+                                    class="flex items-center gap-1.5 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-bold text-xs shadow-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <span class="material-symbols-outlined text-base">sync</span>
                                 Terapkan Penyesuaian Stok
                             </button>

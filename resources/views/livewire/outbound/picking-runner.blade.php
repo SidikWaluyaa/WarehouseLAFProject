@@ -1,4 +1,6 @@
-<div x-init="$dispatch('update-header-title', 'Eksekusi Picking')" class="flex-1 overflow-y-auto p-6 lg:p-margin-desktop space-y-stack-lg custom-scrollbar pb-16">
+<div x-init="$dispatch('update-header-title', 'Eksekusi Picking')"
+     x-on:focus-product.window="$nextTick(() => { const el = document.getElementById('scan-product-input'); if (el) { el.focus(); el.select(); } })"
+     class="flex-1 overflow-y-auto p-6 lg:p-margin-desktop space-y-stack-lg custom-scrollbar pb-16">
     <!-- Top Action / Breadcrumbs Bar -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="flex items-center gap-3">

@@ -226,30 +226,42 @@ class Index extends Component
         $this->toastSuccess("Akun '{$user->name}' berhasil {$statusStr}.");
     }
 
+    /**
+     * Satu sumber kebenaran untuk guard hapus pengguna.
+     * Dipanggil oleh requestDeleteUser() DAN confirmedDeleteUser(), karena event
+     * 'confirmed-delete-user' bisa dikirim langsung dari browser tanpa melewati dialog.
+     *
+     * @return string|null Pesan penolakan, atau null bila boleh dihapus.
+     */
+    private function deleteUserGuardError(User $user): ?string
+    {
+        if ($user->id === Auth::id()) {
+            return "Gagal: Anda tidak dapat menghapus akun Anda sendiri!";
+        }
+
+        if ($user->hasRole('super_admin') && User::role('super_admin')->count() <= 1) {
+            return "Gagal: Tidak dapat menghapus satu-satunya akun Super Admin.";
+        }
+
+        return null;
+    }
+
     public function requestDeleteUser(int $id): void
     {
         Gate::authorize('manage system');
         $user = User::findOrFail($id);
 
-        // Safety Guards
-        if ($user->id === Auth::id()) {
-            $this->toastError("Gagal: Anda tidak dapat menghapus akun Anda sendiri!");
+        if ($error = $this->deleteUserGuardError($user)) {
+            $this->toastError($error);
             return;
-        }
-
-        if ($user->hasRole('super_admin')) {
-            $superAdminCount = User::role('super_admin')->count();
-            if ($superAdminCount <= 1) {
-                $this->toastError("Gagal: Tidak dapat menghapus satu-satunya akun Super Admin.");
-                return;
-            }
         }
 
         $this->alertConfirm(
             action: 'confirmed-delete-user',
             params: ['id' => $id],
             title: 'Hapus Pengguna?',
-            text: "Apakah Anda yakin ingin menghapus akun '{$user->name}'? Data ini tidak dapat dikembalikan."
+            text: "Apakah Anda yakin ingin menghapus akun '{$user->name}'? Data ini tidak dapat dikembalikan.",
+            destructive: true
         );
     }
 
@@ -271,9 +283,8 @@ class Index extends Component
 
         $user = User::findOrFail($id);
 
-        // Final Safety Check
-        if ($user->id === Auth::id()) {
-            $this->toastError("Gagal: Anda tidak dapat menghapus akun Anda sendiri!");
+        if ($error = $this->deleteUserGuardError($user)) {
+            $this->toastError($error);
             return;
         }
 

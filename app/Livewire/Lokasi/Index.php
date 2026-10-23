@@ -167,7 +167,8 @@ class Index extends Component
             action: 'confirmed-delete',
             params: ['id' => $id],
             title: 'Hapus Lokasi?',
-            text: "Apakah Anda yakin ingin menghapus lokasi '{$lokasi->kode_lokasi}'? Tindakan ini tidak dapat dibatalkan."
+            text: "Apakah Anda yakin ingin menghapus lokasi '{$lokasi->kode_lokasi}'? Tindakan ini tidak dapat dibatalkan.",
+            destructive: true
         );
     }
 

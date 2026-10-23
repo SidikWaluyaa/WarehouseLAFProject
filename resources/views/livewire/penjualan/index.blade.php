@@ -1,4 +1,4 @@
-﻿<div x-init="$dispatch('update-header-title', 'Barang Keluar')" class="flex-1 overflow-y-auto p-6 lg:p-margin-desktop space-y-stack-lg custom-scrollbar">
+<div x-init="$dispatch('update-header-title', 'Barang Keluar')" class="flex-1 overflow-y-auto p-6 lg:p-margin-desktop space-y-stack-lg custom-scrollbar">
     <template x-teleport="#header-search-placeholder">
         <div class="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-1.5 border border-white/5 ml-4">
             <span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
@@ -174,7 +174,7 @@
                                                  Cetak PDF
                                              </a>
                                              @if(!$t->is_qc_passed && (auth()->user()->can('manage master') || auth()->user()->can('input keluar')))
-                                                 <button wire:click.stop="delete({{ $t->id }})" wire:confirm="Apakah Anda yakin ingin membatalkan transaksi ini? Stok produk akan dikembalikan." class="flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-lg border border-red-500 text-red-500 hover:bg-red-500/10 transition-colors" title="Batalkan / Hapus Transaksi">
+                                                 <button wire:click.stop="requestDelete({{ $t->id }})" class="flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-lg border border-red-500 text-red-500 hover:bg-red-500/10 transition-colors" title="Batalkan / Hapus Transaksi">
                                                      <span class="material-symbols-outlined text-[12px]">delete</span>
                                                      Batal / Hapus
                                                  </button>

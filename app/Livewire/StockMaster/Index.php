@@ -432,7 +432,8 @@ class Index extends Component
             action: 'confirmed-delete',
             params: ['id' => $id],
             title: 'Hapus Produk?',
-            text: "Apakah Anda yakin ingin menghapus produk '{$product->nama_barang}'?"
+            text: "Apakah Anda yakin ingin menghapus produk '{$product->nama_barang}'?",
+            destructive: true
         );
     }
 
@@ -674,7 +675,6 @@ class Index extends Component
             $analytics->save();
         }
 
-        $this->dispatch('threshold-saved-' . $productId);
         $this->toastSuccess("Ambang batas {$product->nama_barang} diperbarui.");
     }
 

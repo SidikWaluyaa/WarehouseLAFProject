@@ -222,10 +222,10 @@ class BarangKeluarTest extends TestCase
         $this->produk->refresh();
         $this->assertEquals(7, $this->produk->total_stok);
 
-        // Call delete on the Index component
+        // Call confirmedDelete on the Index component
         Livewire::actingAs($this->user)
             ->test(\App\Livewire\Penjualan\Index::class)
-            ->call('delete', $header->id)
+            ->call('confirmedDelete', ['id' => $header->id])
             ->assertHasNoErrors();
 
         // Verify stock is restored
@@ -266,7 +266,7 @@ class BarangKeluarTest extends TestCase
 
         Livewire::actingAs($this->user)
             ->test(\App\Livewire\Penjualan\Index::class)
-            ->call('delete', $header->id)
+            ->call('confirmedDelete', ['id' => $header->id])
             ->assertHasNoErrors();
 
         // Verify transaction is NOT deleted
