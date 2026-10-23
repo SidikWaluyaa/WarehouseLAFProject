@@ -10,6 +10,8 @@ use App\Models\BarangKeluar;
 use App\Models\BarangKeluarDetail;
 use App\Models\Pelanggan;
 use App\Models\PickingList;
+use App\Models\TransferHeader;
+use App\Models\TransferDetail;
 use App\Services\PickingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -144,5 +146,58 @@ class PackingManagerTest extends TestCase
         $this->assertTrue((bool)$bk->is_qc_passed);
         $this->assertEquals('J&T', $bk->kurir);
         $this->assertEquals('JT123456789ID', $bk->resi_ekspedisi);
+    }
+
+    public function test_submit_packing_for_transfer_without_valid_qty_is_rejected_and_atomic(): void
+    {
+        $this->actingAs($this->user);
+
+        $gudangTujuan = Lokasi::create([
+            'kode_lokasi' => 'TKO-R02',
+            'nama_lokasi' => 'Toko Cabang 2',
+            'tipe_lokasi' => 'TOKO',
+            'is_active' => true,
+        ]);
+
+        $transfer = TransferHeader::create([
+            'nomor_transfer' => 'TRF-TEST-ZERO-QTY',
+            'tanggal' => now()->toDateString(),
+            'lokasi_asal_id' => $this->rak->id,
+            'lokasi_tujuan_id' => $gudangTujuan->id,
+            'status' => 'PICKING',
+            'created_by' => $this->user->name,
+        ]);
+
+        $detail = TransferDetail::create([
+            'transfer_header_id' => $transfer->id,
+            'produk_id' => $this->produk->id,
+            'qty_requested' => 0,
+            'qty_sent' => 0,
+            'qty_received' => 0,
+        ]);
+
+        $stokAwal = (int)StokLokasi::where(['produk_id' => $this->produk->id, 'lokasi_id' => $this->rak->id])->value('qty');
+
+        Livewire::test(\App\Livewire\Outbound\PackingManager::class)
+            ->call('submitPacking', $transfer->id, 'TransferHeader')
+            ->assertDispatched('alert:error', function ($event, $params) {
+                $data = $params[0] ?? $params;
+                return str_contains($data['text'] ?? '', 'kuantitas lebih dari 0');
+            })
+            ->assertNotDispatched('toast:success');
+
+        // Pastikan status transfer tidak berubah
+        $this->assertEquals('PICKING', $transfer->fresh()->status);
+        $this->assertEquals(0, $detail->fresh()->qty_sent);
+
+        // Pastikan stok tidak terpotong
+        $stokAkhir = (int)StokLokasi::where(['produk_id' => $this->produk->id, 'lokasi_id' => $this->rak->id])->value('qty');
+        $this->assertEquals($stokAwal, $stokAkhir);
+
+        // Pastikan tidak ada mutasi transfer yang tercatat
+        $this->assertDatabaseMissing('trx_mutasi_lokasi', [
+            'referensi_tipe' => get_class($transfer),
+            'referensi_id' => $transfer->id,
+        ]);
     }
 }
