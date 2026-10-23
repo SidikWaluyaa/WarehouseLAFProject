@@ -6,6 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $produk_id
+ * @property string|null $kategori
+ * @property int $minimal_stock
+ * @property int $safety_stock
+ * @property int $maximum_stock
+ * @property bool $is_manual_stock
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Produk|null $produk
+ */
 class AnalyticsProduk extends Model
 {
     use HasFactory;

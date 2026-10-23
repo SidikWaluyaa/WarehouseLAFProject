@@ -30,9 +30,19 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property bool $is_threshold_active
  * @property string|null $notif_phone
  * @property string|null $lokasi
+ * @property mixed $lokasi_keluar
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\AnalyticsProduk|null $analyticsProduk
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\StokLokasi> $stokLokasi
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MutasiLokasi> $mutasiLokasi
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransferDetail> $transferDetails
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PickingDetail> $pickingDetails
+ * @property-read int|null $stok_lokasi_count
+ * @property-read int|null $mutasi_lokasi_count
+ * @property-read int|null $transfer_details_count
+ * @property-read int|null $picking_details_count
  */
 class Produk extends Model
 {

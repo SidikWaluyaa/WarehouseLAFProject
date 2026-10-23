@@ -6,6 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $opname_header_id
+ * @property int $produk_id
+ * @property int $qty_sistem
+ * @property int $qty_fisik
+ * @property int $selisih
+ * @property string|null $catatan
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\OpnameHeader|null $header
+ * @property-read \App\Models\Produk|null $produk
+ */
 class OpnameDetail extends Model
 {
     use HasFactory;

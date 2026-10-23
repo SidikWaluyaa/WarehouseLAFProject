@@ -16,6 +16,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\StokLokasi> $stokLokasi
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MutasiLokasi> $mutasiAsal
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MutasiLokasi> $mutasiTujuan
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OpnameHeader> $opnameHeaders
+ * @property-read int|null $stok_lokasi_count
+ * @property-read int|null $mutasi_asal_count
+ * @property-read int|null $mutasi_tujuan_count
+ * @property-read int|null $opname_headers_count
  */
 class Lokasi extends Model
 {

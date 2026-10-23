@@ -2,11 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $tanggal
+ * @property string $tipe_nota
+ * @property int $supplier_id
+ * @property string $nomor_nota
+ * @property int|null $po_header_id
+ * @property string|null $keterangan_tambahan
+ * @property string|null $data_dimasukan_oleh
+ * @property string|null $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class BarangMasuk extends Model
 {
     use HasFactory;
@@ -36,12 +50,12 @@ class BarangMasuk extends Model
         return $this->belongsTo(PoHeader::class, 'po_header_id');
     }
 
-    public function scopeFromPo($query)
+    public function scopeFromPo(Builder $query): Builder
     {
         return $query->whereNotNull('po_header_id')->orWhere('tipe_nota', 'Purchase Order');
     }
 
-    public function scopeNonPo($query)
+    public function scopeNonPo(Builder $query): Builder
     {
         return $query->whereNull('po_header_id')->where('tipe_nota', '!=', 'Purchase Order');
     }

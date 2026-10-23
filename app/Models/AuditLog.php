@@ -7,6 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property string $username
+ * @property string $action
+ * @property string $auditable_type
+ * @property int $auditable_id
+ * @property array|null $old_values
+ * @property array|null $new_values
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read User|null $user
+ * @property-read Model|null $auditable
+ */
 class AuditLog extends Model
 {
     use HasFactory;

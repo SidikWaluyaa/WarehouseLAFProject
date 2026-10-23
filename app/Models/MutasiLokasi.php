@@ -7,6 +7,25 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @property int $id
+ * @property int $produk_id
+ * @property int|null $lokasi_asal_id
+ * @property int|null $lokasi_tujuan_id
+ * @property int $qty
+ * @property int|null $total_out
+ * @property string $tipe_mutasi
+ * @property string|null $referensi_tipe
+ * @property int|null $referensi_id
+ * @property string|null $keterangan
+ * @property string|null $data_dimasukan_oleh
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Produk|null $produk
+ * @property-read \App\Models\Lokasi|null $lokasiAsal
+ * @property-read \App\Models\Lokasi|null $lokasiTujuan
+ * @property-read Model|null $referensi
+ */
 class MutasiLokasi extends Model
 {
     use HasFactory;
