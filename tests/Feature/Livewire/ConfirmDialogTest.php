@@ -116,20 +116,21 @@ class ConfirmDialogTest extends TestCase
             'subtotal' => 375000,
         ]);
 
-        $capturedAction = null;
+        $capturedAction = '';
 
         Livewire::actingAs($this->user)
             ->test(PenjualanIndex::class)
             ->call('requestDelete', $bk->id)
             ->assertDispatched('alert:confirm', function ($event, $params) use ($bk, &$capturedAction) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'] ?? null;
+                $capturedAction = (string)($data['action'] ?? '');
                 return $capturedAction === 'confirmed-delete-barang-keluar'
                     && ($data['destructive'] ?? false) === true
                     && ($data['params']['id'] ?? null) === $bk->id
                     && str_contains($data['text'] ?? '', $bk->nomor_nota);
             });
 
+        $this->assertNotSame('', $capturedAction);
         $this->assertDispatchedActionMatchesListener(PenjualanIndex::class, 'confirmedDelete', $capturedAction);
 
         // Pastikan transaksi belum dihapus
@@ -232,7 +233,7 @@ class ConfirmDialogTest extends TestCase
         TransferDetailModel::create([
             'transfer_header_id' => $th->id,
             'produk_id' => $this->produk->id,
-            'qty' => 5,
+            'qty_requested' => 5,
         ]);
 
         return $th;
@@ -250,18 +251,19 @@ class ConfirmDialogTest extends TestCase
         $component = Livewire::actingAs($this->user)
             ->test(TransferDetail::class, ['transfer' => $transfer]);
 
-        $capturedAction = null;
+        $capturedAction = '';
 
         // 1. Request Shipment -> dispatch alert:confirm, status belum berubah
         $component->call('requestProcessShipment')
             ->assertDispatched('alert:confirm', function ($event, $params) use ($transfer, &$capturedAction) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'] ?? null;
+                $capturedAction = (string)($data['action'] ?? '');
                 return $capturedAction === 'confirmed-process-shipment'
                     && ($data['destructive'] ?? false) === false
                     && str_contains($data['text'] ?? '', $transfer->nomor_transfer);
             });
 
+        $this->assertNotSame('', $capturedAction);
         $this->assertDispatchedActionMatchesListener(TransferDetail::class, 'confirmedProcessShipment', $capturedAction);
         $this->assertEquals('DRAFT', $transfer->fresh()->status);
 
@@ -288,18 +290,19 @@ class ConfirmDialogTest extends TestCase
         $component = Livewire::actingAs($this->user)
             ->test(TransferDetail::class, ['transfer' => $transfer]);
 
-        $capturedReceiveAction = null;
+        $capturedReceiveAction = '';
 
         // 1. Request Receive -> dispatch alert:confirm
         $component->call('requestProcessReceive')
             ->assertDispatched('alert:confirm', function ($event, $params) use ($transfer, &$capturedReceiveAction) {
                 $data = $params[0] ?? $params;
-                $capturedReceiveAction = $data['action'] ?? null;
+                $capturedReceiveAction = (string)($data['action'] ?? '');
                 return $capturedReceiveAction === 'confirmed-process-receive'
                     && ($data['destructive'] ?? false) === false
                     && str_contains($data['text'] ?? '', $transfer->nomor_transfer);
             });
 
+        $this->assertNotSame('', $capturedReceiveAction);
         $this->assertDispatchedActionMatchesListener(TransferDetail::class, 'confirmedProcessReceive', $capturedReceiveAction);
         $this->assertEquals('IN_TRANSIT', $transfer->fresh()->status);
 
@@ -309,18 +312,19 @@ class ConfirmDialogTest extends TestCase
 
         $this->assertEquals('RECEIVED', $transfer->fresh()->status);
 
-        $capturedCloseAction = null;
+        $capturedCloseAction = '';
 
         // 3. Request Close -> dispatch alert:confirm
         $component->call('requestCloseTransfer')
             ->assertDispatched('alert:confirm', function ($event, $params) use ($transfer, &$capturedCloseAction) {
                 $data = $params[0] ?? $params;
-                $capturedCloseAction = $data['action'] ?? null;
+                $capturedCloseAction = (string)($data['action'] ?? '');
                 return $capturedCloseAction === 'confirmed-close-transfer'
                     && ($data['destructive'] ?? false) === false
                     && str_contains($data['text'] ?? '', $transfer->nomor_transfer);
             });
 
+        $this->assertNotSame('', $capturedCloseAction);
         $this->assertDispatchedActionMatchesListener(TransferDetail::class, 'confirmedCloseTransfer', $capturedCloseAction);
 
         // 4. Confirmed Close -> status berubah ke CLOSED
@@ -337,18 +341,19 @@ class ConfirmDialogTest extends TestCase
         $component = Livewire::actingAs($this->user)
             ->test(TransferDetail::class, ['transfer' => $transfer]);
 
-        $capturedCancelAction = null;
+        $capturedCancelAction = '';
 
         // 1. Request Cancel -> dispatch alert:confirm with destructive = true
         $component->call('requestCancelTransfer')
             ->assertDispatched('alert:confirm', function ($event, $params) use ($transfer, &$capturedCancelAction) {
                 $data = $params[0] ?? $params;
-                $capturedCancelAction = $data['action'] ?? null;
+                $capturedCancelAction = (string)($data['action'] ?? '');
                 return $capturedCancelAction === 'confirmed-cancel-transfer'
                     && ($data['destructive'] ?? false) === true
                     && str_contains($data['text'] ?? '', $transfer->nomor_transfer);
             });
 
+        $this->assertNotSame('', $capturedCancelAction);
         $this->assertDispatchedActionMatchesListener(TransferDetail::class, 'confirmedCancelTransfer', $capturedCancelAction);
         $this->assertEquals('DRAFT', $transfer->fresh()->status);
 
@@ -423,18 +428,19 @@ class ConfirmDialogTest extends TestCase
             ->test(AuditIndex::class)
             ->call('loadSession', $session->id);
 
-        $capturedAction = null;
+        $capturedAction = '';
 
         // 1. Request cancel session -> dispatch alert:confirm with destructive = true
         $component->call('requestCancelSession')
             ->assertDispatched('alert:confirm', function ($event, $params) use ($session, &$capturedAction) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'] ?? null;
+                $capturedAction = (string)($data['action'] ?? '');
                 return $capturedAction === 'confirmed-cancel-session'
                     && ($data['destructive'] ?? false) === true
                     && str_contains($data['text'] ?? '', $session->nomor_opname);
             });
 
+        $this->assertNotSame('', $capturedAction);
         $this->assertDispatchedActionMatchesListener(AuditIndex::class, 'cancelSession', $capturedAction);
         $this->assertEquals('DRAFT', $session->fresh()->status);
 
@@ -474,13 +480,13 @@ class ConfirmDialogTest extends TestCase
             ->test(AuditIndex::class)
             ->call('loadSession', $session->id);
 
-        $capturedAction = null;
+        $capturedAction = '';
 
         // 1. Request adjustment -> memuat rincian terpisah surplus/defisit, destructive = false, focusCancel = true
         $component->call('requestExecuteAdjustment')
             ->assertDispatched('alert:confirm', function ($event, $params) use ($session, &$capturedAction) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'] ?? null;
+                $capturedAction = (string)($data['action'] ?? '');
                 return $capturedAction === 'confirmed-execute-adjustment'
                     && ($data['destructive'] ?? false) === false
                     && ($data['focusCancel'] ?? false) === true
@@ -489,6 +495,7 @@ class ConfirmDialogTest extends TestCase
                     && str_contains($data['text'] ?? '', 'Defisit 0 item (-0 unit)');
             });
 
+        $this->assertNotSame('', $capturedAction);
         $this->assertDispatchedActionMatchesListener(AuditIndex::class, 'executeAdjustment', $capturedAction);
         $this->assertEquals('COMPLETED', $session->fresh()->status);
 
@@ -623,20 +630,20 @@ class ConfirmDialogTest extends TestCase
             'lokasi_pengambilan' => 'GDG-SRC',
         ]);
 
-        $capturedAction = null;
-        $capturedParams = null;
+        $capturedAction = '';
+        $capturedParams = [];
 
         $component = Livewire::actingAs($this->user)
             ->test(PenjualanIndex::class)
             ->call('requestDelete', $bk->id)
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$capturedAction, &$capturedParams) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'] ?? null;
-                $capturedParams = $data['params'] ?? [];
+                $capturedAction = (string)($data['action'] ?? '');
+                $capturedParams = (array)($data['params'] ?? []);
                 return true;
             });
 
-        $this->assertNotNull($capturedAction);
+        $this->assertNotSame('', $capturedAction);
         $this->assertNotEmpty($capturedParams);
 
         // Kirim balik persis payload hasil tangkapan
@@ -673,20 +680,20 @@ class ConfirmDialogTest extends TestCase
             'lokasi_penerimaan' => 'GDG-SRC',
         ]);
 
-        $capturedAction = null;
-        $capturedParams = null;
+        $capturedAction = '';
+        $capturedParams = [];
 
         $component = Livewire::actingAs($this->user)
             ->test(PembelianIndex::class)
             ->call('destroy', $bm->id)
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$capturedAction, &$capturedParams) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'] ?? null;
-                $capturedParams = $data['params'] ?? [];
+                $capturedAction = (string)($data['action'] ?? '');
+                $capturedParams = (array)($data['params'] ?? []);
                 return true;
             });
 
-        $this->assertNotNull($capturedAction);
+        $this->assertNotSame('', $capturedAction);
         $this->assertNotEmpty($capturedParams);
 
         // Kirim balik persis payload hasil tangkapan
@@ -713,41 +720,44 @@ class ConfirmDialogTest extends TestCase
             ->test(TransferDetail::class, ['transfer' => $transfer]);
 
         // 1. Shipment
-        $shipAction = null;
-        $shipParams = null;
+        $shipAction = '';
+        $shipParams = [];
         $component->call('requestProcessShipment')
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$shipAction, &$shipParams) {
                 $data = $params[0] ?? $params;
-                $shipAction = $data['action'];
-                $shipParams = $data['params'];
+                $shipAction = (string)($data['action'] ?? '');
+                $shipParams = (array)($data['params'] ?? []);
                 return true;
             });
+        $this->assertNotSame('', $shipAction);
         $component->dispatch($shipAction, ...$shipParams)->assertDispatched('toast:success');
         $this->assertEquals('IN_TRANSIT', $transfer->fresh()->status);
 
         // 2. Receive
-        $rcvAction = null;
-        $rcvParams = null;
+        $rcvAction = '';
+        $rcvParams = [];
         $component->call('requestProcessReceive')
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$rcvAction, &$rcvParams) {
                 $data = $params[0] ?? $params;
-                $rcvAction = $data['action'];
-                $rcvParams = $data['params'];
+                $rcvAction = (string)($data['action'] ?? '');
+                $rcvParams = (array)($data['params'] ?? []);
                 return true;
             });
+        $this->assertNotSame('', $rcvAction);
         $component->dispatch($rcvAction, ...$rcvParams)->assertDispatched('toast:success');
         $this->assertEquals('RECEIVED', $transfer->fresh()->status);
 
         // 3. Close
-        $clsAction = null;
-        $clsParams = null;
+        $clsAction = '';
+        $clsParams = [];
         $component->call('requestCloseTransfer')
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$clsAction, &$clsParams) {
                 $data = $params[0] ?? $params;
-                $clsAction = $data['action'];
-                $clsParams = $data['params'];
+                $clsAction = (string)($data['action'] ?? '');
+                $clsParams = (array)($data['params'] ?? []);
                 return true;
             });
+        $this->assertNotSame('', $clsAction);
         $component->dispatch($clsAction, ...$clsParams)->assertDispatched('toast:success');
         $this->assertEquals('CLOSED', $transfer->fresh()->status);
 
@@ -756,15 +766,16 @@ class ConfirmDialogTest extends TestCase
         $compBatal = Livewire::actingAs($this->user)
             ->test(TransferDetail::class, ['transfer' => $transferBatal]);
 
-        $cancelAction = null;
-        $cancelParams = null;
+        $cancelAction = '';
+        $cancelParams = [];
         $compBatal->call('requestCancelTransfer')
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$cancelAction, &$cancelParams) {
                 $data = $params[0] ?? $params;
-                $cancelAction = $data['action'];
-                $cancelParams = $data['params'];
+                $cancelAction = (string)($data['action'] ?? '');
+                $cancelParams = (array)($data['params'] ?? []);
                 return true;
             });
+        $this->assertNotSame('', $cancelAction);
         $compBatal->dispatch($cancelAction, ...$cancelParams)->assertDispatched('toast:success');
         $this->assertEquals('CANCELLED', $transferBatal->fresh()->status);
     }
@@ -780,8 +791,8 @@ class ConfirmDialogTest extends TestCase
             'operator_name' => $this->user->name,
         ]);
 
-        $cancelAction = null;
-        $cancelParams = null;
+        $cancelAction = '';
+        $cancelParams = [];
 
         $compCancel = Livewire::actingAs($this->user)
             ->test(AuditIndex::class)
@@ -789,11 +800,12 @@ class ConfirmDialogTest extends TestCase
             ->call('requestCancelSession')
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$cancelAction, &$cancelParams) {
                 $data = $params[0] ?? $params;
-                $cancelAction = $data['action'];
-                $cancelParams = $data['params'];
+                $cancelAction = (string)($data['action'] ?? '');
+                $cancelParams = (array)($data['params'] ?? []);
                 return true;
             });
 
+        $this->assertNotSame('', $cancelAction);
         $compCancel->dispatch($cancelAction, ...$cancelParams)->assertDispatched('toast:success');
         $this->assertEquals('CANCELLED', $sessionCancel->fresh()->status);
 
@@ -820,8 +832,8 @@ class ConfirmDialogTest extends TestCase
             'selisih' => 5,
         ]);
 
-        $adjAction = null;
-        $adjParams = null;
+        $adjAction = '';
+        $adjParams = [];
 
         $compAdjust = Livewire::actingAs($this->user)
             ->test(AuditIndex::class)
@@ -829,11 +841,12 @@ class ConfirmDialogTest extends TestCase
             ->call('requestExecuteAdjustment')
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$adjAction, &$adjParams) {
                 $data = $params[0] ?? $params;
-                $adjAction = $data['action'];
-                $adjParams = $data['params'];
+                $adjAction = (string)($data['action'] ?? '');
+                $adjParams = (array)($data['params'] ?? []);
                 return true;
             });
 
+        $this->assertNotSame('', $adjAction);
         $compAdjust->dispatch($adjAction, ...$adjParams)->assertDispatched('toast:success');
         $this->assertEquals('ADJUSTED', $sessionAdjust->fresh()->status);
         $stokTerkini = StokLokasi::where(['produk_id' => $this->produk->id, 'lokasi_id' => $this->gudangAsal->id])->first();
@@ -854,20 +867,20 @@ class ConfirmDialogTest extends TestCase
             'total_stok' => 0,
         ]);
 
-        $capturedAction = null;
-        $capturedParams = null;
+        $capturedAction = '';
+        $capturedParams = [];
 
         $component = Livewire::actingAs($this->user)
             ->test(StockMasterIndex::class)
             ->call('destroy', $newProduct->id)
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$capturedAction, &$capturedParams) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'];
-                $capturedParams = $data['params'];
+                $capturedAction = (string)($data['action'] ?? '');
+                $capturedParams = (array)($data['params'] ?? []);
                 return true;
             });
 
-        $this->assertNotNull($capturedAction);
+        $this->assertNotSame('', $capturedAction);
         $this->assertNotEmpty($capturedParams);
 
         $component->dispatch($capturedAction, ...$capturedParams)
@@ -885,20 +898,20 @@ class ConfirmDialogTest extends TestCase
             'is_active' => true,
         ]);
 
-        $capturedAction = null;
-        $capturedParams = null;
+        $capturedAction = '';
+        $capturedParams = [];
 
         $component = Livewire::actingAs($this->user)
             ->test(LokasiIndex::class)
             ->call('destroy', $lokasi->id)
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$capturedAction, &$capturedParams) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'];
-                $capturedParams = $data['params'];
+                $capturedAction = (string)($data['action'] ?? '');
+                $capturedParams = (array)($data['params'] ?? []);
                 return true;
             });
 
-        $this->assertNotNull($capturedAction);
+        $this->assertNotSame('', $capturedAction);
         $this->assertNotEmpty($capturedParams);
 
         $component->dispatch($capturedAction, ...$capturedParams)
@@ -914,20 +927,20 @@ class ConfirmDialogTest extends TestCase
             'kontak' => '0899999999',
         ]);
 
-        $capturedAction = null;
-        $capturedParams = null;
+        $capturedAction = '';
+        $capturedParams = [];
 
         $component = Livewire::actingAs($this->user)
             ->test(PelangganIndex::class)
             ->call('destroy', $pelanggan->id)
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$capturedAction, &$capturedParams) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'];
-                $capturedParams = $data['params'];
+                $capturedAction = (string)($data['action'] ?? '');
+                $capturedParams = (array)($data['params'] ?? []);
                 return true;
             });
 
-        $this->assertNotNull($capturedAction);
+        $this->assertNotSame('', $capturedAction);
         $this->assertNotEmpty($capturedParams);
 
         $component->dispatch($capturedAction, ...$capturedParams)
@@ -943,20 +956,20 @@ class ConfirmDialogTest extends TestCase
             'kontak' => '0877777777',
         ]);
 
-        $capturedAction = null;
-        $capturedParams = null;
+        $capturedAction = '';
+        $capturedParams = [];
 
         $component = Livewire::actingAs($this->user)
             ->test(SupplierIndex::class)
             ->call('destroy', $supplier->id)
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$capturedAction, &$capturedParams) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'];
-                $capturedParams = $data['params'];
+                $capturedAction = (string)($data['action'] ?? '');
+                $capturedParams = (array)($data['params'] ?? []);
                 return true;
             });
 
-        $this->assertNotNull($capturedAction);
+        $this->assertNotSame('', $capturedAction);
         $this->assertNotEmpty($capturedParams);
 
         $component->dispatch($capturedAction, ...$capturedParams)
@@ -975,20 +988,20 @@ class ConfirmDialogTest extends TestCase
             'is_active' => true,
         ]);
 
-        $capturedAction = null;
-        $capturedParams = null;
+        $capturedAction = '';
+        $capturedParams = [];
 
         $component = Livewire::actingAs($this->user)
             ->test(PengkodeanIndex::class)
             ->call('destroy', $aturan->id)
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$capturedAction, &$capturedParams) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'];
-                $capturedParams = $data['params'];
+                $capturedAction = (string)($data['action'] ?? '');
+                $capturedParams = (array)($data['params'] ?? []);
                 return true;
             });
 
-        $this->assertNotNull($capturedAction);
+        $this->assertNotSame('', $capturedAction);
         $this->assertNotEmpty($capturedParams);
 
         $component->dispatch($capturedAction, ...$capturedParams)
@@ -1007,20 +1020,20 @@ class ConfirmDialogTest extends TestCase
         ]);
         $operator->assignRole('operator_gudang');
 
-        $capturedAction = null;
-        $capturedParams = null;
+        $capturedAction = '';
+        $capturedParams = [];
 
         $component = Livewire::actingAs($this->user)
             ->test(UserManagementIndex::class)
             ->call('requestDeleteUser', $operator->id)
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$capturedAction, &$capturedParams) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'];
-                $capturedParams = $data['params'];
+                $capturedAction = (string)($data['action'] ?? '');
+                $capturedParams = (array)($data['params'] ?? []);
                 return true;
             });
 
-        $this->assertNotNull($capturedAction);
+        $this->assertNotSame('', $capturedAction);
         $this->assertNotEmpty($capturedParams);
 
         $component->dispatch($capturedAction, ...$capturedParams)
@@ -1243,19 +1256,20 @@ class ConfirmDialogTest extends TestCase
             'data_dimasukan_oleh' => $this->user->name,
         ]);
 
-        $capturedAction = null;
-        $capturedParams = null;
+        $capturedAction = '';
+        $capturedParams = [];
 
         $component = Livewire::actingAs($admin)
             ->test(PembelianIndex::class)
             ->call('destroy', $bm->id)
             ->assertDispatched('alert:confirm', function ($event, $params) use (&$capturedAction, &$capturedParams) {
                 $data = $params[0] ?? $params;
-                $capturedAction = $data['action'];
-                $capturedParams = $data['params'];
+                $capturedAction = (string)($data['action'] ?? '');
+                $capturedParams = (array)($data['params'] ?? []);
                 return true;
             });
 
+        $this->assertNotSame('', $capturedAction);
         // Dialog sudah muncul => eksekusi tidak boleh 403
         $component->dispatch($capturedAction, ...$capturedParams)
             ->assertDispatched('toast:success');

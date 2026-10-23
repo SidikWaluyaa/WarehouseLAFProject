@@ -114,6 +114,12 @@ class Create extends Component
             abort(403, 'Unauthorized action.');
         }
 
+        $hasValidQty = collect($this->items)->contains(fn ($item) => (int)($item['qty_requested'] ?? 0) > 0);
+        if (!$hasValidQty) {
+            $this->alertError("Transfer order harus memiliki minimal satu item dengan kuantitas lebih dari 0.");
+            return;
+        }
+
         $this->validate();
 
         try {
@@ -132,7 +138,7 @@ class Create extends Component
             \Illuminate\Support\Facades\Log::error("Database Error in Transfer/Create: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             $this->alertError("Terjadi kesalahan pada server. Silakan coba lagi atau hubungi administrator.");
         } catch (Exception $e) {
-            $this->alertError("Gagal membuat Transfer Order: " . $e->getMessage());
+            $this->alertError($e->getMessage());
         }
     }
 

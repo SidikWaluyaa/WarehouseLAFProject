@@ -30,6 +30,20 @@ class Detail extends Component
         $this->transfer = $transfer->load(['lokasiAsal', 'lokasiTujuan', 'details.produk']);
     }
 
+    private function checkShipmentGuard(): ?string
+    {
+        if ($this->transfer->status !== 'DRAFT') {
+            return "Transfer order tidak dapat diproses karena statusnya bukan DRAFT.";
+        }
+
+        $hasValidQty = $this->transfer->details->contains(fn ($detail) => (int)$detail->qty_requested > 0);
+        if (!$hasValidQty) {
+            return "Transfer order tidak dapat dikirim karena tidak memiliki item dengan kuantitas lebih dari 0.";
+        }
+
+        return null;
+    }
+
     public function requestProcessShipment(): void
     {
         /** @var \App\Models\User|null $user */
@@ -38,8 +52,9 @@ class Detail extends Component
             abort(403, 'Unauthorized action.');
         }
 
-        if ($this->transfer->status !== 'DRAFT') {
-            $this->alertError("Transfer order tidak dapat diproses karena statusnya bukan DRAFT.");
+        $guardError = $this->checkShipmentGuard();
+        if ($guardError) {
+            $this->alertError($guardError);
             return;
         }
 
@@ -73,8 +88,9 @@ class Detail extends Component
 
         $this->transfer = $this->transfer->fresh(['lokasiAsal', 'lokasiTujuan', 'details.produk']);
 
-        if ($this->transfer->status !== 'DRAFT') {
-            $this->alertError("Hanya transfer berstatus DRAFT yang dapat diproses kirim.");
+        $guardError = $this->checkShipmentGuard();
+        if ($guardError) {
+            $this->alertError($guardError);
             return;
         }
 

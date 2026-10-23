@@ -41,6 +41,11 @@ class TransferService
     {
         try {
             return DB::transaction(function () use ($data) {
+                $validItems = collect($data['items'] ?? [])->filter(fn ($item) => (int)($item['qty_requested'] ?? 0) > 0);
+                if ($validItems->isEmpty()) {
+                    throw new Exception("Transfer order harus memiliki minimal satu item dengan kuantitas lebih dari 0.");
+                }
+
                 $nomorTransfer = $data['nomor_transfer'] ?? self::generateNomorTransfer($data['tanggal']);
 
                 $header = TransferHeader::create([
@@ -106,6 +111,11 @@ class TransferService
                 }
 
                 $details = TransferDetail::where('transfer_header_id', $header->id)->get();
+
+                $validDetails = $details->filter(fn ($d) => (int)$d->qty_requested > 0);
+                if ($validDetails->isEmpty()) {
+                    throw new Exception("Transfer order tidak dapat dikirim karena tidak memiliki item dengan kuantitas lebih dari 0.");
+                }
 
                 $oldHeaderData = $header->toArray();
                 $oldDetailsData = $details->toArray();
