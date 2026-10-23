@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property \Illuminate\Support\Carbon $tanggal
  * @property string $tipe_nota
- * @property int|null $pelanggan_id
- * @property string $nomor_nota
+ * @property int $pelanggan_id
+ * @property string|null $nomor_nota
  * @property string|null $keterangan_tambahan
  * @property string|null $resi_ekspedisi
  * @property string|null $kurir
@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Pelanggan|null $pelanggan
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BarangKeluarDetail> $details
+ * @property-read int|null $details_count
  */
 class BarangKeluar extends Model
 {
